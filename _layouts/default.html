@@ -5,7 +5,7 @@ layout: compress
 {% include base_path %}
 
 <!doctype html>
-<html lang="{{ site.locale | slice: 0,2 }}" class="no-js">
+<html lang="{{ site.locale | slice: 0,2 }}">
 
 <head>
   {% include head.html %}
@@ -25,23 +25,23 @@ layout: compress
       },
     };
   </script>
-  <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
 <body>
 
-  {% include browser-upgrade.html %}
   {% include masthead.html %}
 
-  {{ content }}
+  <main class="site-main" role="main">
+    {{ content }}
+  </main>
 
-  <div class="page__footer">
-    <footer>
+  <footer class="site-foot">
+    <div class="col">
       {% include footer/custom.html %}
       {% include footer.html %}
-    </footer>
-  </div>
+    </div>
+  </footer>
 
   {% include scripts.html %}
 

@@ -1,145 +1,44 @@
-<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Distinct Distances and Property B</title>
-            <style>
-/* From extension vscode.github */
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+<!doctype html>
+<html lang="en" data-shell="venillalemon">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Distinct Distances and Property B &middot; venillalemon</title>
+<link rel="icon" href="/images/favicon.ico">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+<link rel="stylesheet" href="/assets/css/post.css">
+</head>
+<body>
 
-.vscode-dark img[src$=\#gh-light-mode-only],
-.vscode-light img[src$=\#gh-dark-mode-only],
-.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
-.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
-	display: none;
-}
+<header class="site-head">
+  <div class="col site-head__bar">
+    <a class="brand" href="/">venillalemon</a>
+    <nav class="site-nav">
+      <a href="/">About</a>
+      <a href="/blog/">Blog Posts</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light / dark theme">&#9689; theme</button>
+    </nav>
+  </div>
+</header>
 
-</style>
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
-<style>
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
-                font-size: 14px;
-                line-height: 1.6;
-            }
-        </style>
-        <style>
-.task-list-item {
-    list-style-type: none;
-}
+<main class="site-main">
+  <div class="col">
+    <div class="post-head">
+      <p class="eyebrow">May 21, 2025 · Markdown notes</p>
+      <h1>Distinct Distances and Property B</h1>
+      <hr class="rule">
+    </div>
 
-.task-list-item-checkbox {
-    margin-left: -20px;
-    vertical-align: middle;
-    pointer-events: none;
-}
-</style>
-<style>
-:root {
-  --color-note: #0969da;
-  --color-tip: #1a7f37;
-  --color-warning: #9a6700;
-  --color-severe: #bc4c00;
-  --color-caution: #d1242f;
-  --color-important: #8250df;
-}
-
-</style>
-<style>
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-note: #2f81f7;
-    --color-tip: #3fb950;
-    --color-warning: #d29922;
-    --color-severe: #db6d28;
-    --color-caution: #f85149;
-    --color-important: #a371f7;
-  }
-}
-
-</style>
-<style>
-.markdown-alert {
-  padding: 0.5rem 1rem;
-  margin-bottom: 16px;
-  color: inherit;
-  border-left: .25em solid #888;
-}
-
-.markdown-alert>:first-child {
-  margin-top: 0
-}
-
-.markdown-alert>:last-child {
-  margin-bottom: 0
-}
-
-.markdown-alert .markdown-alert-title {
-  display: flex;
-  font-weight: 500;
-  align-items: center;
-  line-height: 1
-}
-
-.markdown-alert .markdown-alert-title .octicon {
-  margin-right: 0.5rem;
-  display: inline-block;
-  overflow: visible !important;
-  vertical-align: text-bottom;
-  fill: currentColor;
-}
-
-.markdown-alert.markdown-alert-note {
-  border-left-color: var(--color-note);
-}
-
-.markdown-alert.markdown-alert-note .markdown-alert-title {
-  color: var(--color-note);
-}
-
-.markdown-alert.markdown-alert-important {
-  border-left-color: var(--color-important);
-}
-
-.markdown-alert.markdown-alert-important .markdown-alert-title {
-  color: var(--color-important);
-}
-
-.markdown-alert.markdown-alert-warning {
-  border-left-color: var(--color-warning);
-}
-
-.markdown-alert.markdown-alert-warning .markdown-alert-title {
-  color: var(--color-warning);
-}
-
-.markdown-alert.markdown-alert-tip {
-  border-left-color: var(--color-tip);
-}
-
-.markdown-alert.markdown-alert-tip .markdown-alert-title {
-  color: var(--color-tip);
-}
-
-.markdown-alert.markdown-alert-caution {
-  border-left-color: var(--color-caution);
-}
-
-.markdown-alert.markdown-alert-caution .markdown-alert-title {
-  color: var(--color-caution);
-}
-
-</style>
-        
-        </head>
-        <body class="vscode-body vscode-light">
-            <h1 id="distinct-distances-and-property-b">Distinct Distances and Property B</h1>
+    <article class="prose vscode" data-src="vscode">
 <p><em>Lecture Notes for CS477 combinatorics on 2025/05/21</em></p>
 <h3 id="contd-distinct-distances">cont'd: distinct distances</h3>
 <p>目标：有一个点能看到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≥</mo><msup><mi>n</mi><mn>0.8</mn></msup></mrow><annotation encoding="application/x-tex">\geq n^{0.8}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.8</span></span></span></span></span></span></span></span></span></span></span></span> 的距离，反设每个点看到的距离数量都小于 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>n</mi><mn>0.8</mn></msup></mrow><annotation encoding="application/x-tex">n^{0.8}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.8</span></span></span></span></span></span></span></span></span></span></span></span>，假设这个数 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≤</mo><mi>M</mi><mo>=</mo><mi>ϵ</mi><msup><mi>n</mi><mn>0.8</mn></msup></mrow><annotation encoding="application/x-tex">\leq M=\epsilon n^{0.8}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord mathnormal">ϵ</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0.8</span></span></span></span></span></span></span></span></span></span></span></span>, 欲导出矛盾.</p>
@@ -259,5 +158,37 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 
             <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
             
-        </body>
-        </html>
+        </article>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="col">
+    <div class="site-foot__links">
+      <a href="/blog/">&larr; All posts</a>
+      <a href="https://github.com/venillalemon">GitHub</a>
+      <a href="mailto:lifangke@sjtu.edu.cn">Email</a>
+    </div>
+    <div>Fangke Li (Mike Li) &middot; May 21, 2025</div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    function current() {
+      return root.getAttribute('data-theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    }
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var next = current() === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

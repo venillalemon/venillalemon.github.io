@@ -2,7 +2,7 @@
 layout: archive
 permalink: /blog/
 title: "Blog"
-author_profile: true
+author_profile: false
 ---
 
 {% include base_path %}
@@ -10,6 +10,7 @@ author_profile: true
 {% capture written_year %}None{% endcapture %}
 {% assign has_exported_posts = false %}
 
+<div class="post-list">
 {% for file in sorted_static_files %}
   {% if file.extname == '.html' and file.path contains '/files/' %}
     {% assign has_exported_posts = true %}
@@ -23,22 +24,25 @@ author_profile: true
     {% endif %}
 
     {% if year != written_year %}
-      <h2 id="{{ year | slugify }}" class="archive__subtitle">{{ year }}</h2>
+      <h2 class="year-head" id="{{ year | slugify }}">{{ year }}</h2>
       {% capture written_year %}{{ year }}{% endcapture %}
     {% endif %}
 
-    <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
-      <h2 class="archive__item-title" itemprop="headline">
-        <a href="{{ base_path }}{{ file.path }}" rel="permalink">{{ display_title }}</a>
-      </h2>
-      <p class="page__date">
-        <strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Published:" }}</strong>
+    <article class="post-item" itemscope itemtype="http://schema.org/CreativeWork">
+      <h3 class="post-item__title" itemprop="headline">
+        {%- comment -%} upper-case the first letter, keep the rest as the filename has it {%- endcomment -%}
+        {%- assign title_head = display_title | slice: 0 | upcase -%}
+        {%- assign title_tail = display_title | slice: 1, 200 -%}
+        <a href="{{ base_path }}{{ file.path }}" rel="permalink">{{ title_head }}{{ title_tail }}</a>
+      </h3>
+      <p class="post-item__meta">
         <time datetime="{{ file_date }}">{{ file_date }}</time>
       </p>
     </article>
   {% endif %}
 {% endfor %}
+</div>
 
 {% unless has_exported_posts %}
-  <p>No exported HTML posts found in <code>files/</code>.</p>
+  <p class="empty-note">No exported HTML posts found in <code>files/</code>.</p>
 {% endunless %}

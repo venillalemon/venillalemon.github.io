@@ -1,0 +1,8 @@
+# Local development overrides.
+#   bundle exec jekyll serve --config _config.yml,_config.dev.yml
+#
+# Without this, `url` still points at the production domain and every
+# stylesheet / link built from `base_path` would load from the live site
+# instead of the local server.
+url: "http://localhost:4000"
+baseurl: ""
