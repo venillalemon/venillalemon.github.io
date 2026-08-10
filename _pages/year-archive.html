@@ -33,7 +33,8 @@ author_profile: false
         {%- comment -%} upper-case the first letter, keep the rest as the filename has it {%- endcomment -%}
         {%- assign title_head = display_title | slice: 0 | upcase -%}
         {%- assign title_tail = display_title | slice: 1, 200 -%}
-        <a href="{{ base_path }}{{ file.path }}" rel="permalink">{{ title_head }}{{ title_tail }}</a>
+        {%- comment -%} titles keep their punctuation, so & and ' must be escaped here {%- endcomment -%}
+        <a href="{{ base_path }}{{ file.path | escape }}" rel="permalink">{{ title_head | escape }}{{ title_tail | escape }}</a>
       </h3>
       <p class="post-item__meta">
         <time datetime="{{ file_date }}">{{ file_date }}</time>

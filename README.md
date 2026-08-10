@@ -1,6 +1,6 @@
 # venillalemon.github.io
 
-Personal site of Fangke Li (Mike Li) — Jekyll, hosted on GitHub Pages.
+Personal site of Fangke Li — Jekyll, hosted on GitHub Pages.
 
 ## Layout
 
@@ -26,6 +26,42 @@ It keeps the exported body verbatim and swaps the surrounding document for the
 site's header, footer and stylesheet. It is idempotent — re-run it after any
 change to `post.css` or the post chrome. Both VS Code Markdown and Notion
 exports are handled. The blog index picks the file up automatically.
+
+## Writing a post in Markdown
+
+```bash
+pip install markdown pygments
+```
+
+```bash
+python3 _tools/md_to_post.py notes/turan.md
+```
+
+Front matter is optional and only `title` / `date` are read:
+
+```markdown
+---
+title: Turán's Theorem
+date: 2026-08-09
+---
+```
+
+Otherwise the title comes from the first `# heading` (which is then lifted into
+the post header, not repeated in the body), and the date from a `YYYY_MM_DD_`
+filename prefix, else today. `--title`, `--date` and `--out` override.
+
+Supported: headings (with anchor ids), `*em*` `**strong**` `~~del~~`, links and
+reference links, images, nested lists, task lists (`- [ ]` / `- [x]`), pipe
+tables, fenced and indented code (highlighted by Pygments), blockquotes, `---`
+rules, footnotes, definition lists, abbreviations, `{: #id }` on headings, raw
+HTML, two-space hard line breaks, and smart quotes/dashes. Math stays as
+`$...$`, `$$...$$`, `\(...\)`, `\[...\]` and is rendered by KaTeX in the browser.
+
+Not supported — these stay literal: bare-URL autolinking (write `[text](url)`),
+GitHub `> [!NOTE]` alerts, `:emoji:` shortcodes, and LaTeX macro preambles
+(`\def` / `\newcommand` definitions do not carry from one `$…$` to the next).
+Image paths must be site-absolute (`/images/x.png`), since posts are served
+from `/files/`.
 
 ## Running locally
 

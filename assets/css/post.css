@@ -102,6 +102,7 @@ math{font-family:var(--math)}
   border-left:3px solid var(--accent);
 }
 .prose blockquote p{margin:8px 0}
+.prose del{color:var(--faint);text-decoration-color:var(--faint)}
 .prose dl{margin:14px 0}
 .prose dt{font-weight:600;margin-top:10px}
 .prose dd{margin:2px 0 0 22px;color:var(--soft)}
@@ -134,10 +135,28 @@ math{font-family:var(--math)}
 .hljs-emphasis{font-style:italic}
 .hljs-strong{font-weight:700}
 
+/* ------------------------------------------ syntax highlighting (pygments) */
+.highlight pre{margin:0;border:0;background:none;padding:0}
+.highlight .c,.highlight .c1,.highlight .cm,.highlight .ch,.highlight .cs,
+.highlight .cp,.highlight .cpf{color:var(--faint);font-style:italic}
+.highlight .k,.highlight .kc,.highlight .kd,.highlight .kn,.highlight .kp,
+.highlight .kr,.highlight .kt,.highlight .ow,.highlight .bp,
+.highlight .nb{color:var(--accent);font-weight:600}
+.highlight .s,.highlight .s1,.highlight .s2,.highlight .sa,.highlight .sb,
+.highlight .sc,.highlight .sd,.highlight .se,.highlight .sh,.highlight .si,
+.highlight .sr,.highlight .ss,.highlight .sx,
+.highlight .m,.highlight .mb,.highlight .mf,.highlight .mh,.highlight .mi,
+.highlight .mo,.highlight .il{color:var(--soft)}
+.highlight .nc,.highlight .nd,.highlight .nf,.highlight .ne,.highlight .nn,
+.highlight .fm{color:var(--ink);font-weight:600}
+.highlight .err{color:inherit}
+
 /* ------------------------------------- markup from VS Code markdown export */
 .prose[data-src="vscode"] > :first-child{margin-top:0}
 .prose .task-list-item{list-style-type:none}
-.prose .task-list-item-checkbox{margin-left:-20px;vertical-align:middle;pointer-events:none}
+.prose .task-list-item-checkbox{
+  margin:0 7px 0 -20px;vertical-align:baseline;pointer-events:none;accent-color:var(--accent);
+}
 .markdown-alert{
   padding:6px 18px;margin:16px 0;border-radius:6px;background:var(--panel);
   border:1px solid var(--line);border-left:4px solid var(--accent);
@@ -150,12 +169,58 @@ math{font-family:var(--math)}
 .markdown-alert>:last-child{margin-bottom:0}
 .markdown-alert .octicon{fill:currentColor;vertical-align:text-bottom}
 
+/* embedded PDF reader (posts that are just a paper) */
+.prose .pdfview{
+  height:clamp(420px,84vh,1000px);margin:20px 0;background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;overflow:hidden;
+}
+.prose .pdfview object,.prose .pdfview iframe{display:block;width:100%;height:100%;border:0}
+.prose .pdfnote{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.03em}
+@media (max-width:640px){ .prose .pdfview{height:clamp(360px,70vh,700px)} }
+
+/* transcribed theorem / lemma / proof blocks (see the Gaussian-sampling note) */
+.prose .thm{
+  background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:8px;padding:2px 20px 12px;margin:20px 0;
+}
+.prose .thm-h{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;
+  font-weight:600;color:var(--accent);margin:14px 0 2px;
+}
+.prose .thm p{margin:9px 0}
+.prose .thm ol{margin:8px 0}
+.prose .thm .katex-display{margin:10px 0}
+
+/* collapsible proofs: click the label to unfold */
+.prose details.proof > summary{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;
+  font-weight:600;color:var(--accent);cursor:pointer;list-style:none;padding:11px 0;
+  transition:color .15s ease;
+}
+.prose details.proof > summary::-webkit-details-marker{display:none}
+.prose details.proof > summary::before{content:"\25B8\00a0"}
+.prose details.proof[open] > summary::before{content:"\25BE\00a0"}
+.prose details.proof > summary:hover{color:var(--ink)}
+.prose details.proof p{margin:9px 0}
+/* standalone: its own panel, like a theorem block */
+.prose details.proof.standalone{
+  background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:8px;padding:2px 20px;margin:20px 0;
+}
+.prose details.proof.standalone[open]{padding-bottom:12px}
+/* nested inside a theorem block: just a divider, no second panel */
+.prose .thm details.proof{border-top:1px solid var(--line);margin:12px 0 2px}
+.prose .thm details.proof[open]{padding-bottom:4px}
+
 /* ---------------------------------------- markup from Notion HTML export */
 .prose.notion{white-space:pre-wrap}
 .prose.notion .page-body > div{white-space:pre-wrap}
 .prose.notion pre,.prose.notion code{white-space:pre}
 .prose.notion header,.prose.notion .page-description:empty{display:none}
 .prose.notion .page-body > div[style*="display:contents"]{display:contents}
+/* the post header already draws a rule; don't stack a second one on the
+   opening heading (a split-out lecture starts straight on its <h2>) */
+.prose.notion .page-body > div:first-child h2{border-top:0;padding-top:0;margin-top:6px}
 .prose.notion p,.prose.notion .text{margin:13px 0}
 .prose.notion ul.bulleted-list,.prose.notion ol.numbered-list{margin:10px 0;padding-left:24px}
 .prose.notion ul.bulleted-list{list-style:disc}
