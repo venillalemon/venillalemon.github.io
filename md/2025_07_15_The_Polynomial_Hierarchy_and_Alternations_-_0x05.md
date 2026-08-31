@@ -1,0 +1,55 @@
+# The Polynomial Hierarchy and Alternations - 0x05
+
+*July 15, 2025*
+
+motivation: 考虑某个 $\mathbf{NP}$ 语言 $L$ ，它的定义为对任意一个 instance $x$, 存在一个多项式 $p$ 和一个 verifier $V$ ， $x\in L\iff \exists u\in\{0,1\}^{p(|x|)}, V(x,u)=1$.
+
+例如 $INDSET=\{\langle G,k\rangle:G\text{ has an independent set of size }=k\}$ 是一个 $\mathbf{NP}$ 语言，因为取 witness 为某个大于 $k$ 的独立集即可验证.
+
+然而有些语言不够，例如 $ALPHA=\{\langle G,k\rangle:\alpha(G)=k\}$, 一个足够的 witness 不仅仅要给出一个 $k$ -独立集，还要让 verifier 相信大于 $k$ 的顶点集都不独立. 后者所需的长度至多是 ${n\choose k+1}$ (因为只需要看 $k+1$ 子集就行了).
+
+我们需要更强的描述！
+
+## Polynomial Hierarchy
+
+![](https://notes.sjtu.edu.cn/uploads/upload_cead44e4b9eedfc3c96fc9602bf236c9.png)
+
+$ALPHA\in\mathbf{\Sigma}_2^p$, 一个 verifier 只需要 check 输入的两个 witness $S_1$ 是 $k$ 独立集、 $S_2$ 是 $k+1$ 非独立即可.
+
+观察定义，可以看到 $\mathbf{NP}\cup\mathbf{coNP}\subset\mathbf{\Sigma}_2^p$, 因此 $\mathbf{\Sigma}$ 是 $\mathbf{NP}$ 的扩充, $\mathbf{\Sigma}_1^p=\mathbf{NP}$, $\mathbf{\Pi}_1^p=\mathbf{coNP}$. 或许也可以说 $\mathbf{\Sigma}_0^p=\mathbf{\Pi}_0^p=\mathbf{P}$.
+
+### properties
+
+首先我们可以得到 $\mathbf{\Sigma}_i^p\subseteq\mathbf{\Pi}_{i+1}^p\subseteq\mathbf{\Sigma}_{i+2}^p$, 因为对于一个 $i$ 层的 verifier，总存在一个 $i+1$ 层的 verifier 和它干同样的事情.
+
+![](https://notes.sjtu.edu.cn/uploads/upload_f63460c01382764cf2fc18c8d8526328.png)
+
+**Pf. for 1.** Assuming $\mathbf{\Sigma}_i^p=\mathbf{\Pi}_{i}^p$, by induction on $j\geq i$ we proof that $\mathbf{\Sigma}_j^p,\mathbf{\Pi}_j^p\subseteq\mathbf{\Sigma}_i^p$. For $j=i$ it is true, and we assume for all $i\leq j\lt k$ it is true. Consider $j=k$. If $\mathbf{\Sigma}_k^p\subseteq\mathbf{\Sigma}_i^p$ ， then $\mathbf{\Pi}_k^p\subseteq\mathbf{\Pi}_i^p$. So the goal is to prove $\mathbf{\Sigma}_k^p\subseteq\mathbf{\Sigma}_i^p$.
+
+接下来和下面所示的步骤相同.
+
+**Pf. for 2.**![](https://notes.sjtu.edu.cn/uploads/upload_d1bc2a4d73aae6f793430fc70144941a.png)
+
+**Thm 1.** 如果对于某一 $i\in\mathbb{N}$, $\mathbf{\Sigma}_i^p=\mathbf{\Sigma}_{i+1}^p$, 那么 $\mathbf{PH}=\mathbf{\mathbf{\Sigma}}_i^p$
+
+**Pf.** We know that $\mathbf{\Sigma}_i^p\subseteq\mathbf{\Pi}_{i+1}^p=\mathbf{\Pi}_{i}^p$, the second equality follows from $\mathbf{\Sigma}_i^p=\mathbf{\Sigma}_{i+1}^p$. Similarly $\mathbf{\Pi}_i^p\subseteq\mathbf{\Sigma}_{i+1}^p=\mathbf{\Sigma}_{i}^p$. The conclusion follows from **Theorem 5.4**.
+
+## $\mathbf{PH}$ -complete
+
+![](https://notes.sjtu.edu.cn/uploads/upload_f6b5f32c9b0b3b7afc5beeacbe4fbd47.png)
+
+In addition, $\mathbf{PH}\subseteq\mathbf{PSPACE}$.
+
+If $\mathbf{PH}=\mathbf{PSPACE}$, then $TQBF$ would be $\mathbf{PH}$ -complete which causes the hierarchy to collapse.
+
+## Alternating TM
+
+## Oracle Machines
+
+---
+
+### 参考资料
+
+- [1] Sanjeev Arora and Boaz Barak. [Computational Complexity: A Modern Approach](http://venillalemon.github.io/books/ccama.pdf). Cambridge University Press, USA, 1st edition, 2009.
+
+- [2] Sipser, M. [Introduction to the Theory of Computation](http://venillalemon.github.io/books/itc.pdf). Thomson Course Technology, Boston, 3rd edition, 2012.

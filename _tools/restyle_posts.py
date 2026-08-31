@@ -167,6 +167,9 @@ def build(basename, title, iso_date, human_date, flavour, body, title_html=None)
   }})();
 </script>
 
+<script data-goatcounter="https://venillalemon.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
 </body>
 </html>
 """

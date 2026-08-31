@@ -108,9 +108,8 @@ social:
 
 # Analytics
 analytics:
-  provider               : false # false (default), "google", "google-universal", "google-analytics-4", "custom"
-  google:
-    tracking_id          :
+  provider               : "custom" # GoatCounter, wired in _includes/analytics-providers/custom.html
+  goatcounter            : venillalemon # the SUBDOMAIN in https://SUBDOMAIN.goatcounter.com
 
 
 # Reading Files
@@ -135,6 +134,7 @@ exclude:
   - config
   - gulpfile.js
   - log
+  - md
   - node_modules
   - package.json
   - tmp

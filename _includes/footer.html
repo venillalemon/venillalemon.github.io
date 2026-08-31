@@ -2,10 +2,19 @@
 
 <div class="site-foot__links">
   {% if site.author.github %}<a href="https://github.com/{{ site.author.github }}">GitHub</a>{% endif %}
-  {% if site.author.email %}<a href="mailto:{{ site.author.email }}">Email</a>{% endif %}
+  {% if site.author.email %}{% assign email_parts = site.author.email | split: "@" %}<a href="#contact" class="js-email" data-u="{{ email_parts[0] }}" data-d="{{ email_parts[1] }}">Email</a>{% endif %}
   {% if site.atom_feed.hide != true %}<a href="{% if site.atom_feed.path %}{{ site.atom_feed.path }}{% else %}{{ base_path }}/feed.xml{% endif %}">Feed</a>{% endif %}
   <a href="{{ base_path }}/blog/">Blog</a>
-  <a href="{{ base_path }}/sitemap/">Sitemap</a>
 </div>
 
 <div>&copy; {{ site.time | date: '%Y' }} {{ site.name | default: site.title }} &middot; built with <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a></div>
+
+<script>
+  /* de-obfuscate email links: address is split into data-u / data-d so the
+     full mailto never appears in the HTML source */
+  document.querySelectorAll('.js-email').forEach(function (a) {
+    var addr = a.dataset.u + '@' + a.dataset.d;
+    a.href = 'mailto:' + addr;
+    if (a.textContent.indexOf('[at]') !== -1) a.textContent = addr;
+  });
+</script>

@@ -12,6 +12,7 @@ Personal site of Fangke Li — Jekyll, hosted on GitHub Pages.
 | `assets/css/site.css` | theme for the Jekyll pages |
 | `assets/css/post.css` | theme for the exported posts |
 | `_tools/restyle_posts.py` | re-shells `files/*.html` into the site style |
+| `md/` | Markdown sources kept as backups — excluded from the build, never published |
 | `markdown_generator/`, `talkmap.py` | generators kept from the original template |
 
 ## Adding a post
@@ -65,19 +66,31 @@ from `/files/`.
 
 ## Running locally
 
-The system Ruby is too old for this Gemfile; use a modern one (e.g.
-`brew install ruby@3.1`):
+### Install (once)
+
+The macOS system Ruby (2.6) is too old for this Gemfile — it can't even run the
+required bundler. Install a modern Ruby via Homebrew and let bundler fetch the
+gems:
 
 ```bash
-export PATH="/opt/homebrew/opt/ruby@3.1/bin:$PATH" && bundle install
+brew install ruby@3.1
+export PATH="/opt/homebrew/opt/ruby@3.1/bin:$PATH"
+bundle install
 ```
 
+### Run
+
 ```bash
-export PATH="/opt/homebrew/opt/ruby@3.1/bin:$PATH" && bundle exec jekyll serve --config _config.yml,_config.dev.yml --livereload
+export PATH="/opt/homebrew/opt/ruby@3.1/bin:$PATH"
+bundle exec jekyll serve --config _config.yml,_config.dev.yml --livereload
 ```
+
+Then open <http://127.0.0.1:4000>. The `export PATH` line is needed in every
+new shell (or add it to `~/.zshrc` to make it permanent).
 
 `_config.dev.yml` points `url` at `localhost:4000`; without it the local build
-loads its CSS from the production domain.
+loads its CSS from the production domain. Drop `--livereload` if you don't want
+auto-refresh; use `bundle exec jekyll build` to just build into `_site/`.
 
 ## Credit
 

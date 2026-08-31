@@ -1,0 +1,192 @@
+# Modal Logic
+
+*July 12, 2025*
+
+## Intuition
+
+Modes of Truth: 命题逻辑和谓词逻辑不允许真/假之外的可能性，然而自然语言允许。例如“永远为真”“知道为真”“相信为真”。LTL 和 CTL 就是这样的，它们是 Modal Logic 的特例。又例如对于交互式的 agent 来说，模态逻辑是一种帮助我们形式化的方法。
+
+> Our main case study will be the logic of knowledge in a multi-agent system.
+
+## Syntax
+
+简单将谓词逻辑（即 First-Order Logic）的存在/任意，替换成 box $\Box$ 和 diamond $\Diamond$ 。
+
+## Semantics
+
+模态逻辑的**模型**为一个 4-tuple $\mathcal{M}=(W,R,AP,L)$ ：
+
+- 集合 $W$, 其中元素称为“世界”（这个称呼很怪，不知道是不是翻译问题，第一反应“一花一世界”）（如果称呼 $W$ 为宇宙 universe 或许说得通，事实上 Ebbinghaus 的一阶逻辑中就是这么做的）
+
+- $R\subset W\times W$ 可达关系
+
+- $AP$ 原子命题
+
+- $L:W\mapsto \mathcal{P}(AP)$ 标识函数
+
+这里 $R$ 只是一个普通的子集，因此只能看作有向图，如果 $R(x,y)$ 那么称 $y$ 为一个可达世界.
+
+可满足性的定义： $\mathcal{M}=(W,R,L)$, $x\in W$
+
+- $x\vdash \top$
+
+- $x\not\vdash \bot$
+
+- $x\vdash p\iff p\in L(x)$
+
+- not and or imply iff 和 FO 一样
+
+- $x\vdash p\iff p\in L(x)$
+
+- $x\vdash \Box\psi\iff\text{for all } y\in W,\;\neg R(x,y)\text{ or } y\vdash\psi$
+
+- $x\vdash \Diamond\psi\iff\text{there exists } y\in W,\;R(x,y)\text{ and } y\vdash\psi$
+
+### 一些边界情况
+
+如果 $x$ 没有可达世界，那么 $\forall\phi,\; x\vdash\Box\phi$ 且 $x\not\vdash\Diamond\phi$. 这里的 $\phi$ 也包括 $\top$ 和 $\bot$.
+
+因此有一些反直觉：例如对于没有可达世界的 $x$, $x\vdash\Box\bot$. 但是仔细想还是能理解，因为任意 $y$ 都满足 $\neg R(x,y)$.
+
+### Equivalence
+
+要求对任何模型中的任何世界 $x$, 如果 $(\forall\phi\in\Gamma,\;x\vdash\phi)\implies x\vdash\psi$, 那么定义 $\Gamma\vdash\psi$.
+
+等价的意思是 $\{\phi\}\vdash\psi$ 且 $\{\psi\}\vdash\phi$. $\{\}$ 可以去掉.
+
+考虑分配律和 De Moegan 律， $\Box\Diamond$ 和 $\forall\exists$ 很相像，这里省略.
+
+回到上面说的边界情况，我们得到 $\Box\phi\not\equiv\Diamond\phi$. 然而我们有 $\Box\top\equiv\top$ 和 $\Diamond\bot\equiv\bot$. 前者很显然，而后者有点费解，稍微证明一下.
+
+**Pf. of $\Diamond\bot\equiv\bot$:**
+
+首先没有 $x$ 满足 $\bot$, 有 $\bot\vdash\Diamond\bot$. 反过来如果 $x\vdash\Diamond\bot$, 那么存在一个 $x$ 的可达世界 $y\vdash\bot$, 没有这样的 $x$, 就算 $x$ 没有后继也不存在. 双向奔赴了属于是. $\blacksquare$
+
+还有一个有趣的等价 $\Diamond\top\equiv\Box\phi\to\Diamond\phi$, 证明显然，对任意 $\phi$ 成立.
+
+类似一阶逻辑，模态逻辑也有 validity，定义为对任意模型、任意世界都成立，记作 $\vdash\phi$.
+
+$\vdash\neg\Box\phi\leftrightarrow\Diamond\neg\phi$ $\vdash\neg\Diamond\phi\leftrightarrow\Box\neg\phi$
+
+还有一个有趣的有效公式 $K:\Box(\phi\to\psi)\to(\Box\phi\to\Box\psi)$.
+
+## Logic engineering
+
+> 逻辑工程的部分工作是确定什么样的公式模式一共有效，并且勾勒出恰好使这些公式为有效的逻辑.
+
+### Validity
+
+上面我们全部的表述都是**基本**模态逻辑的框架，为了适应之前所说的复杂情况，需要 re-engineer 这些基本模态逻辑. 书上的表述为
+
+> As modal logic **automatically** gives us the connective $\Diamond$,which is equivalent to $\neg\Box\neg$, we can find out what the corresponding readings of in our system will be.
+
+说实话，我不知道怎么就 automatically 了；不如接受这个约定，带入自然语言：![](https://notes.sjtu.edu.cn/uploads/upload_793e179598b5113461bf43b6a06be026.png)
+
+“未来总是真”对应右边“并非未来总是假”，也就是“未来存在真”；“理应为真”其实是“不允许为假”，那么就对应右边“允许为真”（这里反着绕了一下）；“相信 $\phi$ 为真”对应右边“不相信 $\phi$ 为假”，假设 Q 有一个“信念”的集合，那么 $\neg\phi$ 不在这个集合中，也就是说， $\phi$ 不和 Q 的信念矛盾，即 consistent；“知道为真”对应“不知道为假”，也就是说， $\phi$ 不和 Q 的知识矛盾，但是 Q 可能知道 $\phi$, 也可能知道 $\neg\phi$.
+
+p.s. 写这一段的时候想到了*情态动词*（modal verb）；看看标题！
+
+![](https://notes.sjtu.edu.cn/uploads/upload_8689d93f1e0f105402a79863f2f8215f.png)
+
+除了最后三列都和基本模态逻辑相同，其他都需要讨论一下（另外发现 $\Box$ 和 $\Diamond$ 在45°排版中互换）。不过有些很费解就是了。
+
+### Accessibility Relation and Correspondence
+
+这一部分，我们从 $\Box\Diamond$ 的自然语言语义出发，重新回顾 $x\vdash \Box\psi\iff\text{for all } y\in W,\;\neg R(x,y)\text{ or } y\vdash\psi$ $x\vdash \Diamond\psi\iff\text{there exists } y\in W,\;R(x,y)\text{ and } y\vdash\psi$ 这两个形式化定义。
+
+首先重新为 $R$ 建模.![](https://notes.sjtu.edu.cn/uploads/upload_932f9d680782a3f9456b4bfbed6eb592.png)
+
+我们发现上面两个形式化定义与 $R$ 的性质非常相关。例如，如果 $\Box$ 表示“未来总是真”，根据 Table5.7 我们有一个合理的建模，其中 $\Box\phi\to\Box\Box\phi$. 注意到这个逻辑仅仅添加了一条 valid 公式模式（ $\Box\phi\to\Box\Box\phi$ ）. 同时观察到根据 Table 5.8, 这时候的 $R$ 具有了传递性.
+
+一个直觉：对 $\Box$ 的不同解读, 有不同的 validity 公式模式， $R$ 也有不同的性质（我们最开始认为 $R$ 是一个普通的二元关系）.
+
+这里我们为了考察 $R$ 的性质，定义标架 $\mathcal{F}=(W,R,AP)$ （注意之前我们定义“有效”的时候，用的是“任意模型的任何世界”，这里我们将自由度减少，固定了模型中的前两个参数 $W,R$ ）, 称 $\mathcal{F}\vdash\phi$ 当且仅当 $\forall w\in W, L:W\mapsto\mathcal{P}(AP)$, $\mathcal{M}=(W,R,AP,L),w\vdash\phi$ 成立.
+
+**定理.** 给定 $\mathcal{F}=(W,R,AP)$, $R$ 是自反的当且仅当 $\mathcal{F}$ 使 $\Box\phi\to\phi$ 有效.
+
+**证明.** 如果对任意 $w\in W$, $R(w,w)$, 假设 $x\vdash\Box\phi$, 那么对任意可达世界 $y$, $y\vdash\phi$, 其中也包括 $w$; 如果 $\vdash_{\mathcal{F}}\Box\phi\to\phi$, 反设存在 $x\in W$ such that $\neg R(x,x)$. 那么存在一个标识函数 $L$ 使得 $\phi\not\in L(x)$ ，且对任意其他的 $y$, $\phi\in L(y)$. 由于除了 $x$ 其他都满足 $\phi$, 因此 $x\vdash\Box\phi$; 矛盾. $\blacksquare$
+
+| name | formula scheme | property of R | definition |
+|---|---|---|---|
+| K | $\Box\phi\land\Box(\phi\to\psi)$ $\to\Box\psi$ | none |  |
+| T | $\Box \phi \rightarrow \phi$ | reflexive | $\forall x \in W,$ $\;R(x,x)$ |
+| B | $\phi \rightarrow \Box \Diamond \phi$ | symmetric | $\forall x, y \in W,$ $\;R(x,y)\implies R(y,x)$ |
+| D | $\Diamond\top\equiv\Box \phi \rightarrow \Diamond \phi$ | serial | $\forall x,\;\exists y$ $\;\text{s.t. }R(x,y)$ |
+| 4 | $\Box \phi \rightarrow \Box \Box \phi$ | transitive | $\forall x, y, z \in W$, $R(x,y)\land R(y,z)$ $\implies R(x,z)$ |
+| 5 | $\Diamond \phi \rightarrow \Box \Diamond \phi$ | Euclidean | $\forall x, y, z \in W,$ $\;R(x,y)\land R(x,z)$ $\implies R(y,z)$ |
+|  | $\Box \phi \leftrightarrow \Box \phi$ | functional | $\forall x,\;\exists! y\;R(x,y)$ |
+|  | $\Box(\phi \land \Box \phi \rightarrow \psi) \lor$ $\Box(\psi \land \Box \psi \rightarrow \phi)$ | linear | $\forall x, y, z \in W$, $R(x,y)\land R(y,z)\implies$ $R(y,z)\lor y=z\lor R(z,y)$ |
+
+p.s. 以上 scheme 和 property 都是当且仅当关系，而且有 Euclidean $\to$ linear
+
+![](https://notes.sjtu.edu.cn/uploads/upload_2c9f25cbf8386e4c5fe50ba8bb49f194.png)
+
+### KT45 logic: $\mathbb{L}=\{$ T,4,5 $\}$
+
+最开始我们介绍的就是 K logic: $\mathbb{L}=\varnothing$
+
+KT45 逻辑经常用来建模知识推理，这与 Table 5.7 相呼应；这里 4 代表如果 Q 知道某为真，那么知道自己知道它为真；5 代表如果 Q 不知道某为假，那么知道自己不知道它为假. 称为**正反省**和**负反省**（实际上没人能做到，理想化建模；后面我们可以看到这种建模对应的是逻辑游戏中“所有人都拥有足够智慧”的假设）.
+
+然而注意到，“knows”这一行其实除了 T,4,5 还有 D. 事实上 $D$ 可以直接由 $T$ 推出：前提是 $\Box\phi$, 反设 $\Box\neg\phi$, 根据 T，直接推出 $\phi$ 和 $\neg\phi$, 矛盾. 因此有 $\neg\Box\neg\phi=\Diamond\phi$.
+
+如果放在二元关系这里，更简单：如果 $R(x,x)$, 那么每个 $x$ 一定存在自己的可达世界，就是自己.
+
+注意到从 KT45 也可以推出 B, 直观上说，如果 $\phi$ 为真，那么我可以知道我不知道 $\neg\phi$. 反设 $\Box\neg\phi$, 由 T 得 $\neg \phi$, 矛盾. 因此 $\Diamond\phi$. 由 5 得 $\Box\Diamond\phi$.
+
+因此 KT45 对应的二元关系应该也是对称的，因为 $R(x,y)\land R(x,x)$ 可以推出 $R(y,x)$.
+
+总之 KT45 对应的二元关系就变成等价关系了. 书上说（待证明，而且我感觉很奇怪，比如一长串 $\Box$ 怎么等价？）![](https://notes.sjtu.edu.cn/uploads/upload_c89a9e1bb4fcf3cc7d24ac1cdc5f41ed.png)
+
+### KT4 Logic: $\mathbb{L}=\{$ T,4 $\}$
+
+这个逻辑和程序语义、直觉主义逻辑有一些联系，不细说了.
+
+## Natural Deduction
+
+> Going into a dashed box means reasoning in an arbitrary accessible world.
+
+Wherever $\phi$ occurs in a proof, $\phi$ may be put into a subsequent dashed box. Wherever $\psi$ occurs at the end of a dashed box, $\psi$ may be put after that dashed box.
+
+![](https://notes.sjtu.edu.cn/uploads/upload_432d5f30fa7ed7b4db81079778a44427.png)
+
+## KT45$^n$
+
+对 KT45 做推广，扔掉 $\Diamond$, 改写 $\Box$, 得到 KT45$^n$. 其中 $K_i\phi$ 表示 agent $Q_i$ 知道 $\phi$.
+
+KT45$^n$ 的一个模型是一个四元组 $\mathcal{M}=(W,(R_i)_{i\in\mathcal{A}},AP,L)$ ：
+
+根据 $K_i$ 可以扩展定义.
+
+- $x\vdash E_G\phi$ 当且仅当 $\forall i\in G$, $x\vdash K_i\phi$.
+
+- $x\vdash C_G\phi$ 当且仅当 $\forall k\geq1$, $x\vdash E_G^k\phi$.
+
+- $x\vdash D_G\phi$ 当且仅当 $\forall y,$ $(\forall i\in G,R_i(x,y))\implies y\vdash\phi$.
+
+后面大概率用不到 $D$, 因此略过.
+
+![](https://notes.sjtu.edu.cn/uploads/upload_d216f994bea29420b3c979b6f71c01fd.png)
+
+### Some valid formulas
+
+modus ponens![](https://notes.sjtu.edu.cn/uploads/upload_3f38f1af708562d6daa8339e29608ff0.png)
+
+redefinition of relations![](https://notes.sjtu.edu.cn/uploads/upload_62244b02d91d2c7f2c426a43ce78ce77.png)
+
+注意为什么 $R_{E_G}$ 用 for some 定义？因为这个 relation 适用于 $x\vdash E_G\phi\iff \forall i,\;\forall y\text{ s.t. }R_i(x,y),\;y\vdash\phi\iff\forall y\text{ s.t. }R_{E_G}(x,y),\;y\vdash\phi$. 这样 $R_{E_G}$ 的确要包括所有的 $i$. $R_{D_G}$ 同理.
+
+反省规则![](https://notes.sjtu.edu.cn/uploads/upload_565037a3e4c4836ddf5001be2063cd41.png)
+
+自然演绎规则![](https://notes.sjtu.edu.cn/uploads/upload_34d8e806c4da6c66f2cac23bbd115a31.png)
+
+## MULTI-AGENT!
+
+直接抄书![](https://notes.sjtu.edu.cn/uploads/upload_6a89aef207ceba3a6c55aab22b3447c2.png)![](https://notes.sjtu.edu.cn/uploads/upload_2ec0107fb981fc9a45d00622c7126fb6.png)![](https://notes.sjtu.edu.cn/uploads/upload_9104bdeb893eab5b9f9ff15dac22423a.png)
+
+书上另一个例子是孤岛上的红蓝眼睛问题，高二第一次看的时候吓哭了. 现在再也找不到原视频了（我记得视频一直用 emoji 代表岛民）. 无非是旅行者引入了高阶的知识，让所有人知道所有人知道.
+
+---
+
+### 参考资料
+
+- [1] Michael Huth and Mark Ryan. [Logic in Computer Science: Modelling and Reasoning about Systems](https://www.cas.mcmaster.ca/~cs2sd3/course-files/LogicInComputerScience.pdf). Cambridge University Press, USA, 2004.

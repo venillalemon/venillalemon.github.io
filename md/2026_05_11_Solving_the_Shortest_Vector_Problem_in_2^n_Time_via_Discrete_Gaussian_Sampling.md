@@ -1,0 +1,187 @@
+# Solving the Shortest Vector Problem in 2n2^n2n Time via Discrete Gaussian Sampling
+
+*May 11, 2026*
+
+A reading notes of [ADRS14](https://arxiv.org/pdf/1412.7994)
+
+文章主要结论是：存在算法在 $2^{n+o(n)}$ 时间和空间内从格 $L$ 的离散高斯分布 $D_{L,s}$ 采样出 $2^{n/2}$ 个独立同分布的样本。
+
+如果 $s$ 比 smoothing parameter 大，那么以上时间和空间复杂度变成 $2^{n/2+o(n)}$ 。
+
+## Intuition
+
+我们希望给定一定数量的 $D_{L,s}$ sample，能给出一定数量的 $D_{L,s/2}$ sample （总之这个 variance 得少一个常数，这有利于我们采样短向量）。在连续高斯分布下很好做，直接采样后除以 $2$ ；但是在 lattice 中，首先这需要碰运气找到 $2L$ 中的向量，这发生的概率是 $\frac{\rho_s(2L)}{\rho_s(L)}$ ，当 $s$ 很大的时候这个值几乎是 $2^{-n}$ 。
+
+因此换种方法，我们拿到很多 $D_{L,s}$ 样本之后，按照 $L/2L$ 的陪集来分 bucket，让 $\bmod L$ 相同的向量互相消掉。下面用 $c\in{0,1}^n$ 表示陪集 $Bc+2L$ ，研究最终得到的样本分布。一个样本处于陪集 $c$ 的概率是 $\rho_s(c):=\sum_{x\in L}\rho_s(Bc+x)$ ，因此如果有大量样本，将bucket内部两两配对形成形如 $(X,Y)$ 的 sample，那么陪集 $c$ 中的样本个数正比于 $\rho_s(c)$ 。而后，我们计算所有的 $\frac{X+Y}{2}$ ，期望得到的样本服从 $D_{L,s/\sqrt{2}}$ 的分布。
+
+再看：假设我们独立随机选取 $x,y\sim D_{L,s}$ ，然后拒绝采样，即舍弃 $x,y$ 不同陪集的情况。这样， $(x+y)/2$ 的分布就是
+
+$$
+\Pr[X,Y\sim D_{L,s}]{ \frac{X+Y}{2}=z \mid X\equiv Y\bmod 2L}=\Pr[Z\sim D_{L,s/\sqrt{2}}]{Z=z}
+$$
+
+这个式子很好理解。考虑子格
+
+$$
+\overline L=\left\{(x,y):x\equiv y\bmod 2L\right\}\subset L^2
+$$
+
+由于 $X,Y$ 独立同分布，得到 $(X,Y)$ 的联合分布是 $D_{L^2,s}$ ，那么 $(X,Y)| X\equiv Y\bmod 2L$ 这个条件分布的 variance 仍然是 $s$, 即服从 $D_{\overline L,s}$ 。然后，对 $\overline L\subset L^2$ 进行旋转变换
+
+$$
+\sigma:(x,y)\mapsto \left(\frac{x+y}{\sqrt{2}},\frac{x-y}{\sqrt{2}}\right)
+$$
+
+得到的格是
+
+$$
+\sigma(\overline L)=(\sqrt{2}L)^2.
+$$
+
+因此 $\left(\frac{X+Y}{\sqrt{2}},\frac{X-Y}{\sqrt{2}}\right)\sim D_{(\sqrt{2}L)^2,s}$ ，由于高斯分布性质，取边缘分布即得
+
+$$
+\frac{X+Y}{2}\sim D_{L,s/\sqrt{2}}
+$$
+
+现在我们知道了对 $(X,Y)\sim D_{L^2,s}$ 进行拒绝采样，得到的 $\frac{X+Y}{2}$ 就服从我们需要的分布。也就是说，如果我能得到很多样本 $(X,Y)$ ，其中陪集 $c$ 中的样本个数正比于 $\rho_s(c)^2$ ，那么把这些样本拿出来算 $\frac{X+Y}{2}$ 得到的东西就满足 $D_{L,s/\sqrt{2}}$ 。
+
+这和前面贪心配对法不同，在那里陪集 $c$ 中的样本个数正比于 $\rho_s(c)$ 。一个显然的改进是不两两配对，而是每个样本和其他样本全部配对；但是这样样本数会变成平方量级，从 $N$ 变成 $N^2\sum_c\rho_s^2(c)$ 。
+
+## Square Sampler
+
+上面说到能够采样使得一个 $c$ 对应的 $(x,y)$ 在总的样本中比例为 $\rho_s(c)$. 根据这个我们需要把这个概率变成 $\rho_s^2(c)$. 这里我们抽象一点，把每个 $c$ 用 $1\dots N$ 编号，反正抽取它们都一样。假设每个号码的概率 $p_i$ ，我们的 idea 是对这个号码进行拒绝采样，即对样本序列重新遍历，看到这个号码时，以 $p_i$ 的概率选取它。现在有两个问题：
+
+- 这里的 $N\sim 2^n$ ，因此需要牺牲非常多的样本来估计每一个 $p_i$
+
+- 如果分布非常均匀，那么采样生成的样本数会非常少。例如，大家都是 $\frac{1}{N}$ 的概率那么基本需要 $N^2=2^{2n}$ 个样本平均采样出一个。
+
+因此我们需要以 **正比于** $p_i$ 的概率进行拒绝采样，最好的方法是去估计这些概率中的最大值 $p_{\max}=\max_i{p_i}$ ；同时用 Poisson 分布的性质把每个元素的概率信息记录在变量里。下面的定理是用于估计 $p_{\max}$ 的，证明略。
+
+Proposition 3.1 — Estimating p_max
+
+There is an algorithm that takes as input $\kappa \ge 1$ (the confidence parameter) and a sequence of $M$ elements from $\{1,\dots,N\}$ and outputs a value $\tilde p_{\max}$ such that, if the input consists of $M \ge \kappa/p_{\max}$ independent samples from the distribution that assigns probability $p_i$ to element $i$, then
+
+$$
+p_{\max} \;\le\; \tilde p_{\max} \;\le\; 4 p_{\max}
+$$
+
+except with probability at most $C_1 N \log N \exp(-C_2\kappa)$, where $p_{\max} = \max p_i$. The algorithm runs in time $M \cdot \operatorname{poly}(\log \kappa, \log N)$.
+
+Theorem 3.3 是核心定理。
+
+Theorem 3.3 — Square sampler
+
+There is an algorithm that takes as input $\kappa \ge 2$ (the confidence parameter) and $M$ elements from $\{1,\dots,N\}$ and outputs a sequence of elements from the same set such that
+
+1. the running time is $M \cdot \operatorname{poly}(\log \kappa, \log N)$;
+
+2. each $i \in \{1,\dots,N\}$ appears at least twice as often in the input as in the output; and
+
+3. if the input consists of $M \ge 10\kappa^2 / \max p_i$ independent samples from the distribution that assigns probability $p_i$ to element $i$, then the output is within statistical distance $C_1 M N \log N \exp(-C_2 \kappa)$ of $m$ independent samples with respective probabilities $\mathbf{p}^2$, where $m \ge M \cdot \sum_i p_i^2 / (32 \kappa \max p_i)$ is a random variable.
+
+<details>
+
+<summary>Proof</summary>
+
+The algorithm first runs the procedure from Proposition 3.1 on the first $M/2$ elements from its input sequence, receiving as output $\tilde p_{\max}$. The algorithm then reads the remaining elements in sequence. If it ever reads the last element of the input, it fails. For $j = 1,\dots,M\tilde p_{\max}/4$, the algorithm samples $r$ according to $\operatorname{Pois}(1/\tilde p_{\max})$ and takes the next $r$ unused elements in the input. For $i = 1,\dots,N$, let $a_{i,j}$ be the number of times element $i$ appears in the $j$th such subsequence. For each $i,j$ let $b_{i,j}$ be $1$ with probability $\min\{1,\, a_{i,j}/\kappa\}$ and $0$ otherwise. (To achieve the correct running time, we do not actually explicitly store these values when $a_{i,j} = b_{i,j} = 0$.)
+
+Finally, the algorithm looks through the next $M/6$ elements, one element at a time (or it fails if there are not $M/6$ elements remaining). When it sees element $i$, it adds it to its output if $b_{i,j} = 1$ where $j \ge 1$ is the smallest index such that $b_{i,j}$ is unused (or it fails if there is no unused $b_{i,j}$). $\square$
+
+</details>
+
+这里面一个直觉的理解： $r$ 平均长度是 $\frac{1}{\tilde{p}_{\max}}$ ，由 Poisson 分布的性质我们得到 $a_{ij}$ 服从 $\mathrm{Pois}\left(\frac{p_i}{\tilde{p}_{\max}}\right)$ (Lemma 2.22)。然后大概来说， $b_{ij}$ 就服从 $\mathrm{B}\left(\frac{p_i}{\kappa \tilde{p}_{\max}}\right)$ 分布 (Lemma 2.23)。这样最后一步，每次读进一个样本，有 $p_i$ 的概率是 $i$ ，然后有近似 $\frac{p_i}{\kappa \tilde{p}_{\max}}$ 的概率进入最终的结果中，因此最终的分布是 $p_i^*=\frac{p_i^2}{\kappa \tilde{p}_{\max}}$ ，并且得到了期望意义上 $\frac{M\sum_ip_i^2}{6\kappa \tilde{p}_{\max}}$ 个样本，最终用一下 Hoeffding Bound 。
+
+还有一个要点，为什么要搞很多 $a_{ij},b_{ij}$ ，明明全是独立同分布？这是因为我们不能直接根据分布采样，这些都是棋子，当作 coin 来用。
+
+## Gaussian Combiner
+
+一个引理
+
+Lemma 3.4
+
+Let $\mathcal{L} \subset \mathbb{R}^n$ and $s > 0$. Then for all $\mathbf{y} \in \mathcal{L}$,
+
+$$
+\Pr_{(\mathbf{X}_1,\mathbf{X}_2)\sim D^2_{\mathcal{L},s}} \big[(\mathbf{X}_1+\mathbf{X}_2)/2 = \mathbf{y} \;\big|\; \mathbf{X}_1+\mathbf{X}_2 \in 2\mathcal{L}\big] = \Pr_{\mathbf{X}\sim D_{\mathcal{L},s/\sqrt{2}}}\big[\mathbf{X} = \mathbf{y}\big].
+$$
+
+Furthermore,
+
+$$
+\sum_{\mathbf{c}\in\mathcal{L}/(2\mathcal{L})} \rho_s(\mathbf{c})^2 = \rho_{s/\sqrt{2}}(\mathcal{L})^2.
+$$
+
+下面我们将 Theorem 3.3 的采样集合 ${1,\dots, N}$ 换成 $L/2L={c_1,\dots,c_{2^n}}$. 这样来， $p_i=\frac{\rho_s(c_i)}{\rho_s(L)}$ ，注意这里的 $c$ 代表一个陪集 $c+2L$ ；我们有 $p_{\max}=\frac{\rho_s(2L)}{\rho_s(L)}$ （还挺显然的）。
+
+所以只需要检验 Theorem 3.3 条件满足，然后可以计算需要的前提是 $M\geq \frac{10\kappa^2\rho_s(L)}{\rho_s(2L)}$ ，得到的样本总数是 $m\geq M\frac{\rho_s(L)\sum_i\rho_s^2(c_i)}{32\kappa\rho_s(2L)\rho_s^2(L)}=M\frac{\sum_i\rho_s^2(c_i)}{32\kappa\rho_s(2L)\rho_s(L)}$ ，根据 Lemma 3.4 我们有 $m\geq M\frac{\rho_{s/\sqrt{2}}^2(L)}{32\kappa\rho_s(2L)\rho_s(L)}$ 。
+
+Proposition 3.5
+
+There is an algorithm that takes as input a lattice $\mathcal{L} \subset \mathbb{R}^n$, $\kappa \ge 2$ (the confidence parameter), and a sequence of vectors from $\mathcal{L}$, and outputs a sequence of vectors from $\mathcal{L}$ such that, if the input consists of $M \ge 10\kappa^2 \cdot \rho_s(\mathcal{L})/\rho_s(2\mathcal{L})$ independent samples from $D_{\mathcal{L},s}$ for some $s > 0$, then the output is within statistical distance $M\exp(C_1 n - C_2 \kappa)$ of $m$ independent samples from $D_{\mathcal{L},s/\sqrt{2}}$ where $m$ is a random variable with
+
+$$
+m \;\ge\; M \cdot \frac{1}{32\kappa} \cdot \frac{\rho_{s/\sqrt{2}}(\mathcal{L})^2}{\rho_s(\mathcal{L})\,\rho_s(2\mathcal{L})}.
+$$
+
+The running time of the algorithm is at most $M \cdot \operatorname{poly}(n, \log \kappa)$.
+
+注意这里是先从原始 sample 中 extract 出陪集的信息，然后对陪集进行平方采样（注意得到的样本全都来自原来的样本）。然后再遍历平方采样后的样本，去找同一个陪集的 sample （就来自原来的样本）进行消去即可。
+
+<details>
+
+<summary>Proof of Proposition 3.5</summary>
+
+Let $(\mathbf{X}_1,\dots,\mathbf{X}_M)$ be the input vectors. For each $i$, let $\mathbf{c}_i \in \mathcal{L}/(2\mathcal{L})$ be the coset of $\mathbf{X}_i$. The combiner runs the algorithm from Theorem 3.3 with input $\kappa$ and $(\mathbf{c}_1,\dots,\mathbf{c}_M)$, receiving output $(\mathbf{c}'_1,\dots,\mathbf{c}'_m)$. (Formally, we must encode the cosets as integers in $\{1,\dots,2^n\}$.) Finally, for each $\mathbf{c}'_i$, it chooses a pair of unpaired vectors $\mathbf{X}_j, \mathbf{X}_k$ with $\mathbf{c}_j = \mathbf{c}_k = \mathbf{c}'_i$ and outputs $\mathbf{Y}_i = (\mathbf{X}_j + \mathbf{X}_k)/2$.
+
+The running time of the algorithm follows from Item 1 of Theorem 3.3. Furthermore, we note that by Item 2 of the same theorem, there will always be a pair of indices $j,k$ for each $i$ as above.
+
+To prove correctness, we observe that for $\mathbf{c} \in \mathcal{L}/(2\mathcal{L})$ and $\mathbf{y} \in \mathbf{c}$,
+
+$$
+\Pr[\mathbf{X}_i = \mathbf{y}] = \frac{\rho_s(\mathbf{c})}{\rho_s(\mathcal{L})} \cdot \Pr_{\mathbf{X}\sim D_{\mathbf{c},s}}[\mathbf{X} = \mathbf{y}].
+$$
+
+In particular, we have that $\Pr[\mathbf{c}_i = \mathbf{c}] = \rho_s(\mathbf{c})/\rho_s(\mathcal{L})$, and $2\mathcal{L}$ is the coset with the highest probability. Then, the cosets $(\mathbf{c}_1,\dots,\mathbf{c}_M)$ satisfy the conditions necessary for Item 3 of Theorem 3.3 with $\max p_i = \rho_s(2\mathcal{L})/\rho_s(\mathcal{L})$.
+
+Applying the theorem, up to statistical distance $M\exp(C_1 n - C_2\kappa)$, we have that the output vectors are independent, and
+
+$$
+m \;\ge\; M \cdot \frac{1}{32\kappa} \cdot \frac{\sum_{\mathbf{c}\in\mathcal{L}/(2\mathcal{L})}\rho_s(\mathbf{c})^2} {\rho_s(\mathcal{L})\rho_s(2\mathcal{L})} \;=\; M \cdot \frac{1}{32\kappa} \cdot \frac{\rho_{s/\sqrt{2}}(\mathcal{L})^2}{\rho_s(\mathcal{L})\rho_s(2\mathcal{L})},
+$$
+
+where the equality follows from Lemma 3.4. Furthermore, we have $\Pr[\mathbf{c}'_i = \mathbf{c}] = \rho_s(\mathbf{c})^2 / \sum_{\mathbf{c}'} \rho_s(\mathbf{c}')^2$ for any coset $\mathbf{c} \in \mathcal{L}/(2\mathcal{L})$. Therefore, for any $\mathbf{y} \in \mathcal{L}$,
+
+$$
+\begin{aligned} \Pr[\mathbf{Y}_i = \mathbf{y}] &= \frac{1}{\sum \rho_s(\mathbf{c})^2} \cdot \sum_{\mathbf{c}\in\mathcal{L}/(2\mathcal{L})} \rho_s(\mathbf{c})^2 \cdot \Pr_{(\mathbf{X}_j,\mathbf{X}_k)\sim D^2_{\mathbf{c},s}} \big[(\mathbf{X}_j+\mathbf{X}_k)/2 = \mathbf{y}\big] \\[2pt] &= \Pr_{(\mathbf{X}_1,\mathbf{X}_2)\sim D^2_{\mathcal{L},s}} \big[(\mathbf{X}_1+\mathbf{X}_2)/2 = \mathbf{y} \;\big|\; \mathbf{X}_1+\mathbf{X}_2 \in 2\mathcal{L}\big]. \end{aligned}
+$$
+
+The result then follows from Lemma 3.4. $\square$
+
+</details>
+
+## Reduction from SVP to DGS
+
+## A Exact Gaussian Sampler from [[BLP+13]](https://arxiv.org/pdf/1306.0281)
+
+Here is the original version of the Gaussian sampling lemma.
+
+Lemma 2.3
+
+There is a probabilistic polynomial-time algorithm that, given a basis $\mathbf{B}$ of an $n$-dimensional lattice $\Lambda = \mathcal{L}(\mathbf{B})$, $\mathbf{c} \in \mathbb{R}^n$, and a parameter $r \ge \|\widetilde{\mathbf{B}}\| \cdot \sqrt{\ln(2n+4)/\pi}$, outputs a sample distributed according to $D_{\Lambda+\mathbf{c},\,r}$.
+
+首先考虑 $n=1$ 的情况，假设我们要从 $D_{\mathbb Z+c,r}$ 中采样，其中 $c\in[0,1)$. 我们会想到从连续高斯分布中采样然后取整，然后通过拒绝采样修正概率的误差。令 $Z=\rho_r(c)+\rho_r(c-1)+\int_{-\infty}^{c-1}\rho_r(x),\mathrm{d} x+\int_c^{+\infty}\rho_r(x),\mathrm{d} x$.
+
+- 以 $\frac{\rho_r(c)}{Z}$ 取 $c$, 以 $\frac{\rho_r(c-1)}{Z}$ 取 $c-1$;
+
+- 以 $\int_c^{+\infty}\rho_r(x),\mathrm{d} x/Z$ 概率，去 $(c,+\infty)$ 按照连续 Gaussian 采样得到 $x$, 然后令 $y=c+\lceil x-c\rceil$ (向上取整)，然后以 $\frac{\rho_r(y)}{\rho_r(x)}$ 的概率接受，如果拒绝，那么重新回到开始。
+
+- 以 $\int_{-\infty}^{c-1}\rho_r(x),\mathrm{d} x/Z$ 概率，去 $(-\infty,c-1)$ 按照连续 Gaussian 采样得到 $x$, 然后令 $y=c+\lfloor x-c\rfloor$ (向下取整)，然后以 $\frac{\rho_r(y)}{\rho_r(x)}$ 的概率接受，如果拒绝，那么重新回到开始。
+
+当 $k> 0$ 得到 $y=c+k$ 的概率是 $\int_{c+k-1}^{c+k}\rho_r(x)\frac{\rho_r(y)}{\rho_r(x)},\mathrm{d} x/Z=\frac{\rho_r(y)}{Z}$.
+
+当 $k<-1$ 得到 $y=c+k$ 的概率是 $\int_{c+k}^{c+k+1}\rho_r(x)\frac{\rho_r(y)}{\rho_r(x)},\mathrm{d} x/Z=\frac{\rho_r(y)}{Z}$.
+
+同时采样成功的概率就是 $\frac{\rho_r(c+\mathbb Z)}{\rho_r(c)+\rho_r(c-1)+\int_{-\infty}^{c-1}\rho_r(x),\mathrm{d} x+\int_c^{+\infty}\rho_r(x),\mathrm{d} x}\geq\frac{\rho_r(c+\mathbb Z)}{\rho_r(c+\mathbb Z)+\rho_r(c)+\rho_r(c-1)}\geq\frac{1}{2}$.
+
+注意这里的证明并不依赖 $\rho_r$ 的性质，因此随便换一个连续分布函数都是可以的。

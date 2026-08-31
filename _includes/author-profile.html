@@ -22,7 +22,7 @@
     <ul class="profile__facts">
       {% if author.employer %}<li>{{ author.employer }}</li>{% endif %}
       {% if author.location %}<li>{{ author.location }}</li>{% endif %}
-      {% if author.email %}<li><a href="mailto:{{ author.email }}">{{ author.email }}</a></li>{% endif %}
+      {% if author.email %}{% assign email_parts = author.email | split: "@" %}<li><a href="#contact" class="js-email" data-u="{{ email_parts[0] }}" data-d="{{ email_parts[1] }}"><span>{{ email_parts[0] }}</span>&#8203;[at]&#8203;<span>{{ email_parts[1] }}</span></a></li>{% endif %}
       {% if author.uri %}<li><a href="{{ author.uri }}">Website</a></li>{% endif %}
       {% if author.github %}<li><a href="https://github.com/{{ author.github }}">GitHub</a></li>{% endif %}
       {% if author.googlescholar %}<li><a href="{{ author.googlescholar }}">Google Scholar</a></li>{% endif %}
