@@ -135,6 +135,7 @@ exclude:
   - gulpfile.js
   - log
   - md
+  - _tools
   - node_modules
   - package.json
   - tmp

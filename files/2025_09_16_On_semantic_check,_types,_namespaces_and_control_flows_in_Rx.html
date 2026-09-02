@@ -16,6 +16,17 @@
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
 <link rel="stylesheet" href="/assets/css/post.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+  delimiters: [
+    {left: '$$', right: '$$', display: true},
+    {left: '\\[', right: '\\]', display: true},
+    {left: '$', right: '$', display: false},
+    {left: '\\(', right: '\\)', display: false}
+  ],
+  ignoredClasses: ['katex'],
+  throwOnError: false
+})"></script>
 </head>
 <body>
 
@@ -38,10 +49,10 @@
       <hr class="rule">
     </div>
 
-    <article class="prose vscode" data-src="vscode">
+    <article class="prose markdown" data-src="markdown">
 <p>Created: September 16, 2025 1:01 PM</p>
 <p><em>提示：文中含有大量对当前 Rx 语言的简化。如果你已经完成其中的一些特性，完全不需要删除你的实现。你可以和助教讨论你的方案，并且在 cr 时展示。我们会给一定的加分，计入 bonus。</em></p>
-<h2 id="what-to-do">What to do</h2>
+<h2>What to do</h2>
 <ul>
 <li>词法分析</li>
 <li>语法分析</li>
@@ -49,384 +60,266 @@
 </ul>
 <p>在语义分析阶段，你的编译器需要识别一些常规的错误如下：</p>
 <table>
-<thead>
-<tr>
-<th>错误类型</th>
-<th>描述</th>
-</tr>
-</thead>
+<thead><tr><th>错误类型</th><th>描述</th></tr></thead>
 <tbody>
-<tr>
-<td>Type Mismatch</td>
-<td>操作符两侧表达式类型不匹配；<br>函数参数类型不匹配、返回值类型不匹配； <br><code>let</code> 语句类型不匹配； <br><code>if</code> 语句不同分支类型不同，或者单分支类型不是 <code>unit</code> ；<br>borrow / dereference 见后面相应的部分</td>
-</tr>
-<tr>
-<td>Invalid Type</td>
-<td>非法的类型使用，如 condition 非 <code>bool</code> ；<br><code>main</code>  函数返回类型不是 <code>unit</code> ；<br>对非数组类型使用 <code>indexing expression</code> ，或者在 <code>indexing</code>  中使用非 <code>usize</code> 类型；<br>对非引用类型使用解引用 <code>*</code> ；<br>在非 <code>associated item</code> 中使用 <code>Self</code> / <code>self</code>； <br><code>loop</code> / <code>while</code> 块中有尾表达式且该表达式类型不是 <code>unit</code> ；<br>在 <code>const</code> 环境中使用非 <code>const expression</code></td>
-</tr>
-<tr>
-<td>Undefined Name</td>
-<td>找不到变量 / 函数 / <code>struct</code> / <code>enum</code> / <code>enum variant</code>  /  <code>struct</code> 字段或关联 item  / <code>trait</code> / <code>const item</code></td>
-</tr>
-<tr>
-<td>Missing Return</td>
-<td>在返回类型不是 <code>unit</code> 且没有尾表达式作为返回值的函数中，存在缺失返回语句的控制流</td>
-</tr>
-<tr>
-<td>Invalid Control Flow</td>
-<td><code>break</code> / <code>continue</code> 不在循环体内；<br><code>return</code> 不在函数体内（比如，在 <code>const</code> 定义中出现）；<br>在 <code>main</code> 函数最后一条 <code>statement</code> 以外的地方调用 <code>exit</code></td>
-</tr>
-<tr>
-<td>Immutable Variable Mutated</td>
-<td>对不可变变量及其字段进行修改</td>
-</tr>
-<tr>
-<td>Multiple Definition</td>
-<td>同一个 <code>struct</code> 中出现了重名的字段/关联函数/关联常量；<br>同一个 <code>scope</code> 下出现重名的 <code>item</code>；<br>测试点中保证，局部变量不会遮蔽它可见的同名函数、常量，也不会遮蔽同名类方法和常量；如果有，请向助教反映</td>
-</tr>
-<tr>
-<td>Trait Item Unimplemented</td>
-<td><code>impl xx for xx</code> 块中，没有实现 <code>trait</code> 中省略的关联函数体 / 关联 <code>const</code> 值</td>
-</tr>
-<tr>
-<td>Syntax Error</td>
-<td>在词法分析或语法分析阶段检查出的错误</td>
-</tr>
+<tr><td>Type Mismatch</td><td>操作符两侧表达式类型不匹配； 函数参数类型不匹配、返回值类型不匹配； <code>let</code> 语句类型不匹配； <code>if</code> 语句不同分支类型不同，或者单分支类型不是 <code>unit</code> ； borrow / dereference 见后面相应的部分</td></tr>
+<tr><td>Invalid Type</td><td>非法的类型使用，如 condition 非 <code>bool</code> ； <code>main</code> 函数返回类型不是 <code>unit</code> ； 对非数组类型使用 <code>indexing expression</code> ，或者在 <code>indexing</code> 中使用非 <code>usize</code> 类型； 对非引用类型使用解引用 <code>*</code> ； 在非 <code>associated item</code> 中使用 <code>Self</code> / <code>self</code>； <code>loop</code> / <code>while</code> 块中有尾表达式且该表达式类型不是 <code>unit</code> ； 在 <code>const</code> 环境中使用非 <code>const expression</code></td></tr>
+<tr><td>Undefined Name</td><td>找不到变量 / 函数 / <code>struct</code> / <code>enum</code> / <code>enum variant</code> / <code>struct</code> 字段或关联 item / <code>trait</code> / <code>const item</code></td></tr>
+<tr><td>Missing Return</td><td>在返回类型不是 <code>unit</code> 且没有尾表达式作为返回值的函数中，存在缺失返回语句的控制流</td></tr>
+<tr><td>Invalid Control Flow</td><td><code>break</code> / <code>continue</code> 不在循环体内； <code>return</code> 不在函数体内（比如，在 <code>const</code> 定义中出现）； 在 <code>main</code> 函数最后一条 <code>statement</code> 以外的地方调用 <code>exit</code></td></tr>
+<tr><td>Immutable Variable Mutated</td><td>对不可变变量及其字段进行修改</td></tr>
+<tr><td>Multiple Definition</td><td>同一个 <code>struct</code> 中出现了重名的字段/关联函数/关联常量； 同一个 <code>scope</code> 下出现重名的 <code>item</code>； 测试点中保证，局部变量不会遮蔽它可见的同名函数、常量，也不会遮蔽同名类方法和常量；如果有，请向助教反映</td></tr>
+<tr><td>Trait Item Unimplemented</td><td><code>impl xx for xx</code> 块中，没有实现 <code>trait</code> 中省略的关联函数体 / 关联 <code>const</code> 值</td></tr>
+<tr><td>Syntax Error</td><td>在词法分析或语法分析阶段检查出的错误</td></tr>
 </tbody>
 </table>
 <p>说明：</p>
-<ul>
-<li>
 <p>我们保证类型推导涉及到的所有 type 至多只有一层 <code>&amp;</code> 或者 <code>&amp;mut</code> 。你需要实现一些情况下的 implicit borrowing / auto dereferencing。例如：</p>
-<pre><code class="language-rust"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">A</span> {
-    x: <span class="hljs-type">i32</span>,
+<pre><code class="language-rust">struct A {
+    x: i32,
 }
-<span class="hljs-keyword">impl</span> <span class="hljs-title class_">A</span> {
-    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">foo</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">i32</span> {
-        <span class="hljs-number">20250817</span>
+impl A {
+    fn foo(&amp;self) -&gt; i32 {
+        20250817
     }
 }
-<span class="hljs-keyword">fn</span> <span class="hljs-title function_">test1</span>() {
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">a</span>: A = A { x: <span class="hljs-number">1</span> };
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">b</span>: &amp;A = &amp;a;
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">c</span>: <span class="hljs-type">i32</span> = b.x; <span class="hljs-comment">// auto dereferencing in field access expr</span>
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">d</span>: <span class="hljs-type">i32</span> = a.<span class="hljs-title function_ invoke__">foo</span>(); <span class="hljs-comment">// implicit borrowing in method call expr</span>
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">arr</span>: &amp;[<span class="hljs-type">i32</span>; <span class="hljs-number">2</span>] = &amp;[<span class="hljs-number">114</span>, <span class="hljs-number">514</span>];
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">e</span>: <span class="hljs-type">i32</span> = arr[<span class="hljs-number">1</span>]; 
-    <span class="hljs-comment">// you are free to regard this as an auto dereferencing,</span>
-    <span class="hljs-comment">// which requires further discussion in the following parts</span>
+fn test1() {
+    let a: A = A { x: 1 };
+    let b: &amp;A = &amp;a;
+    let c: i32 = b.x; // auto dereferencing in field access expr
+    let d: i32 = a.foo(); // implicit borrowing in method call expr
+    let arr: &amp;[i32; 2] = &amp;[114, 514];
+    let e: i32 = arr[1];
+    // you are free to regard this as an auto dereferencing,
+    // which requires further discussion in the following parts
 }
 </code></pre>
-<p>具体说明，详见后面的 Auto Referencing / Implicit Borrow 部分，有更详细的解释</p>
-</li>
-<li>
-<p>不需要实现<strong>引用</strong>的可变性检查。测试点中不会出现类似如下的错误：</p>
-<pre><code class="language-rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">test2</span>() {
-    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">a</span>: A = A { x: <span class="hljs-number">1</span> };
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">b</span>: &amp;A = &amp;a;
-    *b = A { x: <span class="hljs-number">3</span> }; <span class="hljs-comment">// `*b` is behind a `&amp;` reference</span>
-}
-</code></pre>
-</li>
-<li>
-<p>我们默认同一个 <code>struct</code> 中不允许出现重名的字段 / 关联函数 / 关联常量。这意味着，同一个 <code>struct</code> 所实现的两个 <code>trait</code> 也不允许出现同名的关联函数 / 关联常量（函数和常量互相之间也不重名）。</p>
-</li>
-<li>
-<p>保证不会出现非法的函数 body 缺失 / <code>const</code> 的值缺失 （对于 <code>AssociatedItems</code> ，缺失是合法的）</p>
-</li>
-<li>
-<p>不会出现空的 <code>struct</code></p>
-</li>
-<li>
-<p>misc14 等数据点出现了变量初始化检查。为简化，我们规定 <code>let</code> 必须对变量进行初始化，你不需要实现和变量初始化相关的控制流分析环节</p>
-</li>
-<li>
-<p>保证不使用 <code>reference/wildcard pattern</code> ； <code>identifier pattern</code> 中不会出现 <code>ref</code> 关键字。函数的 <code>self</code> parameter 只会出现 <code>self</code>, <code>&amp;self</code>, <code>&amp;mut self</code> 三种，不会有 <code>TypedSelf</code></p>
-</li>
-<li>
-<p>保证整数常量的类型都可以由它所在的最底层表达式推断出来。也就是说，不会出现两个整数常量进行运算的情况；遇到表达式中有整数字面量时，你只需要看另一个 operand 的类型来确定整数字面量的类型即可 （例如，<code>a + 1</code> 中，如果 <code>a</code> 类型是 <code>u32</code>, 那么 <code>1</code> 类型也是 <code>u32</code>, 如果用了 <code>1i32</code> 字面量，报错 Type Mismatch）</p>
-</li>
-<li>
-<p>测试点不会出现任何形式的 dead code (unreachable code，即编译期可确定永不执行的代码)</p>
-</li>
-<li>
-<p>保证 <code>self</code> 只会单独作为 <code>PathExpression</code> 使用；对于 <code>struct</code> 中常量、方法的引用全部使用 <code>Self::</code></p>
-</li>
+<ul>
+<li>具体说明，详见后面的 Auto Referencing / Implicit Borrow 部分，有更详细的解释</li>
 </ul>
-<h2 id="how-to-check">How to check</h2>
+<p>不需要实现<strong>引用</strong>的可变性检查。测试点中不会出现类似如下的错误：</p>
+<pre><code class="language-rust">fn test2() {
+    let mut a: A = A { x: 1 };
+    let b: &amp;A = &amp;a;
+    *b = A { x: 3 }; // `*b` is behind a `&amp;` reference
+}
+</code></pre>
+<ul>
+<li>我们默认同一个 <code>struct</code> 中不允许出现重名的字段 / 关联函数 / 关联常量。这意味着，同一个 <code>struct</code> 所实现的两个 <code>trait</code> 也不允许出现同名的关联函数 / 关联常量（函数和常量互相之间也不重名）。</li>
+<li>保证不会出现非法的函数 body 缺失 / <code>const</code> 的值缺失 （对于 <code>AssociatedItems</code> ，缺失是合法的）</li>
+<li>不会出现空的 <code>struct</code></li>
+<li>misc14 等数据点出现了变量初始化检查。为简化，我们规定 <code>let</code> 必须对变量进行初始化，你不需要实现和变量初始化相关的控制流分析环节</li>
+<li>保证不使用 <code>reference/wildcard pattern</code> ； <code>identifier pattern</code> 中不会出现 <code>ref</code> 关键字。函数的 <code>self</code> parameter 只会出现 <code>self</code>, <code>&amp;self</code>, <code>&amp;mut self</code> 三种，不会有 <code>TypedSelf</code></li>
+<li>保证整数常量的类型都可以由它所在的最底层表达式推断出来。也就是说，不会出现两个整数常量进行运算的情况；遇到表达式中有整数字面量时，你只需要看另一个 operand 的类型来确定整数字面量的类型即可 （例如，<code>a + 1</code> 中，如果 <code>a</code> 类型是 <code>u32</code>, 那么 <code>1</code> 类型也是 <code>u32</code>, 如果用了 <code>1i32</code> 字面量，报错 Type Mismatch）</li>
+<li>测试点不会出现任何形式的 dead code (unreachable code，即编译期可确定永不执行的代码)</li>
+<li>保证 <code>self</code> 只会单独作为 <code>PathExpression</code> 使用；对于 <code>struct</code> 中常量、方法的引用全部使用 <code>Self::</code></li>
+</ul>
+<h2>How to check</h2>
 <p>假设你已经成功建了一棵 AST。</p>
 <p>在 AST 上，有一类结点非常重要，即 <code>BlockExpression</code> 。在 AST 中，假设你已经将 <code>BlockExpression</code> 中的 <code>Item</code> 和其他 <code>Statement</code> 分开记录下来。</p>
 <p><code>BlockExpression</code>代表一个全新的 <code>scope</code> ，在名称解析的时候，如果当前 <code>scope</code> 找不到符号，那么就会回溯到上一个 <code>scope</code>。这样的 <code>scope</code> 自然地形成一棵树，而不是用完就扔。</p>
 <p>这里你需要考虑一些细节，例如助教的做法是为函数、<code>trait</code>、 <code>impl</code> 和 <code>LoopExpression</code> 也维护 <code>scope</code>，因为你可以在函数 <code>scope</code> 中写一些关于函数参数的信息；或者在 <code>impl Scope</code> 中记录 <code>Self</code> 类型。还有一点好处是，当你寻找一个变量的时候，不断向上回溯，一旦遇到函数的 <code>scope</code> 就可以停下来（因为我们不允许变量捕获（这是闭包干的事情））。</p>
 <p>具体来说，以下每一步都需要遍历一遍 AST：</p>
 <ul>
-<li>
-<p>首先是符号收集。你需要检查 <code>BlockExpression</code> 下的所有 <code>item</code> 和所有 <code>stmt</code>（这是为了遍历到每一个 <code>BlockExpression</code>），将以下几项内容的信息记录在 <code>scope</code> 节点中（这一步先假定函数、<code>const item</code> 用到的类型都存在）：</p>
-<ul>
+<li>首先是符号收集。你需要检查 <code>BlockExpression</code> 下的所有 <code>item</code> 和所有 <code>stmt</code>（这是为了遍历到每一个 <code>BlockExpression</code>），将以下几项内容的信息记录在 <code>scope</code> 节点中（这一步先假定函数、<code>const item</code> 用到的类型都存在）：</li><ul>
 <li><code>const item</code> 及其类型（先假定类型和值匹配）</li>
 <li><code>struct</code> 以及它所有的字段+类型</li>
 <li><code>enum</code> 及其 <code>variants</code></li>
 <li>函数/关联函数的参数 <code>pattern</code> 类型/顺序、返回类型</li>
 <li><code>trait</code> 及其所有关联 <code>const</code> 和关联函数</li>
 </ul>
-<p>同时建立 <code>Scope</code> 节点之间的连接，为后面的 name resolution 提供方便。注意任何 <code>Expr</code> 中都有可能出现 <code>BlockExpression</code>，所以需要完整遍历 AST。</p>
-</li>
-<li>
-<p>第二步，在每个 <code>scope</code>，构建具体的 <code>struct</code> 的字段、方法和函数的信息。</p>
-<ul>
+<li>同时建立 <code>Scope</code> 节点之间的连接，为后面的 name resolution 提供方便。注意任何 <code>Expr</code> 中都有可能出现 <code>BlockExpression</code>，所以需要完整遍历 AST。</li>
+<li>第二步，在每个 <code>scope</code>，构建具体的 <code>struct</code> 的字段、方法和函数的信息。</li><ul>
 <li>对于 <code>struct</code> 中的字段、 <code>impl</code>/ <code>trait</code> 中的关联函数参数和返回值 / 关联<code>const</code>，以及任何用到类型的地方，检查类型是否存在/可见。</li>
 <li>对于 <code>impl</code> ，先寻找它所对应的 <code>struct</code> 类型和 <code>trait</code> （如果是某个 <code>trait</code> 的 <code>impl</code>），然后在那个 <code>struct</code> 中添加 <code>associated item</code> ；同时检查 <code>trait</code> 中未定义的 <code>associated items</code> 是否全部实现。</li>
 </ul>
-<p>如果在当前 <code>scope</code> 或它的所有 parent <code>scope</code> 中找不到这个 <code>const</code> /<code>struct</code> / <code>trait</code>，报错 Undefined Name。</p>
-</li>
-<li>
-<p>第三步，你需要依次检查 <code>BlockExpression</code> 中的 <code>const</code> 和每条非 <code>Item</code> 的 <code>Statement</code> 。你会遇到：</p>
-<ul>
+<li>如果在当前 <code>scope</code> 或它的所有 parent <code>scope</code> 中找不到这个 <code>const</code> /<code>struct</code> / <code>trait</code>，报错 Undefined Name。</li>
+<li>第三步，你需要依次检查 <code>BlockExpression</code> 中的 <code>const</code> 和每条非 <code>Item</code> 的 <code>Statement</code> 。你会遇到：</li><ul>
 <li><code>const item</code></li>
 <li><code>let</code> 语句绑定变量</li>
 <li><code>Expression Statement</code></li>
 </ul>
-<p>你需要做：</p>
-<ul>
-<li>
-<p>对 <code>const context</code> 中的表达式进行求值（包括查找它用到的其他 <code>const</code>）；如果编译期无法求出，报错。这允许你知道所有数组类型的长度，为第四步的类型检查作准备。</p>
-</li>
-<li>
-<p>对于 <code>break</code> <code>continue</code> 检查其是否在循环中。</p>
-</li>
-<li>
-<p>控制流检查：对于所有 <code>BlockExpression</code>，判断执行它时，是否在所有控制流上一定会切换出当前控制流。如果是，在下面的类型推导中，你可以认为这个 <code>BlockExpression</code> 类型是 <code>!</code>. 参考 Control Flow in Rx。</p>
-<p>p.s. 由于我们保证没有 dead code （指编译期可确定永不执行的代码），很多时候你只需要看最后一个 <code>Expression</code> 或 <code>Statement</code>. 也就是说，如果某个 <code>BlockExpression</code> 的最后一句是 <code>break | continue | return</code>，或者是【每个分支都是 <code>!</code> 类型】（前面这8个汉字是定语）的 <code>IfExpression</code>，你可以认为这个 <code>BlockExpr</code> 的类型是 <code>!</code>；否则，按照常规的逻辑推断类型。</p>
-</li>
+<li>你需要做：</li><ul>
+<li>对 <code>const context</code> 中的表达式进行求值（包括查找它用到的其他 <code>const</code>）；如果编译期无法求出，报错。这允许你知道所有数组类型的长度，为第四步的类型检查作准备。</li>
+<li>对于 <code>break</code> <code>continue</code> 检查其是否在循环中。</li>
+<li>控制流检查：对于所有 <code>BlockExpression</code>，判断执行它时，是否在所有控制流上一定会切换出当前控制流。如果是，在下面的类型推导中，你可以认为这个 <code>BlockExpression</code> 类型是 <code>!</code>. 参考 Control Flow in Rx。 p.s. 由于我们保证没有 dead code （指编译期可确定永不执行的代码），很多时候你只需要看最后一个 <code>Expression</code> 或 <code>Statement</code>. 也就是说，如果某个 <code>BlockExpression</code> 的最后一句是 <code>break | continue | return</code>，或者是【每个分支都是 <code>!</code> 类型】（前面这8个汉字是定语）的 <code>IfExpression</code>，你可以认为这个 <code>BlockExpr</code> 的类型是 <code>!</code>；否则，按照常规的逻辑推断类型。</li>
 </ul>
-</li>
-<li>
-<p>第四步，进行类型推断和检查。你需要推断每一个表达式 / 子表达式的类型。下面是一些特例：</p>
-<ul>
-<li>
+<li>第四步，进行类型推断和检查。你需要推断每一个表达式 / 子表达式的类型。下面是一些特例：</li>
+</ul>
 <p><code>CallExpression</code> ：</p>
-<pre><code class="language-markdown">CallExpression -&gt; Expression <span class="hljs-code">`(`</span> CallParams? <span class="hljs-code">`)`</span>
+<pre><code class="language-markdown">CallExpression -&gt; Expression `(` CallParams? `)`
 </code></pre>
 <p>如果碰到这种情况：</p>
-<pre><code class="language-rust"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">A</span> {}
-<span class="hljs-keyword">impl</span> <span class="hljs-title class_">A</span> {
-    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">foo</span>() <span class="hljs-punctuation">-&gt;</span> () {}
+<pre><code class="language-rust">struct A {}
+impl A {
+    fn foo() -&gt; () {}
 }
-<span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() {
-    A::<span class="hljs-title function_ invoke__">foo</span>(); <span class="hljs-comment">// this</span>
+fn main() {
+    A::foo(); // this
 }
 </code></pre>
-<p>就没法给这个路径表达式一个很好的类型了。好在这种情况不算复杂，你可以对 <code>PathExpression</code> 的类型进行一些约定。</p>
-</li>
-<li>
-<p><code>IfExpression</code> ：参考下面 Types in Rx</p>
-</li>
-<li>
-<p>在 <code>scope</code> 中维护变量和类型列表，在遇到 <code>let</code> 的时候引入变量；对于变量的使用，需要查找 <code>scope</code> 树，否则报错 Undefined Name；在使用到变量的地方标记它的类型</p>
-</li>
-<li>
-<p>对于 <code>struct</code> 及其字段 / <code>enum</code> / <code>const</code> 的使用，需要查找你在 <code>scope</code> 中维护的信息，这允许你检测出类似 ‘字段不存在’ 或者 ‘找不到方法’ 的问题；如果找到了，就可以确定其类型</p>
-</li>
-<li>
-<p>对于函数 / <code>struct</code> 方法的使用，需要查找你在 <code>scope</code> 中维护的信息，然后检查其传入参数的类型。如果正确，将返回类型作为 <code>function/method call</code> 表达式的类型</p>
-</li>
-<li>
-<p>对于<code>return</code> ，检查其返回的表达式类型是否和函数返回类型匹配</p>
-</li>
-<li>
-<p>进行 mutability 检查</p>
-</li>
-</ul>
-<p>以及进行一些收尾工作，比如为物理上相同的变量指定同一个（虚拟）寄存器，这个寄存器在 IR 中将会存储这个变量（在栈上）的地址（或者，给重名被覆盖的变量进行重命名，总之在 IR 阶段要能放心使用变量名而不会产生重复，对于 <code>struct</code> 类型名和非关联函数名同理）。这些工作你也可以在 IR 阶段的开头完成。</p>
-</li>
+<p>- 就没法给这个路径表达式一个很好的类型了。好在这种情况不算复杂，你可以对 <code>PathExpression</code> 的类型进行一些约定。</p>
+<p>- <code>IfExpression</code> ：参考下面 Types in Rx</p>
+<p>- 在 <code>scope</code> 中维护变量和类型列表，在遇到 <code>let</code> 的时候引入变量；对于变量的使用，需要查找 <code>scope</code> 树，否则报错 Undefined Name；在使用到变量的地方标记它的类型</p>
+<p>- 对于 <code>struct</code> 及其字段 / <code>enum</code> / <code>const</code> 的使用，需要查找你在 <code>scope</code> 中维护的信息，这允许你检测出类似 ‘字段不存在’ 或者 ‘找不到方法’ 的问题；如果找到了，就可以确定其类型</p>
+<p>- 对于函数 / <code>struct</code> 方法的使用，需要查找你在 <code>scope</code> 中维护的信息，然后检查其传入参数的类型。如果正确，将返回类型作为 <code>function/method call</code> 表达式的类型</p>
+<p>- 对于<code>return</code> ，检查其返回的表达式类型是否和函数返回类型匹配</p>
+<p>- 进行 mutability 检查</p>
+<ul>
+<li>以及进行一些收尾工作，比如为物理上相同的变量指定同一个（虚拟）寄存器，这个寄存器在 IR 中将会存储这个变量（在栈上）的地址（或者，给重名被覆盖的变量进行重命名，总之在 IR 阶段要能放心使用变量名而不会产生重复，对于 <code>struct</code> 类型名和非关联函数名同理）。这些工作你也可以在 IR 阶段的开头完成。</li>
 </ul>
 <p>以上内容仅作参考。有一些步骤你可以自由调换顺序，只要逻辑通顺并且正确完成语法检查的任务。</p>
 <p>如果你好奇上面的步骤<strong>为什么</strong>这样安排，注意几个关键的先后顺序：</p>
 <ul>
 <li>由于 <code>Item</code> 无序，需要一个 pass （第一步）收集每个 <code>scope</code> 的符号，才可以在第二步查找 <code>struct</code> 并且完善它的信息.</li>
 </ul>
-<!-- - `Constant Item` 的值表达式会涉及到 `Struct` 类型及其字段、关联 `Constant Item`. 例如：
-    ```rust
-        struct A {
-            x: i32,
-        }
-        impl A {
-            const C: i32 = 5;
-            fn new(arr: &[i32; Y]) -> Self {
-                Self { x: arr[1] }
-            }
-        }
-        const Y: i32 = A::C;
-    ``` -->
-<ul>
-<li><code>Array</code> 类型依赖于常量求值，例如会出现 <code>[i32; N * N]</code> 类型，如果 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">N=3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span>，它和 <code>[i32; 9]</code> 是相同的类型. 保证不会出现循环依赖，例如<pre><code class="language-rust">    <span class="hljs-keyword">struct</span> <span class="hljs-title class_">A</span> {
-        x: <span class="hljs-type">i32</span>,
-        y: [<span class="hljs-type">i32</span>; Y.x]
+<p><code>Array</code> 类型依赖于常量求值，例如会出现 <code>[i32; N * N]</code> 类型，如果 \(N=3\) ，它和 <code>[i32; 9]</code> 是相同的类型. 保证不会出现循环依赖，例如</p>
+<pre><code class="language-rust">    struct A {
+        x: i32,
+        y: [i32; Y.x]
     }
-    <span class="hljs-keyword">const</span> Y: A = A {x: <span class="hljs-number">2</span>, y: [<span class="hljs-number">114</span>, <span class="hljs-number">514</span>], };
+    const Y: A = A {x: 2, y: [114, 514], };
 </code></pre>
-</li>
+<ul>
 <li>先做控制流检查，再做类型检查。类型检查需要知道某个 <code>BlockExpression</code> 是否是 <code>!</code> 类型.</li>
 <li>....</li>
 </ul>
-<h2 id="types-in-rx">Types in Rx</h2>
+<h2>Types in Rx</h2>
 <p>这一节说明一些类型逻辑，帮助你推断表达式的类型。我们在这里使用 <code>rust</code> 中的 <code>never</code> 类型 <code>!</code> 作为类型推导的中间结果，并且保证这种类型不会显式出现。</p>
-<ul>
-<li>
-<p><code>BlockExpression</code></p>
-<p>首先有<code>BlockExpression</code> 的定义</p>
+<p><code>BlockExpression</code> 首先有<code>BlockExpression</code> 的定义</p>
 <pre><code class="language-markdown">BlockExpression -&gt;
-<span class="hljs-code">	`{`
+	`{`
 	    Statements?
 	`}`
-</span>
+
 Statements -&gt;
-<span class="hljs-code">	  Statement+
+	  Statement+
 	| Statement+ ExpressionWithoutBlock
 	| ExpressionWithoutBlock
-</span>
+
 Statement -&gt;
-<span class="hljs-code">    `;`
+    `;`
   | Item
   | LetStatement
   | ExpressionStatement
-  
+
 ExpressionStatement -&gt;
     ExpressionWithoutBlock `;`
   | ExpressionWithBlock `;`?
-</span></code></pre>
-<p>下面我们统称 <code>Statements</code> 末尾的 <code>ExpressionWithoutBlock</code> 和不带分号的 <code>ExpressionWithBlock</code> 为「尾表达式」。</p>
-<p><code>Rx</code> 中 <code>BlockExpression</code> 的类型规则是：</p>
+</code></pre>
 <ul>
+<li>下面我们统称 <code>Statements</code> 末尾的 <code>ExpressionWithoutBlock</code> 和不带分号的 <code>ExpressionWithBlock</code> 为「尾表达式」。 <code>Rx</code> 中 <code>BlockExpression</code> 的类型规则是：</li><ul>
 <li>有尾表达式的情况，使用该表达式的类型；</li>
 <li>没有尾表达式的情况，如果所有控制流都会遇到 <code>return</code> / <code>break</code> / <code>continue</code> ，使用 <code>!</code>；否则类型为 <code>unit</code>.</li>
 </ul>
-</li>
-<li>
-<p><code>IfExpression</code></p>
-<p>常规来说，两个分支需要有相同的类型。然而分支中会出现 <code>return</code>/ <code>break</code> / <code>continue</code>。</p>
-<p>根据控制流检查的结果，如果有分支没有尾表达式且一定返回，那么这个分支可以确定为 <code>!</code>。例如：</p>
-<pre><code class="language-rust"><span class="hljs-title function_ invoke__">if</span> (cond1) {
-    <span class="hljs-title function_ invoke__">if</span> (cond2) {
-        <span class="hljs-keyword">return</span> <span class="hljs-number">3</span>;
-    } <span class="hljs-keyword">else</span> {
-        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
-    } <span class="hljs-comment">// this if evaluates to !</span>
-    stmt; <span class="hljs-comment">// dead code</span>
-} <span class="hljs-keyword">else</span> {
-    <span class="hljs-number">4i32</span>
+</ul>
+<p><code>IfExpression</code> 常规来说，两个分支需要有相同的类型。然而分支中会出现 <code>return</code>/ <code>break</code> / <code>continue</code>。 根据控制流检查的结果，如果有分支没有尾表达式且一定返回，那么这个分支可以确定为 <code>!</code>。例如：</p>
+<pre><code class="language-rust">if (cond1) {
+    if (cond2) {
+        return 3;
+    } else {
+        return 1;
+    } // this if evaluates to !
+    stmt; // dead code
+} else {
+    4i32
 }
 </code></pre>
 <p>的类型是 <code>i32</code> ，由于 <code>true</code> 分支为类型 <code>!</code>，可以 coerce 到 <code>i32</code>，所以 <code>if</code> 的类型出自 <code>false</code> 分支。如果两分支都是类型 <code>!</code>， <code>if</code> 表达式类型为 <code>!</code>。注意下面的语句属于类型不匹配：</p>
-<pre><code class="language-rust"><span class="hljs-title function_ invoke__">if</span> (cond1) {
-    <span class="hljs-title function_ invoke__">if</span> (cond2) {
-        <span class="hljs-keyword">return</span> <span class="hljs-number">3</span>;
-    } <span class="hljs-keyword">else</span> {
-        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
-    } <span class="hljs-comment">// this if evaluates to !</span>
-    <span class="hljs-string">&quot;114514&quot;</span> <span class="hljs-comment">// dead code</span>
-} <span class="hljs-keyword">else</span> {
-    <span class="hljs-number">4i32</span>
+<pre><code class="language-rust">if (cond1) {
+    if (cond2) {
+        return 3;
+    } else {
+        return 1;
+    } // this if evaluates to !
+    &quot;114514&quot; // dead code
+} else {
+    4i32
 }
 </code></pre>
-<p>由于 dead code, 以上两个例子都不会在 case 中出现。</p>
-<p>我们的 Spec 保证了不会显式出现 <code>!</code> 类型，但是你需要自己实现它的一些特性。例如你可能会遇到这种代码：</p>
-<pre><code class="language-rust"><span class="hljs-keyword">loop</span> {
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">y</span>: <span class="hljs-type">i32</span> = <span class="hljs-title function_ invoke__">if</span> (cond) {
-        <span class="hljs-keyword">break</span> <span class="hljs-number">4</span>; <span class="hljs-comment">// this Block evaluates to !</span>
-    } <span class="hljs-keyword">else</span> {
-        <span class="hljs-number">2</span> <span class="hljs-comment">// and coerces with i32</span>
+<p>由于 dead code, 以上两个例子都不会在 case 中出现。 我们的 Spec 保证了不会显式出现 <code>!</code> 类型，但是你需要自己实现它的一些特性。例如你可能会遇到这种代码：</p>
+<pre><code class="language-rust">loop {
+    let y: i32 = if (cond) {
+        break 4; // this Block evaluates to !
+    } else {
+        2 // and coerces with i32
     }
-} <span class="hljs-comment">// by the way, the loop evaluates to i32</span>
+} // by the way, the loop evaluates to i32
 </code></pre>
-</li>
-<li>
-<p><code>LoopExpression</code> ：</p>
-<p>Spec 里面提到， <code>while</code> 的类型是 <code>unit</code>， <code>loop</code> 类型取决于其中 <code>break expr</code> 的 <code>expr</code> 类型。我们保证没有任何情况的死循环，因此 <code>loop</code> 表达式一定有 <code>break</code> 语句，据此推断类型。</p>
-</li>
+<ul>
+<li><code>LoopExpression</code> ： Spec 里面提到， <code>while</code> 的类型是 <code>unit</code>， <code>loop</code> 类型取决于其中 <code>break expr</code> 的 <code>expr</code> 类型。我们保证没有任何情况的死循环，因此 <code>loop</code> 表达式一定有 <code>break</code> 语句，据此推断类型。</li>
 </ul>
-<h2 id="namespaces-in-rx">Namespaces in Rx</h2>
+<h2>Namespaces in Rx</h2>
 <p>我们有时候可以知道某个符号是干什么用的，去 <code>scope</code> 里面找对应的东西就好了。比如代码调用了一个函数，就去函数列表里面找；如果用到了一个 <code>struct expression</code>，就去 <code>struct</code> 列表里面找。</p>
 <p>对于个别特例，我们不知道某个符号指代的是什么。例如，在 <code>PathExpression</code> 中，第一个 <code>Segment</code> 可能是 <code>struct</code>, 可能是 <code>enum</code>; 第二个 <code>Segment</code> 可能是 <code>const item</code>, 可能是关联函数，也可能是 <code>enum variant</code>.</p>
-<p>因此你可以实现（也可以不实现）类似 <code>rust</code> 的 <code>namespace</code> 规则，将每个 <code>scope</code> 的 <code>namespace</code> 分成 <code>type namespace</code>  和 <code>value namespace</code> 。如果不实现，在 <code>scope</code> 中把 <code>struct</code> / 函数 / <code>enum</code> / <code>const</code> 的名字分开来，按需寻找，也可以满足语法检查的要求。</p>
-<h2 id="bonus-control-flow-in-rx">Bonus: Control flow in Rx</h2>
+<p>因此你可以实现（也可以不实现）类似 <code>rust</code> 的 <code>namespace</code> 规则，将每个 <code>scope</code> 的 <code>namespace</code> 分成 <code>type namespace</code> 和 <code>value namespace</code> 。如果不实现，在 <code>scope</code> 中把 <code>struct</code> / 函数 / <code>enum</code> / <code>const</code> 的名字分开来，按需寻找，也可以满足语法检查的要求。</p>
+<h2>Bonus: Control flow in Rx</h2>
 <p>控制流检查不应该依赖类型检查。实际上 <code>Rust</code> 也是这么做的，看几个例子：</p>
-<pre><code class="language-rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">test3</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">i32</span> {
+<pre><code class="language-rust">fn test3() -&gt; i32 {
     {
-        <span class="hljs-title function_ invoke__">if</span> (<span class="hljs-number">3</span> &gt; <span class="hljs-number">4</span>) {
-            <span class="hljs-keyword">return</span> <span class="hljs-number">3</span>;
-        } <span class="hljs-keyword">else</span> {
-            <span class="hljs-keyword">return</span> <span class="hljs-number">7</span>;
+        if (3 &gt; 4) {
+            return 3;
+        } else {
+            return 7;
         }
-        <span class="hljs-number">1</span>
+        1
     };
 }
 </code></pre>
 <p>这里 <code>BlockExpression</code> 的类型被推断成 <code>i32</code>，这和我们的规则相符。编译器也知道这一段代码总会返回。</p>
-<pre><code class="language-rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">test4</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">i32</span> {
-    <span class="hljs-title function_ invoke__">if</span> ({
-        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
-        <span class="hljs-number">1</span>
-    } == <span class="hljs-number">1</span>)
+<pre><code class="language-rust">fn test4() -&gt; i32 {
+    if ({
+        return 1;
+        1
+    } == 1)
     {
-        <span class="hljs-number">3</span>;
+        3;
     };
 }
 </code></pre>
 <p>这里 <code>IfExpression</code> 的类型被推断成 <code>i32</code>。实际上除了 <code>return 1</code> 之外，没有表达式被推断成 <code>!</code> ，但是编译器知道这一段代码总会返回。</p>
-<p>你可以在以上两个例子中插入 <code>let y =</code>  以测试类型推断的结果。</p>
+<p>你可以在以上两个例子中插入 <code>let y =</code> 以测试类型推断的结果。</p>
 <p>上面两个例子说明了，如果用 <code>Rust</code> 的 <code>!</code> 类型来处理控制流，逻辑将会非常复杂。因此我们鼓励大家自己想办法来解决控制流的问题（没有想象中那么难！）</p>
 <p>比如，你可以为每个 <code>Expression</code>做“一定返回”的标记，表示执行这个 <code>Expression</code> 的过程中，函数无论经过哪一条控制流，都会返回。这种标记需要遵循一些逻辑，例如 <code>if</code> 表达式。最终如果一个返回类型非 <code>unit</code> 函数的函数体没有标记，报错。</p>
 <p>以上仅作参考，可自由选择实现方式。</p>
 <p>由于保证没有 dead code，控制流分析被极大地简化了。如果对奇怪的案例感兴趣，可以自行摸索/实现。</p>
-<h2 id="auto-dereferencing--implicit-borrow">Auto Dereferencing / Implicit Borrow</h2>
+<h2>Auto Dereferencing / Implicit Borrow</h2>
 <p>在 Rust 中，有时候即使类型看起来不完全匹配，代码依然能运行，也无需手动添加繁琐的 <code>*</code>（解引用）或 <code>&amp;</code>（引用）符号。这来自于编译器为了提升代码可读性和编写效率而提供的两个特性：<strong>解引用转换 (Deref Coercion)</strong> 和 <strong>点运算符自动引用 (Dot Operator Auto-referencing)</strong>。</p>
-<p>在 Rx 中也是如此，但相较于 Rust 大幅简化。Rx 的自动转换机制<s>暂时</s>只需要考虑 <strong>点运算符的自动校准</strong> 和 <strong>方法调用与数组索引</strong>。</p>
-<h3 id="总结tldr">总结（TL；DR）</h3>
+<p>在 Rx 中也是如此，但相较于 Rust 大幅简化。Rx 的自动转换机制<del>暂时</del>只需要考虑 <strong>点运算符的自动校准</strong> 和 <strong>方法调用与数组索引</strong>。</p>
+<h3>总结（TL；DR）</h3>
 <ul>
-<li>以下四条规则是 Rx 中自动引用与自动解引用的<strong>省流版</strong>，如果具体原理太难理解，<strong>可以直接查看这四条结论，并让你的编译器实现一致的结果。</strong>
-<ol>
-<li>
-<p><strong>在值上调用需要引用的方法</strong>：当在一个值（例如 <code>my_string</code>）上调用需要不可变或可变引用的方法（如 <code>len(&amp;self)</code> 或 <code>append(&amp;mut self)</code>) 时，编译器会自动为该值创建所需的引用。即 <code>my_string.len()</code> 会被视为 <code>(&amp;my_string).len()</code> 来处理。</p>
-<pre><code class="language-rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">s</span>: <span class="hljs-type">String</span> = String::<span class="hljs-title function_ invoke__">from</span>(<span class="hljs-string">&quot;hello&quot;</span>);
-<span class="hljs-comment">// .len() 需要 &amp;self，编译器自动将 s 转换为 &amp;s</span>
-<span class="hljs-keyword">let</span> <span class="hljs-variable">length</span>: <span class="hljs-type">usize</span> = s.<span class="hljs-title function_ invoke__">len</span>();
-</code></pre>
-</li>
-<li>
-<p><strong>在引用上访问其字段</strong>：当通过一个引用来访问其指向的结构体的字段时，编译器会自动解引用。即 <code>my_ref.field</code> 会被直接转换为 <code>(*my_ref).field</code> 来访问。</p>
-<pre><code class="language-rust"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Point</span> { x: <span class="hljs-type">i32</span> }
-<span class="hljs-keyword">let</span> <span class="hljs-variable">p</span>: Point = Point { x: <span class="hljs-number">10</span> };
-<span class="hljs-keyword">let</span> <span class="hljs-variable">p_ref</span>: &amp;Point = &amp;p;
-<span class="hljs-comment">// 编译器自动将 p_ref.x 转换为 (*p_ref).x</span>
-<span class="hljs-keyword">let</span> <span class="hljs-variable">x_value</span>: <span class="hljs-type">i32</span> = p_ref.x;
-</code></pre>
-</li>
-<li>
-<p><strong>在类引用上调用其方法</strong>：当在一个引用（例如 <code>my_string_ref</code>）上调用方法时，点运算符 <code>.</code> 会自动“看穿”这个引用，直接找到并执行其指向的值上所定义的方法。因此无需手动解引用，编译器会自动处理。</p>
-<pre><code class="language-rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">s</span>: <span class="hljs-type">String</span> = String::<span class="hljs-title function_ invoke__">from</span>(<span class="hljs-string">&quot;world&quot;</span>);
-<span class="hljs-comment">// s_ref 是一个对 String 的引用</span>
-<span class="hljs-keyword">let</span> <span class="hljs-variable">s_ref</span>: &amp;<span class="hljs-type">String</span> = &amp;s;
-<span class="hljs-comment">// 编译器“看穿” s_ref，直接找到 String 上的 .len() 方法来执行</span>
-<span class="hljs-keyword">let</span> <span class="hljs-variable">length</span>: <span class="hljs-type">usize</span> = s_ref.<span class="hljs-title function_ invoke__">len</span>();
-</code></pre>
-</li>
-<li>
-<p><strong>在数组引用上使用数组索引</strong>：当有一个指向数组的引用时（例如 <code>array_ref</code>），可以像操作数组本身一样，直接使用 <code>[]</code> 来访问其中的元素。编译器会自动“看穿”这个引用，直接从它指向的实际数组中取出需要的成员。</p>
-<pre><code class="language-rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">numbers</span>: [<span class="hljs-type">i32</span>; <span class="hljs-number">3</span>] = [<span class="hljs-number">10</span>, <span class="hljs-number">20</span>, <span class="hljs-number">30</span>];
-<span class="hljs-comment">// numbers_ref 是一个对数组的引用</span>
-<span class="hljs-keyword">let</span> <span class="hljs-variable">numbers_ref</span>: &amp;[<span class="hljs-type">i32</span>; <span class="hljs-number">3</span>] = &amp;numbers;
-<span class="hljs-comment">// 直接在引用上使用索引，编译器自动解引用</span>
-<span class="hljs-keyword">let</span> <span class="hljs-variable">second_item</span>: <span class="hljs-type">i32</span> = numbers_ref[<span class="hljs-number">1</span>];
-</code></pre>
-</li>
-</ol>
-</li>
+<li>以下四条规则是 Rx 中自动引用与自动解引用的<strong>省流版</strong>，如果具体原理太难理解，<strong>可以直接查看这四条结论，并让你的编译器实现一致的结果。</strong></li>
 </ul>
+<p><strong>在值上调用需要引用的方法</strong>：当在一个值（例如 <code>my_string</code>）上调用需要不可变或可变引用的方法（如 <code>len(&amp;self)</code> 或 <code>append(&amp;mut self)</code>) 时，编译器会自动为该值创建所需的引用。即 <code>my_string.len()</code> 会被视为 <code>(&amp;my_string).len()</code> 来处理。</p>
+<pre><code class="language-rust">let s: String = String::from(&quot;hello&quot;);
+// .len() 需要 &amp;self，编译器自动将 s 转换为 &amp;s
+let length: usize = s.len();
+</code></pre>
+<p><strong>在引用上访问其字段</strong>：当通过一个引用来访问其指向的结构体的字段时，编译器会自动解引用。即 <code>my_ref.field</code> 会被直接转换为 <code>(*my_ref).field</code> 来访问。</p>
+<pre><code class="language-rust">struct Point { x: i32 }
+let p: Point = Point { x: 10 };
+let p_ref: &amp;Point = &amp;p;
+// 编译器自动将 p_ref.x 转换为 (*p_ref).x
+let x_value: i32 = p_ref.x;
+</code></pre>
+<p><strong>在类引用上调用其方法</strong>：当在一个引用（例如 <code>my_string_ref</code>）上调用方法时，点运算符 <code>.</code> 会自动“看穿”这个引用，直接找到并执行其指向的值上所定义的方法。因此无需手动解引用，编译器会自动处理。</p>
+<pre><code class="language-rust">let s: String = String::from(&quot;world&quot;);
+// s_ref 是一个对 String 的引用
+let s_ref: &amp;String = &amp;s;
+// 编译器“看穿” s_ref，直接找到 String 上的 .len() 方法来执行
+let length: usize = s_ref.len();
+</code></pre>
+<p><strong>在数组引用上使用数组索引</strong>：当有一个指向数组的引用时（例如 <code>array_ref</code>），可以像操作数组本身一样，直接使用 <code>[]</code> 来访问其中的元素。编译器会自动“看穿”这个引用，直接从它指向的实际数组中取出需要的成员。</p>
+<pre><code class="language-rust">let numbers: [i32; 3] = [10, 20, 30];
+// numbers_ref 是一个对数组的引用
+let numbers_ref: &amp;[i32; 3] = &amp;numbers;
+// 直接在引用上使用索引，编译器自动解引用
+let second_item: i32 = numbers_ref[1];
+</code></pre>
 <p><img src="https://notes.sjtu.edu.cn/uploads/upload_5cac2e1a8ce1430892b7d5b25a33655b.jpg" alt="rust"></p>
 <p><em>Anyway，祝大家 Semantic 愉快！</em></p>
 <p><strong>Upd at September 28, 2025 1:17 AM.</strong></p>
-<h2 id="constants-and-constant-context-in-rx">Constants and Constant Context in Rx</h2>
+<h2>Constants and Constant Context in Rx</h2>
 <p>Rx 有三种常量环境（constant contexts）:</p>
 <ul>
 <li>常量的初始化表达式</li>
@@ -442,7 +335,7 @@ ExpressionStatement -&gt;
 </ul>
 <p>以下两项可选择实现，作为 Bonus，不会出现在常规数据点中：</p>
 <ul>
-<li>数组表达式，但是形如 <code>[Expression ; Expression]</code> 这类除外，只允许 <code>[Expression ( , Expression )* ,?]</code> 的形式</li>
+<li>数组表达式，但是形如 <code>[Expression; Expression]</code> 这类除外，只允许 <code>[Expression (, Expression)*,?]</code> 的形式</li>
 <li>数组的下标表达式</li>
 </ul>
 <p>也就是说，以下几种表达式不会出现在常量环境中：</p>
@@ -456,18 +349,11 @@ ExpressionStatement -&gt;
 <li>比较表达式，例如 <code>==</code>, <code>&lt;</code> 等六个</li>
 <li>任何函数调用、类方法调用</li>
 </ul>
-<p>
-<strong>说明.</strong></p>
+<p><strong>说明.</strong></p>
 <ol>
-<li>关于 <code>ArrayExpr</code>.
-个人认为，类似 <code>[Expression ; Expression]</code> 这类数组常量似乎（？）没有太大意义.
-目前测试点中确实没有数组类型的常量，不过 <code>[Expression ( , Expression )* ,?]</code> 还是有用（例如模拟随机种子、常量打表或者字符串）. 故将这两种数组形式留作 Bonus.
-</li>
+<li>关于 <code>ArrayExpr</code>. 个人认为，类似 <code>[Expression; Expression]</code> 这类数组常量似乎（？）没有太大意义. 目前测试点中确实没有数组类型的常量，不过 <code>[Expression (, Expression)*,?]</code> 还是有用（例如模拟随机种子、常量打表或者字符串）. 故将这两种数组形式留作 Bonus.</li>
 </ol>
-
-            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
-            
-        </article>
+</article>
   </div>
 </main>
 

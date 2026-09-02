@@ -2,6 +2,8 @@
 
 *May 11, 2026*
 
+*May 11, 2026*
+
 A reading notes of [ADRS14](https://arxiv.org/pdf/1412.7994)
 
 文章主要结论是：存在算法在 $2^{n+o(n)}$ 时间和空间内从格 $L$ 的离散高斯分布 $D_{L,s}$ 采样出 $2^{n/2}$ 个独立同分布的样本。
@@ -17,7 +19,7 @@ A reading notes of [ADRS14](https://arxiv.org/pdf/1412.7994)
 再看：假设我们独立随机选取 $x,y\sim D_{L,s}$ ，然后拒绝采样，即舍弃 $x,y$ 不同陪集的情况。这样， $(x+y)/2$ 的分布就是
 
 $$
-\Pr[X,Y\sim D_{L,s}]{ \frac{X+Y}{2}=z \mid X\equiv Y\bmod 2L}=\Pr[Z\sim D_{L,s/\sqrt{2}}]{Z=z}
+\Pr_{X,Y\sim D_{L,s}}\left[\frac{X+Y}{2}=z \mid X\equiv Y\bmod 2L\right]=\Pr_{Z\sim D_{L,s/\sqrt{2}}}[Z=z]
 $$
 
 这个式子很好理解。考虑子格
@@ -168,7 +170,7 @@ Here is the original version of the Gaussian sampling lemma.
 
 Lemma 2.3
 
-There is a probabilistic polynomial-time algorithm that, given a basis $\mathbf{B}$ of an $n$-dimensional lattice $\Lambda = \mathcal{L}(\mathbf{B})$, $\mathbf{c} \in \mathbb{R}^n$, and a parameter $r \ge \|\widetilde{\mathbf{B}}\| \cdot \sqrt{\ln(2n+4)/\pi}$, outputs a sample distributed according to $D_{\Lambda+\mathbf{c},\,r}$.
+There is a probabilistic polynomial-time algorithm that, given a basis $\mathbf{B}$ of an $n$ -dimensional lattice $\Lambda = \mathcal{L}(\mathbf{B})$, $\mathbf{c} \in \mathbb{R}^n$, and a parameter $r \ge \|\widetilde{\mathbf{B}}\| \cdot \sqrt{\ln(2n+4)/\pi}$, outputs a sample distributed according to $D_{\Lambda+\mathbf{c},\,r}$.
 
 首先考虑 $n=1$ 的情况，假设我们要从 $D_{\mathbb Z+c,r}$ 中采样，其中 $c\in[0,1)$. 我们会想到从连续高斯分布中采样然后取整，然后通过拒绝采样修正概率的误差。令 $Z=\rho_r(c)+\rho_r(c-1)+\int_{-\infty}^{c-1}\rho_r(x),\mathrm{d} x+\int_c^{+\infty}\rho_r(x),\mathrm{d} x$.
 

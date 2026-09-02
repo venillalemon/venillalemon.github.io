@@ -13,3 +13,6 @@ package-lock.json
 # Python bytecode from _tools/
 __pycache__/
 *.pyc
+
+# macOS
+.DS_Store

@@ -13,7 +13,6 @@ Personal site of Fangke Li — Jekyll, hosted on GitHub Pages.
 | `assets/css/post.css` | theme for the exported posts |
 | `_tools/restyle_posts.py` | re-shells `files/*.html` into the site style |
 | `md/` | Markdown sources kept as backups — excluded from the build, never published |
-| `markdown_generator/`, `talkmap.py` | generators kept from the original template |
 
 ## Adding a post
 
@@ -30,39 +29,42 @@ exports are handled. The blog index picks the file up automatically.
 
 ## Writing a post in Markdown
 
-```bash
-pip install markdown pygments
-```
+No dependencies — the converter is stdlib-only:
 
 ```bash
-python3 _tools/md_to_post.py notes/turan.md
+python3 _tools/md2html.py md/2026_08_31_some_title.md
 ```
 
-Front matter is optional and only `title` / `date` are read:
+writes `files/<same-stem>.html`, shelled by `restyle_posts.build()` so the
+chrome (header, footer, theme toggle, analytics) always matches the site.
+`--out`, `--title` and `--date` override the defaults.
 
-```markdown
----
-title: Turán's Theorem
-date: 2026-08-09
----
+The title comes from the first `# heading` (lifted into the post header, not
+repeated in the body), the date from a `*March 15, 2026*` line under it or the
+`YYYY_MM_DD_` filename prefix. Frontmatter with `title:` / `date:` also works.
+The dialect is exactly what `html2md.py` emits (the two are inverses, verified
+by round-tripping every file in `md/`): headings, `*em*` `**strong**` `~~del~~`,
+links, images, inline `code`, fenced code blocks, nested `-` / `1.` lists,
+`> ` blockquotes, pipe tables (`\|` escapes a pipe in a cell), `---` rules, and
+raw HTML blocks (`<details>` etc.). Math stays as `$...$` / `$$...$$` (also
+`\(...\)` / `\[...\]`) and is rendered by KaTeX in the browser; a literal `$`
+in prose is left alone as long as it isn't glued to non-space text on both
+sides. Not supported: underscore emphasis (a literal `_` stays literal),
+footnotes, task lists, autolinking. Image paths must be site-absolute
+(`/images/x.png`), since posts are served from `/files/`.
+
+## Backing up posts as Markdown
+
+`md/` holds Markdown versions of the posts, reconstructed from the restyled
+HTML (LaTeX recovered from the KaTeX annotations). Regenerate with:
+
+```bash
+python3 _tools/html2md.py md files/*.html
 ```
 
-Otherwise the title comes from the first `# heading` (which is then lifted into
-the post header, not repeated in the body), and the date from a `YYYY_MM_DD_`
-filename prefix, else today. `--title`, `--date` and `--out` override.
-
-Supported: headings (with anchor ids), `*em*` `**strong**` `~~del~~`, links and
-reference links, images, nested lists, task lists (`- [ ]` / `- [x]`), pipe
-tables, fenced and indented code (highlighted by Pygments), blockquotes, `---`
-rules, footnotes, definition lists, abbreviations, `{: #id }` on headings, raw
-HTML, two-space hard line breaks, and smart quotes/dashes. Math stays as
-`$...$`, `$$...$$`, `\(...\)`, `\[...\]` and is rendered by KaTeX in the browser.
-
-Not supported — these stay literal: bare-URL autolinking (write `[text](url)`),
-GitHub `> [!NOTE]` alerts, `:emoji:` shortcodes, and LaTeX macro preambles
-(`\def` / `\newcommand` definitions do not carry from one `$…$` to the next).
-Image paths must be site-absolute (`/images/x.png`), since posts are served
-from `/files/`.
+First argument is the output directory; the rest are the posts to convert.
+PDF-embed posts become a stub linking to the PDF. `md/` is excluded from the
+Jekyll build — these files never appear on the site.
 
 ## Running locally
 

@@ -16,6 +16,17 @@
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
 <link rel="stylesheet" href="/assets/css/post.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+  delimiters: [
+    {left: '$$', right: '$$', display: true},
+    {left: '\\[', right: '\\]', display: true},
+    {left: '$', right: '$', display: false},
+    {left: '\\(', right: '\\)', display: false}
+  ],
+  ignoredClasses: ['katex'],
+  throwOnError: false
+})"></script>
 </head>
 <body>
 
@@ -38,21 +49,14 @@
       <hr class="rule">
     </div>
 
-    <article class="prose vscode" data-src="vscode">
-            <p>Today I set up my blog on GitHub successfully.</p>
-<p>In the past I am used to take hand-written notes
-to help me learn.</p>
-<p>So it may
-take a lot of time to post them on this
-site.</p>
-<p>In the future I will post my new blog
-and in the same time repost those in my notebook.</p>
-<h2 id="handwriting-is-cool">Handwriting is cool🤗</h2>
+    <article class="prose markdown" data-src="markdown">
+<p>Today I set up my blog on GitHub successfully.</p>
+<p>In the past I am used to take hand-written notes to help me learn.</p>
+<p>So it may take a lot of time to post them on this site.</p>
+<p>In the future I will post my new blog and in the same time repost those in my notebook.</p>
+<h2>Handwriting is cool🤗</h2>
 <p>But Poor Handwriting (PH) is not😭</p>
-
-            
-            
-        </article>
+</article>
   </div>
 </main>
 

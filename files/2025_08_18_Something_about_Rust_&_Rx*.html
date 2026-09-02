@@ -16,6 +16,17 @@
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
 <link rel="stylesheet" href="/assets/css/post.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+  delimiters: [
+    {left: '$$', right: '$$', display: true},
+    {left: '\\[', right: '\\]', display: true},
+    {left: '$', right: '$', display: false},
+    {left: '\\(', right: '\\)', display: false}
+  ],
+  ignoredClasses: ['katex'],
+  throwOnError: false
+})"></script>
 </head>
 <body>
 
@@ -38,226 +49,224 @@
       <hr class="rule">
     </div>
 
-    <article class="prose vscode" data-src="vscode">
-<h2 id="names-of-associated-items">Names of associated items</h2>
+    <article class="prose markdown" data-src="markdown">
+<h2>Names of associated items</h2>
 <p>类方法、类中 associated const item 都属于 value namespace. 但是由于一个 <code>struct</code> 可以有多个 <code>impl</code> 块，仍然会有重名发生.</p>
-<pre><code class="language-rust"><span class="hljs-keyword">enum</span> <span class="hljs-title class_">D</span> {
+<pre><code class="language-rust">enum D {
     A,
     B,
     C,
 }
 
-<span class="hljs-keyword">impl</span> <span class="hljs-title class_">Int</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">D</span> {
-    <span class="hljs-keyword">const</span> FN: <span class="hljs-type">i32</span> = <span class="hljs-number">1926</span>;
-    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">get</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">i32</span> {
-        <span class="hljs-keyword">match</span> <span class="hljs-keyword">self</span> {
-            D::A =&gt; <span class="hljs-number">1</span>,
-            D::B =&gt; <span class="hljs-number">2</span>,
-            D::C =&gt; <span class="hljs-number">3</span>,
+impl Int for D {
+    const FN: i32 = 1926;
+    fn get(&amp;self) -&gt; i32 {
+        match self {
+            D::A =&gt; 1,
+            D::B =&gt; 2,
+            D::C =&gt; 3,
         }
     }
 }
 
-<span class="hljs-keyword">impl</span> <span class="hljs-title class_">Str</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">D</span> {
-    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">get</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">String</span> {
-        <span class="hljs-keyword">match</span> <span class="hljs-keyword">self</span> {
-            D::A =&gt; String::<span class="hljs-title function_ invoke__">from</span>(<span class="hljs-string">&quot;A&quot;</span>),
-            D::B =&gt; String::<span class="hljs-title function_ invoke__">from</span>(<span class="hljs-string">&quot;B&quot;</span>),
-            D::C =&gt; String::<span class="hljs-title function_ invoke__">from</span>(<span class="hljs-string">&quot;C&quot;</span>),
+impl Str for D {
+    fn get(&amp;self) -&gt; String {
+        match self {
+            D::A =&gt; String::from(&quot;A&quot;),
+            D::B =&gt; String::from(&quot;B&quot;),
+            D::C =&gt; String::from(&quot;C&quot;),
         }
     }
 }
 
-<span class="hljs-keyword">impl</span> <span class="hljs-title class_">D</span> {
-    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">get</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">i32</span> {
-        <span class="hljs-number">114514</span>
+impl D {
+    fn get(&amp;self) -&gt; i32 {
+        114514
     }
 }
 
-<span class="hljs-keyword">impl</span> <span class="hljs-title class_">Con</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">D</span> {}
+impl Con for D {}
 
-<span class="hljs-keyword">struct</span> <span class="hljs-title class_">P</span> {}
+struct P {}
 
-<span class="hljs-keyword">impl</span> <span class="hljs-title class_">Int</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">P</span> {
-    <span class="hljs-keyword">const</span> FN: <span class="hljs-type">i32</span> = <span class="hljs-number">2026</span>;
-    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">get</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">i32</span> {
-        <span class="hljs-number">1919810</span>
+impl Int for P {
+    const FN: i32 = 2026;
+    fn get(&amp;self) -&gt; i32 {
+        1919810
     }
 }
 
-<span class="hljs-keyword">trait</span> <span class="hljs-title class_">Int</span> {
-    <span class="hljs-keyword">const</span> FN: <span class="hljs-type">i32</span>;
-    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">get</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">i32</span>;
+trait Int {
+    const FN: i32;
+    fn get(&amp;self) -&gt; i32;
 }
 
-<span class="hljs-keyword">trait</span> <span class="hljs-title class_">Str</span> {
-    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">get</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">String</span>;
+trait Str {
+    fn get(&amp;self) -&gt; String;
 }
 
-<span class="hljs-keyword">trait</span> <span class="hljs-title class_">Con</span> {
-    <span class="hljs-keyword">const</span> FN: <span class="hljs-type">i32</span> = <span class="hljs-number">0817</span>;
+trait Con {
+    const FN: i32 = 0817;
 }
-<span class="hljs-keyword">struct</span> <span class="hljs-title class_">Y</span> {
-    i: <span class="hljs-type">i32</span>,
-    p: <span class="hljs-type">i32</span>,
+struct Y {
+    i: i32,
+    p: i32,
 }
 
-<span class="hljs-keyword">fn</span> <span class="hljs-title function_">g</span>(d: <span class="hljs-type">i32</span>, ff: &amp;<span class="hljs-type">str</span>) <span class="hljs-punctuation">-&gt;</span> [<span class="hljs-type">i32</span>; <span class="hljs-number">2</span>] {
-    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">a</span> = [<span class="hljs-number">0</span>; <span class="hljs-number">2</span>];
-    a[<span class="hljs-number">0</span>] = d;
-    a[<span class="hljs-number">1</span>] = ff.<span class="hljs-title function_ invoke__">len</span>() <span class="hljs-keyword">as</span> <span class="hljs-type">i32</span>;
+fn g(d: i32, ff: &amp;str) -&gt; [i32; 2] {
+    let mut a = [0; 2];
+    a[0] = d;
+    a[1] = ff.len() as i32;
     a
 }
-<span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() {
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">d</span> = D::B;
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{}&quot;</span>, D::<span class="hljs-title function_ invoke__">get</span>(&amp;d)); <span class="hljs-comment">// 114514</span>
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{}&quot;</span>, Int::<span class="hljs-title function_ invoke__">get</span>(&amp;d)); <span class="hljs-comment">// 2</span>
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">p</span> = P {};
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{}&quot;</span>, Int::<span class="hljs-title function_ invoke__">get</span>(&amp;p)); <span class="hljs-comment">// 1919810</span>
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{}&quot;</span>, Str::<span class="hljs-title function_ invoke__">get</span>(&amp;d)); <span class="hljs-comment">// B</span>
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{}&quot;</span>, d.<span class="hljs-title function_ invoke__">get</span>()); <span class="hljs-comment">// 114514</span>
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{}&quot;</span>, P::FN); <span class="hljs-comment">// 2026</span>
-    <span class="hljs-comment">// println!(&quot;{}&quot;, D::FN); // error</span>
-    <span class="hljs-comment">// println!(&quot;{}&quot;, Int::FN); // error</span>
-    <span class="hljs-comment">// println!(&quot;{}&quot;, Con::FN); // error</span>
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{}&quot;</span>, &lt;D <span class="hljs-keyword">as</span> Con&gt;::FN); <span class="hljs-comment">// 817</span>
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{}&quot;</span>, &lt;D <span class="hljs-keyword">as</span> Int&gt;::FN); <span class="hljs-comment">// 1926</span>
-    <span class="hljs-built_in">println!</span>(
-        <span class="hljs-string">&quot;{:?}&quot;</span>,
-        <span class="hljs-title function_ invoke__">g</span>({ <span class="hljs-number">123</span> }, <span class="hljs-string">&quot;Hello&quot;</span>) <span class="hljs-comment">// [123, 5]</span>
+fn main() {
+    let d = D::B;
+    println!(&quot;{}&quot;, D::get(&amp;d)); // 114514
+    println!(&quot;{}&quot;, Int::get(&amp;d)); // 2
+    let p = P {};
+    println!(&quot;{}&quot;, Int::get(&amp;p)); // 1919810
+    println!(&quot;{}&quot;, Str::get(&amp;d)); // B
+    println!(&quot;{}&quot;, d.get()); // 114514
+    println!(&quot;{}&quot;, P::FN); // 2026
+    // println!(&quot;{}&quot;, D::FN); // error
+    // println!(&quot;{}&quot;, Int::FN); // error
+    // println!(&quot;{}&quot;, Con::FN); // error
+    println!(&quot;{}&quot;, &lt;D as Con&gt;::FN); // 817
+    println!(&quot;{}&quot;, &lt;D as Int&gt;::FN); // 1926
+    println!(
+        &quot;{:?}&quot;,
+        g({ 123 }, &quot;Hello&quot;) // [123, 5]
     );
 }
 </code></pre>
 <p>总之 1.field 和 method 可以重名；2.默认用 inherent impl 的 associated item, 它会覆盖 trait impl 的同名 item；3.如果要用 trait impl 的同名 item, 需要显式指定 trait 名.</p>
 <p>有时候 method 中没有 <code>&amp;self</code> 参数，这样就必须用 <code>as</code> 指定调用的是哪个 <code>struct</code> 的 method.</p>
-<h2 id="nested-impl">Nested <code>impl</code></h2>
-<pre><code class="language-rust"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">G</span> {}
+<h2>Nested <code>impl</code></h2>
+<pre><code class="language-rust">struct G {}
 
-<span class="hljs-keyword">trait</span> <span class="hljs-title class_">Get</span> {
-    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">get</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">i32</span> {
-        <span class="hljs-number">19260817</span>
+trait Get {
+    fn get(&amp;self) -&gt; i32 {
+        19260817
     }
 }
-<span class="hljs-keyword">fn</span> <span class="hljs-title function_">max</span>(x: <span class="hljs-type">i32</span>, y: <span class="hljs-type">i32</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">i32</span> {
-    <span class="hljs-keyword">struct</span> <span class="hljs-title class_">G</span> {
-        a: <span class="hljs-type">i32</span>,
+fn max(x: i32, y: i32) -&gt; i32 {
+    struct G {
+        a: i32,
     }
-    <span class="hljs-keyword">impl</span> <span class="hljs-title class_">crate</span>::G { <span class="hljs-comment">// 1</span>
-        <span class="hljs-keyword">fn</span> <span class="hljs-title function_">get</span>() <span class="hljs-punctuation">-&gt;</span> G {
-            G { a: <span class="hljs-number">1919810</span> }
+    impl crate::G { // 1
+        fn get() -&gt; G {
+            G { a: 1919810 }
         }
     }
-    <span class="hljs-keyword">if</span> x &gt; y {
-        <span class="hljs-keyword">impl</span> <span class="hljs-title class_">Get</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">G</span> {} <span class="hljs-comment">// 2</span>
-        <span class="hljs-keyword">return</span> x;
+    if x &gt; y {
+        impl Get for G {} // 2
+        return x;
     }
     y
 }
-<span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() {
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">g</span> = G::<span class="hljs-title function_ invoke__">get</span>();
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{}&quot;</span>, g.<span class="hljs-title function_ invoke__">get</span>()); <span class="hljs-comment">// 19260817</span>
+fn main() {
+    let g = G::get();
+    println!(&quot;{}&quot;, g.get()); // 19260817
 }
 </code></pre>
 <p>情况 1，编译器直接按照路径寻找，得到的是函数外的空结构体；情况 2，在当前 scope 中寻找 <code>G</code>, 没找到继续回溯，直到在函数体这一层找到.</p>
 <p>同时，<code>g</code> 的类型是通过类型推导得到的，编译器会在 <code>G::get()</code> 处推导出 <code>G</code> 的类型，并且知道这个 <code>G</code> 不仅仅有一个 field，还有个 <code>get</code> 方法. (用 <code>Ctrl</code> 是点不开这个 <code>g.get()</code> 的)</p>
-<h2 id="copy-clone-and-reference">Copy, Clone and Reference</h2>
+<h2>Copy, Clone and Reference</h2>
 <p>区分 <code>Copy</code> 和 <code>move</code> 语义的目的在于，浅拷贝容易出现 double free 的问题，例如带有堆上数据的数据结构 <code>String</code> <code>Box&lt;T&gt;</code>. 这一点，lifetime 和 <code>Drop</code> 机制是联合作用的，变量离开作用域时，<code>Drop</code> 会被调用，释放堆上数据. <code>Copy</code> trait 只有当数据结构中所有 field 都是 <code>Copy</code> 的时候，才能被自动实现.</p>
 <p>如同标题所说，我们需要处理编译器赋值（包括传参、数组构造——其实也相当于函数传参）时编译器的细节，不能口口声声说我们删除了 <code>trait</code> 就弃之不顾。</p>
 <p>几乎所有语言的基础类型（包括指针）都是值拷贝；对于用户自定义类型，C++ 允许用户自定义拷贝构造函数，Rust 则是通过 <code>Copy</code> trait 来标记类型是否可以值拷贝. Java 和 Python 则是引用传递. 浅拷贝可不能和引用混淆了(x).</p>
-<h3 id="how-does-ir-pass-by-value">How does IR pass by value?</h3>
+<h3>How does IR pass by value?</h3>
 <p>如果有一个大结构体，我们需要用传值的方式调用函数. 该怎么实现？</p>
 <p>先考虑如何返回一个结构体. 最先想到的是存在栈上，但是肯定不可放在 Callee 的栈帧，因为调用完就没法用了. 所以需要一个指针指向 Caller 栈的某一块，这一块必须提早被 Caller 分配好.</p>
 <p>然后就是传参，很简单直接去 Caller 栈上取就行了.</p>
-<pre><code class="language-rust"><span class="hljs-meta">#![no_std]</span>
-<span class="hljs-meta">#[repr(C)]</span>
-<span class="hljs-keyword">struct</span> <span class="hljs-title class_">A</span> {
-    a: <span class="hljs-type">i32</span>,
-    b: [<span class="hljs-type">i8</span>; <span class="hljs-number">32</span>],
+<pre><code class="language-rust">#![no_std]
+#[repr(C)]
+struct A {
+    a: i32,
+    b: [i8; 32],
 }
-<span class="hljs-keyword">impl</span> <span class="hljs-title class_">A</span>{
-    <span class="hljs-meta">#[no_mangle]</span>
-    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">add</span>(a: <span class="hljs-keyword">Self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-keyword">Self</span> {
-        A{a: a.a + <span class="hljs-number">1</span>, b: a.b}
+impl A{
+    #[no_mangle]
+    fn add(a: Self) -&gt; Self {
+        A{a: a.a + 1, b: a.b}
     }
 }
-<span class="hljs-meta">#[no_mangle]</span>
-<span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() <span class="hljs-punctuation">-&gt;</span> () {
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">c</span> = A::<span class="hljs-title function_ invoke__">add</span>(A{a: <span class="hljs-number">4</span>, b: [<span class="hljs-number">2</span>; <span class="hljs-number">32</span>]});
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">b</span> = c;
-    <span class="hljs-title function_ invoke__">printlnInt</span>(b.a);
+#[no_mangle]
+fn main() -&gt; () {
+    let c = A::add(A{a: 4, b: [2; 32]});
+    let b = c;
+    printlnInt(b.a);
 }
-<span class="hljs-meta">#[no_mangle]</span>
-<span class="hljs-keyword">fn</span> <span class="hljs-title function_">printlnInt</span>(i:<span class="hljs-type">i32</span>) <span class="hljs-punctuation">-&gt;</span> () {
-    <span class="hljs-comment">// omitted</span>
+#[no_mangle]
+fn printlnInt(i:i32) -&gt; () {
+    // omitted
 }
-
-
 </code></pre>
 <p>这段代码直接复制进 <a href="https://godbolt.org/">godbolt</a>，选择 Rust nightly 版本, 编译参数为：</p>
 <pre><code>--emit=llvm-ir --target=riscv64gc-unknown-none-elf -C target-cpu=generic-rv64 -C debuginfo=0
 </code></pre>
 <p>你也可以使用 <code>--target=riscv64gc-unknown-linux-gnu</code>, 区别是有标准库 <code>std</code>.</p>
 <p>下面抄写部分 llvm IR 代码</p>
-<pre><code class="language-llvm"><span class="hljs-keyword">define</span> void <span class="hljs-title">@main</span>() <span class="hljs-keyword">unnamed_addr</span> <span class="hljs-variable">#1</span> {
-  <span class="hljs-variable">%_3</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">alloca</span> [<span class="hljs-number">32</span> <span class="hljs-keyword">x</span> <span class="hljs-type">i8</span>]<span class="hljs-punctuation">,</span> <span class="hljs-keyword">align</span> <span class="hljs-number">1</span>                                                       <span class="hljs-comment">; temporary array</span>
-  <span class="hljs-variable">%_2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">alloca</span> [<span class="hljs-number">36</span> <span class="hljs-keyword">x</span> <span class="hljs-type">i8</span>]<span class="hljs-punctuation">,</span> <span class="hljs-keyword">align</span> <span class="hljs-number">4</span>                                                       <span class="hljs-comment">; struct A</span>
-  <span class="hljs-variable">%c</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">alloca</span> [<span class="hljs-number">36</span> <span class="hljs-keyword">x</span> <span class="hljs-type">i8</span>]<span class="hljs-punctuation">,</span> <span class="hljs-keyword">align</span> <span class="hljs-number">4</span>                                                        <span class="hljs-comment">; for return value</span>
-  <span class="hljs-keyword">call</span> void <span class="hljs-title">@llvm.memset.p0.i64</span>(ptr <span class="hljs-keyword">align</span> <span class="hljs-number">1</span> <span class="hljs-variable">%_3</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i8</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i64</span> <span class="hljs-number">32</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i1</span> <span class="hljs-keyword">false</span>)                <span class="hljs-comment">; fill array with 2</span>
-  <span class="hljs-keyword">store</span> <span class="hljs-type">i32</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-variable">%_2</span><span class="hljs-punctuation">,</span> <span class="hljs-keyword">align</span> <span class="hljs-number">4</span>                                                         <span class="hljs-comment">; set field a</span>
-  <span class="hljs-variable">%0</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">getelementptr</span> <span class="hljs-keyword">inbounds</span> <span class="hljs-type">i8</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-variable">%_2</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i64</span> <span class="hljs-number">4</span>                                        <span class="hljs-comment">; pointer to field b</span>
-  <span class="hljs-keyword">call</span> void <span class="hljs-title">@llvm.memcpy.p0.p0.i64</span>(ptr <span class="hljs-keyword">align</span> <span class="hljs-number">4</span> <span class="hljs-variable">%0</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-keyword">align</span> <span class="hljs-number">1</span> <span class="hljs-variable">%_3</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i64</span> <span class="hljs-number">32</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i1</span> <span class="hljs-keyword">false</span>)   <span class="hljs-comment">; copy array to field b</span>
-  <span class="hljs-keyword">call</span> void <span class="hljs-title">@add</span>(ptr <span class="hljs-keyword">sret</span>([<span class="hljs-number">36</span> <span class="hljs-keyword">x</span> <span class="hljs-type">i8</span>]) <span class="hljs-keyword">align</span> <span class="hljs-number">4</span> <span class="hljs-variable">%c</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-keyword">align</span> <span class="hljs-number">4</span> <span class="hljs-variable">%_2</span>)                       <span class="hljs-comment">; call A::add, with sret the first argument</span>
-  <span class="hljs-variable">%_5</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">load</span> <span class="hljs-type">i32</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-variable">%c</span><span class="hljs-punctuation">,</span> <span class="hljs-keyword">align</span> <span class="hljs-number">4</span>                                                       <span class="hljs-comment">; load return value field a, note the %c ptr is used</span>
-  <span class="hljs-keyword">call</span> void <span class="hljs-title">@printlnInt</span>(<span class="hljs-type">i32</span> <span class="hljs-keyword">signext</span> <span class="hljs-variable">%_5</span>)
-  <span class="hljs-keyword">ret</span> void
+<pre><code class="language-llvm">define void @main() unnamed_addr #1 {
+  %_3 = alloca [32 x i8], align 1                                                       ; temporary array
+  %_2 = alloca [36 x i8], align 4                                                       ; struct A
+  %c = alloca [36 x i8], align 4                                                        ; for return value
+  call void @llvm.memset.p0.i64(ptr align 1 %_3, i8 2, i64 32, i1 false)                ; fill array with 2
+  store i32 4, ptr %_2, align 4                                                         ; set field a
+  %0 = getelementptr inbounds i8, ptr %_2, i64 4                                        ; pointer to field b
+  call void @llvm.memcpy.p0.p0.i64(ptr align 4 %0, ptr align 1 %_3, i64 32, i1 false)   ; copy array to field b
+  call void @add(ptr sret([36 x i8]) align 4 %c, ptr align 4 %_2)                       ; call A::add, with sret the first argument
+  %_5 = load i32, ptr %c, align 4                                                       ; load return value field a, note the %c ptr is used
+  call void @printlnInt(i32 signext %_5)
+  ret void
 }
-<span class="hljs-keyword">define</span> void <span class="hljs-title">@add</span>(ptr <span class="hljs-keyword">sret</span>([<span class="hljs-number">36</span> <span class="hljs-keyword">x</span> <span class="hljs-type">i8</span>]) <span class="hljs-keyword">align</span> <span class="hljs-number">4</span> <span class="hljs-variable">%_0</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-keyword">align</span> <span class="hljs-number">4</span> <span class="hljs-variable">%a</span>) <span class="hljs-keyword">unnamed_addr</span> <span class="hljs-variable">#1</span> {
-  <span class="hljs-variable">%_5</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">alloca</span> [<span class="hljs-number">32</span> <span class="hljs-keyword">x</span> <span class="hljs-type">i8</span>]<span class="hljs-punctuation">,</span> <span class="hljs-keyword">align</span> <span class="hljs-number">1</span>
-  <span class="hljs-variable">%_3</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">load</span> <span class="hljs-type">i32</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-variable">%a</span><span class="hljs-punctuation">,</span> <span class="hljs-keyword">align</span> <span class="hljs-number">4</span>
-  <span class="hljs-variable">%0</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">call</span> { <span class="hljs-type">i32</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i1</span> } <span class="hljs-title">@llvm.sadd.with.overflow.i32</span>(<span class="hljs-type">i32</span> <span class="hljs-variable">%_3</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i32</span> <span class="hljs-number">1</span>)                    <span class="hljs-comment">; check overflow call</span>
-  <span class="hljs-variable">%_4.0</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">extractvalue</span> { <span class="hljs-type">i32</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i1</span> } <span class="hljs-variable">%0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">0</span>
-  <span class="hljs-variable">%_4.1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">extractvalue</span> { <span class="hljs-type">i32</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i1</span> } <span class="hljs-variable">%0</span><span class="hljs-punctuation">,</span> <span class="hljs-number">1</span>                                                <span class="hljs-comment">; something like Result&lt;T,E&gt;</span>
-  <span class="hljs-keyword">br</span> <span class="hljs-type">i1</span> <span class="hljs-variable">%_4.1</span><span class="hljs-punctuation">,</span> label <span class="hljs-variable">%panic</span><span class="hljs-punctuation">,</span> label <span class="hljs-variable">%bb1</span>
+define void @add(ptr sret([36 x i8]) align 4 %_0, ptr align 4 %a) unnamed_addr #1 {
+  %_5 = alloca [32 x i8], align 1
+  %_3 = load i32, ptr %a, align 4
+  %0 = call { i32, i1 } @llvm.sadd.with.overflow.i32(i32 %_3, i32 1)                    ; check overflow call
+  %_4.0 = extractvalue { i32, i1 } %0, 0
+  %_4.1 = extractvalue { i32, i1 } %0, 1                                                ; something like Result&lt;T,E&gt;
+  br i1 %_4.1, label %panic, label %bb1
 
-bb<span class="hljs-number">1</span>:                                              <span class="hljs-comment">; preds = %start</span>
-  <span class="hljs-variable">%1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">getelementptr</span> <span class="hljs-keyword">inbounds</span> <span class="hljs-type">i8</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-variable">%a</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i64</span> <span class="hljs-number">4</span>
-  <span class="hljs-keyword">call</span> void <span class="hljs-title">@llvm.memcpy.p0.p0.i64</span>(ptr <span class="hljs-keyword">align</span> <span class="hljs-number">1</span> <span class="hljs-variable">%_5</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-keyword">align</span> <span class="hljs-number">4</span> <span class="hljs-variable">%1</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i64</span> <span class="hljs-number">32</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i1</span> <span class="hljs-keyword">false</span>)   <span class="hljs-comment">; copy field b to temporary array</span>
-  <span class="hljs-keyword">store</span> <span class="hljs-type">i32</span> <span class="hljs-variable">%_4.0</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-variable">%_0</span><span class="hljs-punctuation">,</span> <span class="hljs-keyword">align</span> <span class="hljs-number">4</span>                                                     <span class="hljs-comment">; store the result a</span>
-  <span class="hljs-variable">%2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">getelementptr</span> <span class="hljs-keyword">inbounds</span> <span class="hljs-type">i8</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-variable">%_0</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i64</span> <span class="hljs-number">4</span>
-  <span class="hljs-keyword">call</span> void <span class="hljs-title">@llvm.memcpy.p0.p0.i64</span>(ptr <span class="hljs-keyword">align</span> <span class="hljs-number">4</span> <span class="hljs-variable">%2</span><span class="hljs-punctuation">,</span> ptr <span class="hljs-keyword">align</span> <span class="hljs-number">1</span> <span class="hljs-variable">%_5</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i64</span> <span class="hljs-number">32</span><span class="hljs-punctuation">,</span> <span class="hljs-type">i1</span> <span class="hljs-keyword">false</span>)   <span class="hljs-comment">; store field b</span>
-  <span class="hljs-keyword">ret</span> void                                                                              <span class="hljs-comment">; return void</span>
-<span class="hljs-symbol">
-panic:</span>                                            <span class="hljs-comment">; preds = %start</span>
-  <span class="hljs-keyword">call</span> void <span class="hljs-title">@_ZN4core9panicking11panic_const24panic_const_add_overflow17h446c73c159762aceE</span>(ptr <span class="hljs-keyword">align</span> <span class="hljs-number">8</span> <span class="hljs-title">@alloc_7c1e053569136b9ce98c807d1b3e2690</span>) <span class="hljs-variable">#6</span>
-  <span class="hljs-keyword">unreachable</span>
+bb1:                                              ; preds = %start
+  %1 = getelementptr inbounds i8, ptr %a, i64 4
+  call void @llvm.memcpy.p0.p0.i64(ptr align 1 %_5, ptr align 4 %1, i64 32, i1 false)   ; copy field b to temporary array
+  store i32 %_4.0, ptr %_0, align 4                                                     ; store the result a
+  %2 = getelementptr inbounds i8, ptr %_0, i64 4
+  call void @llvm.memcpy.p0.p0.i64(ptr align 4 %2, ptr align 1 %_5, i64 32, i1 false)   ; store field b
+  ret void                                                                              ; return void
+
+panic:                                            ; preds = %start
+  call void @_ZN4core9panicking11panic_const24panic_const_add_overflow17h446c73c159762aceE(ptr align 8 @alloc_7c1e053569136b9ce98c807d1b3e2690) #6
+  unreachable
 }
 </code></pre>
 <p>关于为什么用 <code>memcpy</code> 来初始化 array，你可以尝试把 <code>i8</code> 改成 <code>i32</code>, 它就会手写循环来赋值. 后面各种移动当然还是 <code>memcpy</code>; 至于我们的 <code>RCompiler</code>, 我想循环就够了.</p>
-<h2 id="const">Const</h2>
-<pre><code class="language-rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() {
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">f</span>: &amp;<span class="hljs-keyword">mut</span> <span class="hljs-type">i32</span> = &amp;<span class="hljs-keyword">mut</span> X;
-    *f = <span class="hljs-number">4</span>;
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;{}&quot;</span>, X); <span class="hljs-comment">// 5</span>
-    <span class="hljs-keyword">let</span> <span class="hljs-variable">f</span> = &amp;<span class="hljs-keyword">mut</span> F;
-    *f = A { x: <span class="hljs-number">3</span>, y: <span class="hljs-number">4</span> };
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;F.x: {}, F.y: {}&quot;</span>, F.x, F.y); <span class="hljs-comment">// 1, 2</span>
-    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;f.x: {}, f.y: {}&quot;</span>, f.x, f.y); <span class="hljs-comment">// 3, 4</span>
+<h2>Const</h2>
+<pre><code class="language-rust">fn main() {
+    let f: &amp;mut i32 = &amp;mut X;
+    *f = 4;
+    println!(&quot;{}&quot;, X); // 5
+    let f = &amp;mut F;
+    *f = A { x: 3, y: 4 };
+    println!(&quot;F.x: {}, F.y: {}&quot;, F.x, F.y); // 1, 2
+    println!(&quot;f.x: {}, f.y: {}&quot;, f.x, f.y); // 3, 4
 }
 
-<span class="hljs-keyword">const</span> X: <span class="hljs-type">i32</span> = <span class="hljs-number">5</span>;
+const X: i32 = 5;
 
-<span class="hljs-keyword">struct</span> <span class="hljs-title class_">A</span> {
-    x: <span class="hljs-type">i32</span>,
-    y: <span class="hljs-type">i32</span>,
+struct A {
+    x: i32,
+    y: i32,
 }
 
-<span class="hljs-keyword">const</span> F: A = A { x: <span class="hljs-number">1</span>, y: <span class="hljs-number">2</span> };
+const F: A = A { x: 1, y: 2 };
 </code></pre>
 <blockquote>
 <p>Constants are essentially inlined wherever they are used, meaning that they are <strong>copied directly into the relevant context when used</strong>. This includes usage of constants from external crates, and non-Copy types. References to the same constant are not necessarily guaranteed to refer to the same memory address.</p>
 </blockquote>
 <p>就像其他的 literal 一样，const 也完全支持 <code>&amp;mut</code>, 不过你只能通过 <code>&amp;mut</code> 修改它的某个副本.</p>
-<h2 id="autoref-and-autoderef">Autoref and Autoderef</h2>
+<h2>Autoref and Autoderef</h2>
 <p>主要讨论 method call 中的自动引用和解引用. 我们针对没有实现 <code>Copy</code> trait 的 <code>struct A</code> 来分类讨论：</p>
 <ul>
 <li>如果最外层引用非 mutable，不能转为任何最外层是 <code>mut</code> 的引用</li>
@@ -266,10 +275,7 @@ panic:</span>                                            <span class="hljs-comme
 <li>涉及到所有权移动，例如传值的情况，只有类型 <code>A</code> 的变量可以作为参数传入，其他都不行; 因为不能说某个表达式 (例如 <code>**a</code>) 持有该数据的所有权.</li>
 </ul>
 <p>可以自己验证，不保证完全正确，但是覆盖了绝大多数情况.</p>
-
-            
-            
-        </article>
+</article>
   </div>
 </main>
 
