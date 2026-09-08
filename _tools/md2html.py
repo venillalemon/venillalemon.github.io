@@ -90,7 +90,8 @@ class Stash:
 # ---- inline markdown -> html ----------------------------------------------
 
 IMG_RE = re.compile(r"!\[([^\]]*)\]\(([^()\s]+)\)")
-LINK_RE = re.compile(r"\[([^\]]+)\]\(([^()\s]+)\)")
+# Link labels may contain one balanced bracket pair, as in ``[[GPV08]](url)``.
+LINK_RE = re.compile(r"\[((?:[^\[\]]|\[[^\[\]]*\])+)\]\(([^()\s]+)\)")
 STRONG_RE = re.compile(r"\*\*(.+?)\*\*", re.S)
 EM_RE = re.compile(r"(?<!\*)\*([^*\n]+)\*(?!\*)")
 DEL_RE = re.compile(r"~~(.+?)~~", re.S)

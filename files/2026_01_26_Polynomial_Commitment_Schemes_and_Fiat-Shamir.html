@@ -87,7 +87,7 @@ e\left(g, g\right)^{\frac{\delta}{\tau-u}}=\frac{e\left(g,\pi'\right)}{e\left(g,
 <p>The polynomial is hidden by the random \(r'\) .</p>
 <h3>Variants of KZG</h3>
 <ul>
-<li>For multivariate poly: \(f(x_1,\dots,x_k)-f(u_1,\dots,u_k)=\sum_{i\in[k]}(x_i-u_i)q_i(x_1,\dots,x_k)\) . Prover computes and sends \(\pi_i=g^{q_i(\tau_1,\dots,\tau_n)}\) . Prover time is \(O(km)\)  group exponentials where \(m\leq 2^k\)  is the number of terms of \(f\) . [[Chopin]](https://eprint.iacr.org/2026/480.pdf) claims to reduce the prover time to \(m+O(\sqrt{m})\)  MSMs (compute \(\prod_j g_j^{a_j}\) ).</li>
+<li>For multivariate poly: \(f(x_1,\dots,x_k)-f(u_1,\dots,u_k)=\sum_{i\in[k]}(x_i-u_i)q_i(x_1,\dots,x_k)\) . Prover computes and sends \(\pi_i=g^{q_i(\tau_1,\dots,\tau_n)}\) . Prover time is \(O(km)\)  group exponentials where \(m\leq 2^k\)  is the number of terms of \(f\) . <a href="https://eprint.iacr.org/2026/480.pdf">[Chopin]</a> claims to reduce the prover time to \(m+O(\sqrt{m})\)  MSMs (compute \(\prod_j g_j^{a_j}\) ).</li>
 <li>For batch query on \(u_1,\dots,u_m\) : \(f(x)-h(x)=q(x)\prod_{i\in[m]}(x-u_i)\)  where \(h(x)\)  is the extrapolation of \((u_i,f(u_i))\) ’s.</li>
 <li>For multi-party, each party has a private number for setup, and the public parameters are (for example, 2-party) \(gp=\left(g,g^{st},\dots,g^{(st)^d}\right)\) . The parameters can be generated party after party, since \(g^{(st)^i}=\left(g^{s^i}\right)^{t^i}\) .</li>
 </ul>

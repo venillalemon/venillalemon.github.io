@@ -52,7 +52,7 @@
     <article class="prose markdown" data-src="markdown">
 <h2>Lattice-Based Signatures: Hash-and-Sign, Fiat-Shamir</h2>
 <h3>Trapdoors for hard lattices and new cryptographic constructions</h3>
-<p>[[GPV08]](https://eprint.iacr.org/2007/432)</p>
+<p><a href="https://eprint.iacr.org/2007/432">[GPV08]</a></p>
 <p>First showed how to solve DGS in polynomial time for large parameters.</p>
 <p>The sampling algorithm itself is actually a simple randomized variant of Babai’s nearest-plane algorithm [Bab86], which was originally proposed by Klein [Kle00] in another context.</p>
 <p>The early GGH signature proposal of Goldreich, Goldwasser, and Halevi [GGH97] was directly related to a certain lattice problem, but it lacked a security proof, and recently, Nguyen and Regev [NR06] showed how to recover the entire secret key (or its equivalent) from a transcript of signatures.</p>
@@ -66,35 +66,35 @@
 <p>Additionally, GPV08 provides a sampling algorithm as follows:</p>
 <p><a href="/images/LC/image1.png"><img src="/images/LC/image1.png" alt=""></a><a href="/images/LC/image2.png"><img src="/images/LC/image2.png" alt=""></a></p>
 <p>This algorithm only adjusts a little from Babai’s nearest-plane algorithm.</p>
-<p>A following work [[PT26]](https://eprint.iacr.org/2026/1208.pdf) extends this construction without Gaussian sampling.</p>
+<p>A following work <a href="https://eprint.iacr.org/2026/1208.pdf">[PT26]</a> extends this construction without Gaussian sampling.</p>
 <h3><strong>Lattice Signatures Without Trapdoors</strong></h3>
-<p>[[Lyu12]](https://eprint.iacr.org/2011/537)</p>
+<p><a href="https://eprint.iacr.org/2011/537">[Lyu12]</a></p>
 <p>Fiat-Shamir with abort, which is a new method other then [GPV08]’s Hash-and-Sign.</p>
 <p>In Quorus: Essentially all prior works on lattice-based threshold signatures based on the Fiat-Shamir transform either rely on threshold homomorphic encryption or attempted to leverage the similarities between Lyubashevsky-like signatures [Lyu12] and Schnorr.</p>
 <h3>Solving the Shortest Vector Problem in \(2^n\) Time via Discrete Gaussian Sampling</h3>
-<p>[[ADRS14]](https://arxiv.org/pdf/1412.7994)</p>
+<p><a href="https://arxiv.org/pdf/1412.7994">[ADRS14]</a></p>
 <p>Solve SVP through SIS and reduce variance during each sampling/sieving</p>
 <h3>Classical Hardness of Learning with Errors</h3>
-<p>[[BLP+13]](https://arxiv.org/pdf/1306.0281)</p>
+<p><a href="https://arxiv.org/pdf/1306.0281">[BLP+13]</a></p>
 <p>A concrete Gaussian sampler with relatively large variance</p>
 <h3>Lattice-Based Identification Schemes Secure Under Active Attacks</h3>
-<p>[[Lyu08]](https://cseweb.ucsd.edu/~vlyubash/papers/idlatticeconf.pdf)</p>
+<p><a href="https://cseweb.ucsd.edu/~vlyubash/papers/idlatticeconf.pdf">[Lyu08]</a></p>
 <p>The first signature with rejection sampling for ID scheme</p>
 <p><a href="/images/LC/image3.png"><img src="/images/LC/image3.png" alt=""></a></p>
-<p>The paper also includes lemmas from [[Reg05]](https://cims.nyu.edu/~regev/papers/average.pdf):</p>
+<p>The paper also includes lemmas from <a href="https://cims.nyu.edu/~regev/papers/average.pdf">[Reg05]</a>:</p>
 <p><a href="/images/LC/image4.png"><img src="/images/LC/image4.png" alt=""></a><a href="/images/LC/image5.png"><img src="/images/LC/image5.png" alt=""></a></p>
-<p>and from [[LM06]](https://cseweb.ucsd.edu/~vlyubash/papers/generalknapsackfull.pdf):</p>
+<p>and from <a href="https://cseweb.ucsd.edu/~vlyubash/papers/generalknapsackfull.pdf">[LM06]</a>:</p>
 <p><a href="/images/LC/image6.png"><img src="/images/LC/image6.png" alt=""></a></p>
 <p><a href="/images/LC/image7.png"><img src="/images/LC/image7.png" alt=""></a><a href="/images/LC/image8.png"><img src="/images/LC/image8.png" alt=""></a></p>
 <h2>Ideal Lattices</h2>
 <h3>Generalized compact knapsacks, cyclic lattices, and efficient one-way functions</h3>
-<p>[[Micciancio02]](https://cseweb.ucsd.edu/~daniele/papers/Cyclic.pdf) OWF using cyclic lattices (ideal lattices are extension of them)</p>
+<p><a href="https://cseweb.ucsd.edu/~daniele/papers/Cyclic.pdf">[Micciancio02]</a> OWF using cyclic lattices (ideal lattices are extension of them)</p>
 <h3>Generalized Compact Knapsacks Are Collision Resistant</h3>
-<p>[[LM06]](https://cseweb.ucsd.edu/~vlyubash/papers/generalknapsackfull.pdf) Lyubashevsky &amp; Micciancio</p>
-<p>Ideal lattices were first studied in the context of cryptography in it, concerning worst-case to average-case reduction. Here is the main theorem, formulated in [[Lyu08]](https://cseweb.ucsd.edu/~vlyubash/papers/idlatticeconf.pdf):</p>
+<p><a href="https://cseweb.ucsd.edu/~vlyubash/papers/generalknapsackfull.pdf">[LM06]</a> Lyubashevsky &amp; Micciancio</p>
+<p>Ideal lattices were first studied in the context of cryptography in it, concerning worst-case to average-case reduction. Here is the main theorem, formulated in <a href="https://cseweb.ucsd.edu/~vlyubash/papers/idlatticeconf.pdf">[Lyu08]</a>:</p>
 <p><strong>Theorem 2.</strong> For integer \(m = \lceil 4n \log n \rceil\) and some integer \(p = \tilde{O}(n^3)\), if there exists a polynomial-time algorithm that solves \(\mathrm{SIS}(A)\) for uniformly random \(A \in \operatorname{ROT}(n, m, p)\), then SIVP (and also SVP) can be approximated in polynomial time to within a factor of \(\tilde{O}(n^2)\) in every \(n\) -dimensional lattice corresponding to an ideal in \(\mathbb{Z}[x] / \langle x^n + 1 \rangle\).</p>
 <h3>On Ideal Lattices and Learning with Errors Over Rings</h3>
-<p>[[LPR12]](https://eprint.iacr.org/2012/230.pdf) Lyubashevsky, Peikert, Regev</p>
+<p><a href="https://eprint.iacr.org/2012/230.pdf">[LPR12]</a> Lyubashevsky, Peikert, Regev</p>
 </article>
   </div>
 </main>
