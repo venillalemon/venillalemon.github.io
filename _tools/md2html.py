@@ -211,6 +211,9 @@ def parse_blocks(text):
 
 FRONT_RE = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 DATE_LINE_RE = re.compile(r"^\*([A-Z][a-z]+ \d{1,2}, \d{4})\*$")
+# the stub html2md.py writes for a pdf-embed post (see its pdf-embed branch);
+# rebuilding from this would silently replace the live iframe with a link
+PDF_STUB_RE = re.compile(r"^\s*This post is a PDF document:")
 MONTHS = ["January", "February", "March", "April", "May", "June", "July",
           "August", "September", "October", "November", "December"]
 
@@ -246,6 +249,10 @@ def convert(path, out_path=None, title=None, date=None):
     src = open(path, encoding="utf-8").read()
     basename = os.path.splitext(os.path.basename(path))[0]
     doc_title, doc_date, body_md = take_header(src)
+    if PDF_STUB_RE.match(body_md):
+        print(f"skipped {path}: this is a pdf-embed stub (from html2md.py) — "
+              f"rebuilding it would replace the live PDF viewer with a plain link", flush=True)
+        return
     title = title or doc_title or " ".join(basename.split("_")[3:]) or basename
     iso_date, human_date = date_from_basename(basename)
     human_date = date or doc_date or human_date

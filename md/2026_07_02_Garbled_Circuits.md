@@ -437,56 +437,68 @@ Therefore the outcomes of at most $k$ corrupted OTs are independent of $y$.
 
 ### Authenticated garbling: WRK
 
-令 $G$ 为 garbler，$E$ 为 evaluator。对于 wire $w$，令 $v_w\in\mathbb F_2$ 为其真实值。双方分别持有随机 mask share $\lambda_w^{(G)}$ 和 $\lambda_w^{(E)}$，并定义
+令 $G$ 为 garbler，$E$ 为 evaluator。对于 wire $\omega$，令 $v_\omega\in\mathbb F_2$ 为其真实值。双方分别持有随机 mask share $\lambda_\omega^{(G)}$ 和 $\lambda_\omega^{(E)}$，并定义
 
 $$
-\lambda_w=\lambda_w^{(G)}\oplus\lambda_w^{(E)},\qquad
-\widehat v_w=v_w\oplus\lambda_w.
+\lambda_\omega=\lambda_\omega^{(G)}\oplus\lambda_\omega^{(E)},\qquad
+\widehat v_\omega=v_\omega\oplus\lambda_\omega.
 $$
 
-$G$ 持有全局 offset $\Delta^{(G)}\in\mathbb F_2^\kappa$。它为每条 wire 选择 $L_{w,0}$，并令
+$G$ 持有全局 offset $\Delta^{(G)}\in\mathbb F_2^\kappa$。它为每条 wire 选择 $L_{\omega,0}$，并令
 
 $$
-L_{w,1}=L_{w,0}\oplus\Delta^{(G)}.
+L_{\omega,1}=L_{\omega,0}\oplus\Delta^{(G)}.
 $$
 
-因此，$E$ 在 wire $w$ 上持有的状态为
+因此，$E$ 在 wire $\omega$ 上持有的状态为
 
 $$
-\left(\widehat v_w,L_{w,\widehat v_w}\right).
+\left(\widehat v_\omega,L_{\omega,\widehat v_\omega}\right).
 $$
 
-其中 $\widehat v_w$ 是 masked bit，不是 $v_w$。实现时可以把 $\widehat v_w$ 编码在 label 的 permutation bit 中。
+其中 $\widehat v_\omega$ 是 masked bit，不是 $v_\omega$。实现时可以把 $\widehat v_\omega$ 编码在 label 的 permutation bit 中。
 
-双方还分别持有全局 MAC key $\Delta^{(G)}$ 和 $\Delta^{(E)}$。$G$ 持有的 mask share $\lambda_w^{(G)}$ 由 $E$ 认证：
-
-$$
-M_w^{(G)}
-=K_w^{(E)}\oplus\lambda_w^{(G)}\Delta^{(E)}.
-$$
-
-$E$ 持有的 mask share $\lambda_w^{(E)}$ 由 $G$ 认证：
+双方还分别持有全局 MAC key $\Delta^{(G)}$ 和 $\Delta^{(E)}$。$G$ 持有的 mask share $\lambda_\omega^{(G)}$ 由 $E$ 认证：
 
 $$
-M_w^{(E)}
-=K_w^{(G)}\oplus\lambda_w^{(E)}\Delta^{(G)}.
+M_\omega^{(G)}
+=K_\omega^{(E)}\oplus\lambda_\omega^{(G)}\Delta^{(E)}.
 $$
 
-上标表示持有者；下标 $w$ 表示这些值属于 wire $w$。若 $G$ 将 $\lambda_w^{(G)}$ 改变一个 bit，它还必须计算出
+$E$ 持有的 mask share $\lambda_\omega^{(E)}$ 由 $G$ 认证：
 
 $$
-M_w^{(G)}\oplus\Delta^{(E)}.
+M_\omega^{(E)}
+=K_\omega^{(G)}\oplus\lambda_\omega^{(E)}\Delta^{(G)}.
+$$
+
+上标表示持有者；下标 $\omega$ 表示这些值属于 wire $\omega$；接下来将会有大量符号混用，$M_g$ 代表和 gate $g$ （英文字母）关联的 MAC，$M_\omega$ 代表和 wire $\omega$ （希腊字母）关联的 MAC，$M_{g,p,q}$ 代表和 gate $g$ 关联，input 分别为 $p,q\in\{0,1\}$ 的 MAC. WRK 协议中，任何被 share 的值 $x$ 都需要以下面的形式被认证：
+
+$$
+x=x^{(G)}\oplus x^{(E)},\quad
+M_x^{(G)}
+=K_x^{(E)}\oplus x^{(G)}\Delta^{(E)},\quad
+M_x^{(E)}
+=K_x^{(G)}\oplus x^{(E)}\Delta^{(G)}.
+$$
+
+前面我们已经 share 了每个 wire 的 label，后面还会 share 和 gate 有关的 $\lambda_\alpha\lambda_\beta$, 于是下标用 $g$; 还会 share 和 gate 两个输入值有关的 $r_{g,p,q}$, 于是下标用 $g,p,q$.
+
+若 $G$ 将 $\lambda_\omega^{(G)}$ 改变一个 bit，它还必须计算出
+
+$$
+M_\omega^{(G)}\oplus\Delta^{(E)}.
 $$
 
 由于 $G$ 不知道 $\Delta^{(E)}$，伪造成功的概率为 $2^{-\kappa}$。另一方向同理。
 
 **Garbling.** 考虑输入 wires 为 $\alpha,\beta$、输出 wire 为 $\gamma$ 的 AND gate $g$.
 
-对于由 masked input bits $(p,q)$ 选中的一行，令 $r_{p,q}$ 表示该行应产生的 masked output。于是
+对于由 masked input bits $(p,q)$ 选中的一行，令 $r_{g,p,q}$ 表示该行应产生的 masked output。于是
 
 $$
 \begin{aligned}
-r_{p,q}
+r_{g,p,q}
 &=(p\oplus\lambda_\alpha)(q\oplus\lambda_\beta)
   \oplus\lambda_\gamma\\
 &=pq\oplus p\lambda_\beta\oplus q\lambda_\alpha
@@ -504,17 +516,17 @@ M_g^{(E)}
 =K_g^{(G)}\oplus t^{(E)}\Delta^{(G)}.
 $$
 
-由此双方得到 $r_{p,q}$ 的 sharings：
+由此双方得到 $r_{g,p,q}$ 的 sharings：
 
 $$
 \begin{aligned}
-r_{p,q}^{(G)}
+r_{g,p,q}^{(G)}
 &=pq
   \oplus p\lambda_\beta^{(G)}
   \oplus q\lambda_\alpha^{(G)}
   \oplus t^{(G)}
   \oplus\lambda_\gamma^{(G)},\\
-r_{p,q}^{(E)}
+r_{g,p,q}^{(E)}
 &=p\lambda_\beta^{(E)}
   \oplus q\lambda_\alpha^{(E)}
   \oplus t^{(E)}
@@ -526,33 +538,33 @@ $$
 
 $$
 \begin{aligned}
-M_{p,q}^{(G)}
-&=K_{p,q}^{(E)}\oplus r_{p,q}^{(G)}\Delta^{(E)},\\
-M_{p,q}^{(E)}
-&=K_{p,q}^{(G)}\oplus r_{p,q}^{(E)}\Delta^{(G)}.
+M_{g,p,q}^{(G)}
+&=K_{g,p,q}^{(E)}\oplus r_{g,p,q}^{(G)}\Delta^{(E)},\\
+M_{g,p,q}^{(E)}
+&=K_{g,p,q}^{(G)}\oplus r_{g,p,q}^{(E)}\Delta^{(G)}.
 \end{aligned}
 $$
 
-要怎么得到符合条件的 $M_{p,q}^{(G)},M_{p,q}^{(E)},K_{p,q}^{(G)},K_{p,q}^{(E)}$ 呢？答案是用各自已有的 key 和 mac 组合。
+要怎么得到符合条件的 $M_{g,p,q}^{(G)},M_{g,p,q}^{(E)},K_{g,p,q}^{(G)},K_{g,p,q}^{(E)}$ 呢？答案是用各自已有的 key 和 mac 组合。
 
 $$
 \begin{aligned}
-M_{p,q}^{(G)}
+M_{g,p,q}^{(G)}
 &=pM_\beta^{(G)}
   \oplus qM_\alpha^{(G)}
   \oplus M_g^{(G)}
   \oplus M_\gamma^{(G)},\\
-M_{p,q}^{(E)}
+M_{g,p,q}^{(E)}
 &=pM_\beta^{(E)}
   \oplus qM_\alpha^{(E)}
   \oplus M_g^{(E)}
   \oplus M_\gamma^{(E)},\\
-K_{p,q}^{(G)}
+K_{g,p,q}^{(G)}
 &=pK_\beta^{(G)}
   \oplus qK_\alpha^{(G)}
   \oplus K_g^{(G)}
   \oplus K_\gamma^{(G)},\\
-K_{p,q}^{(E)}
+K_{g,p,q}^{(E)}
 &=pK_\beta^{(E)}
   \oplus qK_\alpha^{(E)}
   \oplus K_g^{(E)}
@@ -565,53 +577,53 @@ $$
 令 $g$ 为 gate identifier，$H_g$ 为该 gate 使用的 garbling hash。对于每一行 $(p,q)$，$G$ 计算
 
 $$
-Q_{p,q}
+Q_{g,p,q}
 =L_{\gamma,0}
- \oplus K_{p,q}^{(G)}
- \oplus r_{p,q}^{(G)}\Delta^{(G)},
+ \oplus K_{g,p,q}^{(G)}
+ \oplus r_{g,p,q}^{(G)}\Delta^{(G)},
 $$
 
 然后将下面四个值填入 Garbling table:
 
 $$
-C_{p,q}
+C_{g,p,q}
 =H_g\left(L_{\alpha,p},L_{\beta,q}\right)
  \oplus
  \left(
- r_{p,q}^{(G)}
- \mathbin\|M_{p,q}^{(G)}
- \mathbin\|Q_{p,q}
+ r_{g,p,q}^{(G)}
+ \mathbin\|M_{g,p,q}^{(G)}
+ \mathbin\|Q_{g,p,q}
  \right),
 \qquad (p,q)\in\mathbb F_2^2.
 $$
 
-**Evaluation.** $E$ 持有 $(p,L_{\alpha,p})$ 和 $(q,L_{\beta,q})$，所以只能解开第 $(p,q)$ 行，得到 $r_{p,q}^{(G)}, M_{p,q}^{(G)}, Q_{p,q}.$ 首先检查
+**Evaluation.** $E$ 持有 $(p,L_{\alpha,p})$ 和 $(q,L_{\beta,q})$，所以只能解开第 $(p,q)$ 行，得到 $r_{g,p,q}^{(G)}, M_{g,p,q}^{(G)}, Q_{g,p,q}.$ 首先检查
 
 $$
-M_{p,q}^{(G)}
+M_{g,p,q}^{(G)}
 \stackrel{?}{=}
-K_{p,q}^{(E)}\oplus r_{p,q}^{(G)}\Delta^{(E)}.
+K_{g,p,q}^{(E)}\oplus r_{g,p,q}^{(G)}\Delta^{(E)}.
 $$
 
 验证通过后，$E$ 计算输出 wire 上的 masked bit
 
 $$
 \widehat v_\gamma
-=r_{p,q}^{(G)}\oplus r_{p,q}^{(E)}
+=r_{g,p,q}^{(G)}\oplus r_{g,p,q}^{(E)}
 $$
 
 以及对应的 label
 
 $$
 \begin{aligned}
-Q_{p,q}\oplus M_{p,q}^{(E)}
+Q_{g,p,q}\oplus M_{g,p,q}^{(E)}
 &=L_{\gamma,0}
-  \oplus K_{p,q}^{(G)}
-  \oplus r_{p,q}^{(G)}\Delta^{(G)}\\
-&\quad\oplus K_{p,q}^{(G)}
-  \oplus r_{p,q}^{(E)}\Delta^{(G)}\\
+  \oplus K_{g,p,q}^{(G)}
+  \oplus r_{g,p,q}^{(G)}\Delta^{(G)}\\
+&\quad\oplus K_{g,p,q}^{(G)}
+  \oplus r_{g,p,q}^{(E)}\Delta^{(G)}\\
 &=L_{\gamma,0}
-  \oplus\left(r_{p,q}^{(G)}\oplus r_{p,q}^{(E)}\right)\Delta^{(G)}\\
+  \oplus\left(r_{g,p,q}^{(G)}\oplus r_{g,p,q}^{(E)}\right)\Delta^{(G)}\\
 &=L_{\gamma,\widehat v_\gamma}.
 \end{aligned}
 $$
@@ -622,7 +634,7 @@ $$
 \left(\widehat v_\gamma,L_{\gamma,\widehat v_\gamma}\right).
 $$
 
-恶意 $G$ 若改变 $r_{p,q}^{(G)}$，还必须在不知道 $\Delta^{(E)}$ 的情况下伪造 $M_{p,q}^{(G)}$。同时，$Q_{p,q}$ 只有与 $E$ 持有的 $M_{p,q}^{(E)}$ 结合，才能得到正确的 output label。
+恶意 $G$ 若改变 $r_{g,p,q}^{(G)}$，还必须在不知道 $\Delta^{(E)}$ 的情况下伪造 $M_{g,p,q}^{(G)}$。同时，$Q_{g,p,q}$ 只有与 $E$ 持有的 $M_{g,p,q}^{(E)}$ 结合，才能得到正确的 output label。
 
 **Free-XOR.** 依旧要求
 
@@ -636,25 +648,27 @@ $$
 L_{\alpha,p}\oplus L_{\beta,q}=L_{\gamma,p\oplus q}.
 $$
 
-**Bootstrapping.** 与 BMR 类似，问题在于 $E$ 如何在 input wire $w$ 上得到初始状态 $(\widehat v_w,L_{w,\widehat v_w})$。由于 $\lambda_w$ 是 shared 的，input 的所有者需要先从对方拿到 mask share，且这个 share 必须带 MAC。
+**Bootstrapping.** 与 BMR 类似，问题在于 $E$ 如何在 input wire $\omega$ 上得到初始状态 $(\widehat v_\omega,L_{\omega,\widehat v_\omega})$。由于 $\lambda_\omega$ 是 shared 的，input 的所有者需要先从对方拿到 mask share，且这个 share 必须带 MAC。
 
-若 $w$ 是 $G$ 的 input wire，$E$ 向 $G$ 发送 $(\lambda_w^{(E)},M_w^{(E)})$，$G$ 检查
-
-$$
-M_w^{(E)}\stackrel{?}{=}K_w^{(G)}\oplus\lambda_w^{(E)}\Delta^{(G)},
-$$
-
-然后计算 $\widehat v_w=v_w\oplus\lambda_w^{(G)}\oplus\lambda_w^{(E)}$，并把 $(\widehat v_w,L_{w,\widehat v_w})$ 发给 $E$。恶意 $G$ 在这里能做的只是改变 $\widehat v_w$，这等价于换一个自己的输入，不构成攻击。
-
-若 $w$ 是 $E$ 的 input wire，则反过来：$G$ 向 $E$ 发送 $(\lambda_w^{(G)},M_w^{(G)})$，$E$ 用 $K_w^{(E)},\Delta^{(E)}$ 检查后计算 $\widehat v_w$ 发给 $G$，$G$ 回复 $L_{w,\widehat v_w}$。$G$ 得到的只是 masked bit，而 $\lambda_w^{(E)}$ 对它是隐藏的，所以 $v_w$ 不泄露。若 $G$ 回复错误的 label，$E$ 在后续 gate 上解出的行无法通过 MAC 检查，只能导致 abort，且 abort 与否和 $v_w$ 无关，因此没有 selective failure。
-
-**Output.** 对 output wire $w$，$E$ 已持有 $\widehat v_w$。$G$ 向 $E$ 发送 $(\lambda_w^{(G)},M_w^{(G)})$，$E$ 检查后计算
+若 $\omega$ 是 $G$ 的 input wire，$E$ 向 $G$ 发送 $(\lambda_\omega^{(E)},M_\omega^{(E)})$，$G$ 检查
 
 $$
-v_w=\widehat v_w\oplus\lambda_w^{(G)}\oplus\lambda_w^{(E)}.
+M_\omega^{(E)}\stackrel{?}{=}K_\omega^{(G)}\oplus\lambda_\omega^{(E)}\Delta^{(G)},
 $$
 
-若 $G$ 也需要输出，$E$ 对称地把 $(\widehat v_w,\lambda_w^{(E)},M_w^{(E)})$ 发给 $G$。
+然后计算 $\widehat v_\omega=v_\omega\oplus\lambda_\omega^{(G)}\oplus\lambda_\omega^{(E)}$，并把 $(\widehat v_\omega,L_{\omega,\widehat v_\omega})$ 发给 $E$。恶意 $G$ 在这里能做的只是改变 $\widehat v_\omega$，这等价于换一个自己的输入，不构成攻击。
+
+若 $\omega$ 是 $E$ 的 input wire，则反过来：$G$ 向 $E$ 发送 $(\lambda_\omega^{(G)},M_\omega^{(G)})$，$E$ 用 $K_\omega^{(E)},\Delta^{(E)}$ 检查后计算 $\widehat v_\omega$ 发给 $G$，$G$ 回复 $L_{\omega,\widehat v_\omega}$。$G$ 得到的只是 masked bit，而 $\lambda_\omega^{(E)}$ 对它是隐藏的，所以 $v_\omega$ 不泄露。若 $G$ 回复错误的 label，$E$ 在后续 gate 上解出的行无法通过 MAC 检查，只能导致 abort，且 abort 与否和 $v_\omega$ 无关，因此没有 selective failure。
+
+**Output.** 对 output wire $\omega$，$E$ 已持有 $\widehat v_\omega$。$G$ 向 $E$ 发送 $(\lambda_\omega^{(G)},M_\omega^{(G)})$，$E$ 检查后计算
+
+$$
+v_\omega=\widehat v_\omega\oplus\lambda_\omega^{(G)}\oplus\lambda_\omega^{(E)}.
+$$
+
+若 $G$ 也需要输出，$E$ 对称地把 $(\widehat v_\omega,\lambda_\omega^{(E)},M_\omega^{(E)})$ 发给 $G$。
+
+注意这里 $G$ 可以在 Garbling 的时候就向 $E$ 发送，可以说如果目的只是让 Evaluator 知道结果的话，打开并不需要 Online 通信.
 
 ## Multi-party computation with a secure core
 

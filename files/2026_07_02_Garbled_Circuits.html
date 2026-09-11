@@ -343,40 +343,49 @@ A\widehat y=y.
 \]</p>
 <p>Therefore the outcomes of at most \(k\) corrupted OTs are independent of \(y\).</p>
 <h3>Authenticated garbling: WRK</h3>
-<p>令 \(G\) 为 garbler，\(E\) 为 evaluator。对于 wire \(w\)，令 \(v_w\in\mathbb F_2\) 为其真实值。双方分别持有随机 mask share \(\lambda_w^{(G)}\) 和 \(\lambda_w^{(E)}\)，并定义</p>
+<p>令 \(G\) 为 garbler，\(E\) 为 evaluator。对于 wire \(\omega\)，令 \(v_\omega\in\mathbb F_2\) 为其真实值。双方分别持有随机 mask share \(\lambda_\omega^{(G)}\) 和 \(\lambda_\omega^{(E)}\)，并定义</p>
 <p>\[
-\lambda_w=\lambda_w^{(G)}\oplus\lambda_w^{(E)},\qquad
-\widehat v_w=v_w\oplus\lambda_w.
+\lambda_\omega=\lambda_\omega^{(G)}\oplus\lambda_\omega^{(E)},\qquad
+\widehat v_\omega=v_\omega\oplus\lambda_\omega.
 \]</p>
-<p>\(G\) 持有全局 offset \(\Delta^{(G)}\in\mathbb F_2^\kappa\)。它为每条 wire 选择 \(L_{w,0}\)，并令</p>
+<p>\(G\) 持有全局 offset \(\Delta^{(G)}\in\mathbb F_2^\kappa\)。它为每条 wire 选择 \(L_{\omega,0}\)，并令</p>
 <p>\[
-L_{w,1}=L_{w,0}\oplus\Delta^{(G)}.
+L_{\omega,1}=L_{\omega,0}\oplus\Delta^{(G)}.
 \]</p>
-<p>因此，\(E\) 在 wire \(w\) 上持有的状态为</p>
+<p>因此，\(E\) 在 wire \(\omega\) 上持有的状态为</p>
 <p>\[
-\left(\widehat v_w,L_{w,\widehat v_w}\right).
+\left(\widehat v_\omega,L_{\omega,\widehat v_\omega}\right).
 \]</p>
-<p>其中 \(\widehat v_w\) 是 masked bit，不是 \(v_w\)。实现时可以把 \(\widehat v_w\) 编码在 label 的 permutation bit 中。</p>
-<p>双方还分别持有全局 MAC key \(\Delta^{(G)}\) 和 \(\Delta^{(E)}\)。\(G\) 持有的 mask share \(\lambda_w^{(G)}\) 由 \(E\) 认证：</p>
+<p>其中 \(\widehat v_\omega\) 是 masked bit，不是 \(v_\omega\)。实现时可以把 \(\widehat v_\omega\) 编码在 label 的 permutation bit 中。</p>
+<p>双方还分别持有全局 MAC key \(\Delta^{(G)}\) 和 \(\Delta^{(E)}\)。\(G\) 持有的 mask share \(\lambda_\omega^{(G)}\) 由 \(E\) 认证：</p>
 <p>\[
-M_w^{(G)}
-=K_w^{(E)}\oplus\lambda_w^{(G)}\Delta^{(E)}.
+M_\omega^{(G)}
+=K_\omega^{(E)}\oplus\lambda_\omega^{(G)}\Delta^{(E)}.
 \]</p>
-<p>\(E\) 持有的 mask share \(\lambda_w^{(E)}\) 由 \(G\) 认证：</p>
+<p>\(E\) 持有的 mask share \(\lambda_\omega^{(E)}\) 由 \(G\) 认证：</p>
 <p>\[
-M_w^{(E)}
-=K_w^{(G)}\oplus\lambda_w^{(E)}\Delta^{(G)}.
+M_\omega^{(E)}
+=K_\omega^{(G)}\oplus\lambda_\omega^{(E)}\Delta^{(G)}.
 \]</p>
-<p>上标表示持有者；下标 \(w\) 表示这些值属于 wire \(w\)。若 \(G\) 将 \(\lambda_w^{(G)}\) 改变一个 bit，它还必须计算出</p>
+<p>上标表示持有者；下标 \(\omega\) 表示这些值属于 wire \(\omega\)；接下来将会有大量符号混用，\(M_g\) 代表和 gate \(g\) （英文字母）关联的 MAC，\(M_\omega\) 代表和 wire \(\omega\) （希腊字母）关联的 MAC，\(M_{g,p,q}\) 代表和 gate \(g\) 关联，input 分别为 \(p,q\in\{0,1\}\) 的 MAC. WRK 协议中，任何被 share 的值 \(x\) 都需要以下面的形式被认证：</p>
 <p>\[
-M_w^{(G)}\oplus\Delta^{(E)}.
+x=x^{(G)}\oplus x^{(E)},\quad
+M_x^{(G)}
+=K_x^{(E)}\oplus x^{(G)}\Delta^{(E)},\quad
+M_x^{(E)}
+=K_x^{(G)}\oplus x^{(E)}\Delta^{(G)}.
+\]</p>
+<p>前面我们已经 share 了每个 wire 的 label，后面还会 share 和 gate 有关的 \(\lambda_\alpha\lambda_\beta\), 于是下标用 \(g\); 还会 share 和 gate 两个输入值有关的 \(r_{g,p,q}\), 于是下标用 \(g,p,q\).</p>
+<p>若 \(G\) 将 \(\lambda_\omega^{(G)}\) 改变一个 bit，它还必须计算出</p>
+<p>\[
+M_\omega^{(G)}\oplus\Delta^{(E)}.
 \]</p>
 <p>由于 \(G\) 不知道 \(\Delta^{(E)}\)，伪造成功的概率为 \(2^{-\kappa}\)。另一方向同理。</p>
 <p><strong>Garbling.</strong> 考虑输入 wires 为 \(\alpha,\beta\)、输出 wire 为 \(\gamma\) 的 AND gate \(g\).</p>
-<p>对于由 masked input bits \((p,q)\) 选中的一行，令 \(r_{p,q}\) 表示该行应产生的 masked output。于是</p>
+<p>对于由 masked input bits \((p,q)\) 选中的一行，令 \(r_{g,p,q}\) 表示该行应产生的 masked output。于是</p>
 <p>\[
 \begin{aligned}
-r_{p,q}
+r_{g,p,q}
 &amp;=(p\oplus\lambda_\alpha)(q\oplus\lambda_\beta)
   \oplus\lambda_\gamma\\
 &amp;=pq\oplus p\lambda_\beta\oplus q\lambda_\alpha
@@ -391,16 +400,16 @@ M_g^{(G)}
 M_g^{(E)}
 =K_g^{(G)}\oplus t^{(E)}\Delta^{(G)}.
 \]</p>
-<p>由此双方得到 \(r_{p,q}\) 的 sharings：</p>
+<p>由此双方得到 \(r_{g,p,q}\) 的 sharings：</p>
 <p>\[
 \begin{aligned}
-r_{p,q}^{(G)}
+r_{g,p,q}^{(G)}
 &amp;=pq
   \oplus p\lambda_\beta^{(G)}
   \oplus q\lambda_\alpha^{(G)}
   \oplus t^{(G)}
   \oplus\lambda_\gamma^{(G)},\\
-r_{p,q}^{(E)}
+r_{g,p,q}^{(E)}
 &amp;=p\lambda_\beta^{(E)}
   \oplus q\lambda_\alpha^{(E)}
   \oplus t^{(E)}
@@ -410,83 +419,79 @@ r_{p,q}^{(E)}
 <p>要使这个 sharing 被 authenticated，对于每一行 \((p,q)\)，双方需要分别持有</p>
 <p>\[
 \begin{aligned}
-M_{p,q}^{(G)}
-&amp;=K_{p,q}^{(E)}\oplus r_{p,q}^{(G)}\Delta^{(E)},\\
-M_{p,q}^{(E)}
-&amp;=K_{p,q}^{(G)}\oplus r_{p,q}^{(E)}\Delta^{(G)}.
+M_{g,p,q}^{(G)}
+&amp;=K_{g,p,q}^{(E)}\oplus r_{g,p,q}^{(G)}\Delta^{(E)},\\
+M_{g,p,q}^{(E)}
+&amp;=K_{g,p,q}^{(G)}\oplus r_{g,p,q}^{(E)}\Delta^{(G)}.
 \end{aligned}
 \]</p>
-<p>要怎么得到符合条件的 \(M_{p,q}^{(G)},M_{p,q}^{(E)},K_{p,q}^{(G)},K_{p,q}^{(E)}\) 呢？答案是用各自已有的 key 和 mac 组合。</p>
+<p>要怎么得到符合条件的 \(M_{g,p,q}^{(G)},M_{g,p,q}^{(E)},K_{g,p,q}^{(G)},K_{g,p,q}^{(E)}\) 呢？答案是用各自已有的 key 和 mac 组合。</p>
 <p>\[
 \begin{aligned}
-M_{p,q}^{(G)}
+M_{g,p,q}^{(G)}
 &amp;=pM_\beta^{(G)}
   \oplus qM_\alpha^{(G)}
   \oplus M_g^{(G)}
   \oplus M_\gamma^{(G)},\\
-K_{p,q}^{(E)}
-&amp;=pK_\beta^{(E)}
-  \oplus qK_\alpha^{(E)}
-  \oplus K_g^{(E)}
-  \oplus K_\gamma^{(E)}
-  \oplus pq\Delta^{(E)},\\
-M_{p,q}^{(E)}
+M_{g,p,q}^{(E)}
 &amp;=pM_\beta^{(E)}
   \oplus qM_\alpha^{(E)}
   \oplus M_g^{(E)}
   \oplus M_\gamma^{(E)},\\
-K_{p,q}^{(G)}
+K_{g,p,q}^{(G)}
 &amp;=pK_\beta^{(G)}
   \oplus qK_\alpha^{(G)}
   \oplus K_g^{(G)}
-  \oplus K_\gamma^{(G)}.
+  \oplus K_\gamma^{(G)},\\
+K_{g,p,q}^{(E)}
+&amp;=pK_\beta^{(E)}
+  \oplus qK_\alpha^{(E)}
+  \oplus K_g^{(E)}
+  \oplus K_\gamma^{(E)}
+  \oplus pq\Delta^{(E)}.
 \end{aligned}
 \]</p>
 <p>令 \(g\) 为 gate identifier，\(H_g\) 为该 gate 使用的 garbling hash。对于每一行 \((p,q)\)，\(G\) 计算</p>
 <p>\[
-Q_{p,q}
+Q_{g,p,q}
 =L_{\gamma,0}
- \oplus K_{p,q}^{(G)}
- \oplus r_{p,q}^{(G)}\Delta^{(G)},
+ \oplus K_{g,p,q}^{(G)}
+ \oplus r_{g,p,q}^{(G)}\Delta^{(G)},
 \]</p>
-<p>并发送四个 ciphertexts</p>
+<p>然后将下面四个值填入 Garbling table:</p>
 <p>\[
-C_{p,q}
+C_{g,p,q}
 =H_g\left(L_{\alpha,p},L_{\beta,q}\right)
  \oplus
  \left(
- r_{p,q}^{(G)}
- \mathbin\|M_{p,q}^{(G)}
- \mathbin\|Q_{p,q}
+ r_{g,p,q}^{(G)}
+ \mathbin\|M_{g,p,q}^{(G)}
+ \mathbin\|Q_{g,p,q}
  \right),
 \qquad (p,q)\in\mathbb F_2^2.
 \]</p>
-<p>\(E\) 持有 \(L_{\alpha,p}\) 和 \(L_{\beta,q}\)，所以只能解开第 \((p,q)\) 行，得到</p>
+<p><strong>Evaluation.</strong> \(E\) 持有 \((p,L_{\alpha,p})\) 和 \((q,L_{\beta,q})\)，所以只能解开第 \((p,q)\) 行，得到 \(r_{g,p,q}^{(G)}, M_{g,p,q}^{(G)}, Q_{g,p,q}.\) 首先检查</p>
 <p>\[
-r_{p,q}^{(G)},\qquad M_{p,q}^{(G)},\qquad Q_{p,q}.
-\]</p>
-<p>\(E\) 首先检查</p>
-<p>\[
-M_{p,q}^{(G)}
+M_{g,p,q}^{(G)}
 \stackrel{?}{=}
-K_{p,q}^{(E)}\oplus r_{p,q}^{(G)}\Delta^{(E)}.
+K_{g,p,q}^{(E)}\oplus r_{g,p,q}^{(G)}\Delta^{(E)}.
 \]</p>
 <p>验证通过后，\(E\) 计算输出 wire 上的 masked bit</p>
 <p>\[
 \widehat v_\gamma
-=r_{p,q}^{(G)}\oplus r_{p,q}^{(E)}
+=r_{g,p,q}^{(G)}\oplus r_{g,p,q}^{(E)}
 \]</p>
 <p>以及对应的 label</p>
 <p>\[
 \begin{aligned}
-Q_{p,q}\oplus M_{p,q}^{(E)}
+Q_{g,p,q}\oplus M_{g,p,q}^{(E)}
 &amp;=L_{\gamma,0}
-  \oplus K_{p,q}^{(G)}
-  \oplus r_{p,q}^{(G)}\Delta^{(G)}\\
-&amp;\quad\oplus K_{p,q}^{(G)}
-  \oplus r_{p,q}^{(E)}\Delta^{(G)}\\
+  \oplus K_{g,p,q}^{(G)}
+  \oplus r_{g,p,q}^{(G)}\Delta^{(G)}\\
+&amp;\quad\oplus K_{g,p,q}^{(G)}
+  \oplus r_{g,p,q}^{(E)}\Delta^{(G)}\\
 &amp;=L_{\gamma,0}
-  \oplus\left(r_{p,q}^{(G)}\oplus r_{p,q}^{(E)}\right)\Delta^{(G)}\\
+  \oplus\left(r_{g,p,q}^{(G)}\oplus r_{g,p,q}^{(E)}\right)\Delta^{(G)}\\
 &amp;=L_{\gamma,\widehat v_\gamma}.
 \end{aligned}
 \]</p>
@@ -494,7 +499,28 @@ Q_{p,q}\oplus M_{p,q}^{(E)}
 <p>\[
 \left(\widehat v_\gamma,L_{\gamma,\widehat v_\gamma}\right).
 \]</p>
-<p>恶意 \(G\) 若改变 \(r_{p,q}^{(G)}\)，还必须在不知道 \(\Delta^{(E)}\) 的情况下伪造 \(M_{p,q}^{(G)}\)。同时，\(Q_{p,q}\) 只有与 \(E\) 持有的 \(M_{p,q}^{(E)}\) 结合，才能得到正确的 output label。</p>
+<p>恶意 \(G\) 若改变 \(r_{g,p,q}^{(G)}\)，还必须在不知道 \(\Delta^{(E)}\) 的情况下伪造 \(M_{g,p,q}^{(G)}\)。同时，\(Q_{g,p,q}\) 只有与 \(E\) 持有的 \(M_{g,p,q}^{(E)}\) 结合，才能得到正确的 output label。</p>
+<p><strong>Free-XOR.</strong> 依旧要求</p>
+<p>\[
+L_{\gamma,0}=L_{\alpha,0}\oplus L_{\beta,0},\quad \lambda_\gamma=\lambda_\alpha\oplus\lambda_\beta.
+\]</p>
+<p>这样就有</p>
+<p>\[
+L_{\alpha,p}\oplus L_{\beta,q}=L_{\gamma,p\oplus q}.
+\]</p>
+<p><strong>Bootstrapping.</strong> 与 BMR 类似，问题在于 \(E\) 如何在 input wire \(\omega\) 上得到初始状态 \((\widehat v_\omega,L_{\omega,\widehat v_\omega})\)。由于 \(\lambda_\omega\) 是 shared 的，input 的所有者需要先从对方拿到 mask share，且这个 share 必须带 MAC。</p>
+<p>若 \(\omega\) 是 \(G\) 的 input wire，\(E\) 向 \(G\) 发送 \((\lambda_\omega^{(E)},M_\omega^{(E)})\)，\(G\) 检查</p>
+<p>\[
+M_\omega^{(E)}\stackrel{?}{=}K_\omega^{(G)}\oplus\lambda_\omega^{(E)}\Delta^{(G)},
+\]</p>
+<p>然后计算 \(\widehat v_\omega=v_\omega\oplus\lambda_\omega^{(G)}\oplus\lambda_\omega^{(E)}\)，并把 \((\widehat v_\omega,L_{\omega,\widehat v_\omega})\) 发给 \(E\)。恶意 \(G\) 在这里能做的只是改变 \(\widehat v_\omega\)，这等价于换一个自己的输入，不构成攻击。</p>
+<p>若 \(\omega\) 是 \(E\) 的 input wire，则反过来：\(G\) 向 \(E\) 发送 \((\lambda_\omega^{(G)},M_\omega^{(G)})\)，\(E\) 用 \(K_\omega^{(E)},\Delta^{(E)}\) 检查后计算 \(\widehat v_\omega\) 发给 \(G\)，\(G\) 回复 \(L_{\omega,\widehat v_\omega}\)。\(G\) 得到的只是 masked bit，而 \(\lambda_\omega^{(E)}\) 对它是隐藏的，所以 \(v_\omega\) 不泄露。若 \(G\) 回复错误的 label，\(E\) 在后续 gate 上解出的行无法通过 MAC 检查，只能导致 abort，且 abort 与否和 \(v_\omega\) 无关，因此没有 selective failure。</p>
+<p><strong>Output.</strong> 对 output wire \(\omega\)，\(E\) 已持有 \(\widehat v_\omega\)。\(G\) 向 \(E\) 发送 \((\lambda_\omega^{(G)},M_\omega^{(G)})\)，\(E\) 检查后计算</p>
+<p>\[
+v_\omega=\widehat v_\omega\oplus\lambda_\omega^{(G)}\oplus\lambda_\omega^{(E)}.
+\]</p>
+<p>若 \(G\) 也需要输出，\(E\) 对称地把 \((\widehat v_\omega,\lambda_\omega^{(E)},M_\omega^{(E)})\) 发给 \(G\)。</p>
+<p>注意这里 \(G\) 可以在 Garbling 的时候就向 \(E\) 发送，可以说如果目的只是让 Evaluator 知道结果的话，打开并不需要 Online 通信.</p>
 <h2>Multi-party computation with a secure core</h2>
 <p>“In practice, a typical way to build a multi-party protocol is to start with a secure 3-party protocol, and to use that protocol as a service provided to a larger set of parties.”</p>
 <p>Here we consider (for example) how to use Beaver’s 2.5-party maliciously secure protocol to obtain an \(N\) -party protocol.</p>
