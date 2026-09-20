@@ -4,115 +4,123 @@
 
 ## A quick catch-up
 
-这里我们用统一的语言描述 GC 的各种构造和优化。设要跑的门是 $g$, 对应 0,1 的 label 为 $a_0,a_1,b_0,b_1$ for input wires, $c_0,c_1$ for output wires. Garbling table 用 map 表示，也可以看作一个函数. 导线上的值用 $v$ 表示，随机 bit 用 $r$ 表示。
+这里我们用统一的语言描述 GC 的各种构造和优化。设要跑的门是 $g$，其两条 input wire 记为 $\alpha,\beta$，output wire 记为 $\gamma$；更一般地，任意一条 wire 记为 $\omega$。Wire $\omega$ 上对应 bit $x\in\{0,1\}$ 的 label 统一记为 $L_{\omega,x}$，于是这个 gate 的 label 就是 $L_{\alpha,0},L_{\alpha,1},L_{\beta,0},L_{\beta,1}$（input）和 $L_{\gamma,0},L_{\gamma,1}$（output）。Garbling table 用 map 表示，也可以看作一个函数. 导线上的值用 $v$ 表示，随机 pad bit 统一用 $\lambda$ 表示。
 
 ### **Yao's GC**
 
 $$
-(r_a\oplus v_a,r_b\oplus v_b)\to H(a_{v_a},b_{v_b},i)\oplus c_{g(v_a,v_b)}
+(\lambda_\alpha\oplus v_\alpha,\lambda_\beta\oplus v_\beta)\to H(L_{\alpha,v_\alpha},L_{\beta,v_\beta},i)\oplus L_{\gamma,g(v_\alpha,v_\beta)}
 $$
 
 附加条件：所有 label 末尾有连续多个 $0$ （和安全参数正比）以判断哪个是正确的 label.
 
 ### **Point-and-Permute**
 
+用作掩码的随机数 $\lambda_\omega$ 由 Garbler 持有，对于 gate $g$,
+
 $$
-(v_a\oplus r_a,v_b\oplus r_b)\to H(a_{v_a\oplus r_a},b_{v_b\oplus r_b},i)\oplus c_{g(v_a,v_b)\oplus r_c}
+\widehat v_\alpha=v_\alpha\oplus \lambda_\alpha,\ \widehat v_\beta=v_\beta\oplus \lambda_\beta,\ \widehat v_\gamma=g(v_\alpha,v_\beta)\oplus \lambda_\gamma
 $$
 
-附加条件：所有 label 的下标总是和它最后一位相同. 拿到 label 后直接按照最后一位去表格找即可.
+Garble 的过程是对于所有 $(\widehat v_\alpha,\widehat v_\beta)\in\{0,1\}^2$,
+
+$$
+\left(\widehat v_\alpha,L_{\alpha,\widehat v_\alpha}\right),\left(\widehat v_\beta,L_{\beta,\widehat v_\beta}\right)
+\to
+H\left(L_{\alpha,\widehat v_\alpha},L_{\beta,\widehat v_\beta},i\right)\oplus L_{\gamma,\widehat v_\gamma}
+$$
 
 ### **BMR**
 
 Point-and-Permute 在 $n$ 方的推广。一个 Evaluator，多个 Garbler。
 
-**Garble**: 首先每个 $P_i$ 为每个 wire $a$ 随机选 label $a_0^{(i)},a_1^{(i)}$ 和 pad bit $\lambda_a^{(i)}$.
+**Garble**: 首先每个 $P_i$ 为每个 wire $\omega$ 随机选 label $L_{\omega,0}^{(i)},L_{\omega,1}^{(i)}$ 和 pad bit $\lambda_\omega^{(i)}$.
 
-对于 gate $g$ 假设 input wire 是 $a,b$ ，output wire 是 $c$ 。令
+对于 gate $g$ 假设 input wire 是 $\alpha,\beta$ ，output wire 是 $\gamma$ 。令
 
 $$
-\lambda_a:=\bigoplus_{i\in[n]}\lambda_a^{(i)}.
+\lambda_\alpha:=\bigoplus_{i\in[n]}\lambda_\alpha^{(i)}.
 $$
 
 并且令对于 $x\in\{0,1\}$,
 
 $$
-a_{x}=a_x^{(1)}\|\cdots\|a_x^{(n)}\|x.
+L_{\alpha,x}=L_{\alpha,x}^{(1)}\|\cdots\|L_{\alpha,x}^{(n)}\|x.
 $$
 
-然后每方 $P_i$ 本地计算 $H(a^{(i)}_{\rho_a},b^{(i)}_{\rho_b},\mathrm{id})$, 其中 $\rho_a,\rho_b\in\{0,1\}$ 都要遍历到.
+然后每方 $P_i$ 本地计算 $H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})$, 其中 $\widehat v_\alpha,\widehat v_\beta\in\{0,1\}$ 都要遍历到.
 
-接下来所有参与方运行 MPC 协议，获取电路的输出，对所有 $\rho_a,\rho_b\in\{0,1\}$ 都重复一遍。电路输入是每个人的份额 $\lambda_a^{(i)},\lambda_b^{(i)},\lambda_c^{(i)},c_{0}^{(i)},c_{1}^{(i)},H(a^{(i)}_{\rho_a},b^{(i)}_{\rho_b},\mathrm{id})$, 计算
+接下来所有参与方运行 MPC 协议，获取电路的输出，对所有 $\widehat v_\alpha,\widehat v_\beta\in\{0,1\}$ 都重复一遍。电路输入是每个人的份额 $\lambda_\alpha^{(i)},\lambda_\beta^{(i)},\lambda_\gamma^{(i)},L_{\gamma,0}^{(i)},L_{\gamma,1}^{(i)},H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})$, 计算
 
 $$
-\chi=g(\lambda_a\oplus\rho_a,\lambda_b\oplus\rho_b)\oplus\lambda_c=g\left(\bigoplus_{i\in[n]}\lambda_a^{(i)}\oplus\rho_a,\bigoplus_{i\in[n]}\lambda_b^{(i)}\oplus\rho_b\right)\oplus\bigoplus_{i\in[n]}\lambda_c^{(i)}
+\chi=g(\lambda_\alpha\oplus\widehat v_\alpha,\lambda_\beta\oplus\widehat v_\beta)\oplus\lambda_\gamma=g\left(\bigoplus_{i\in[n]}\lambda_\alpha^{(i)}\oplus\widehat v_\alpha,\bigoplus_{i\in[n]}\lambda_\beta^{(i)}\oplus\widehat v_\beta\right)\oplus\bigoplus_{i\in[n]}\lambda_\gamma^{(i)}
 $$
 
 以及
 
 $$
-e_{\rho_a,\rho_b}= (c_\chi^{(1)}\|\cdots\|c_\chi^{(n)}\|\chi)\oplus\left(\bigoplus_{i\in[n]} H(a^{(i)}_{\rho_a},b^{(i)}_{\rho_b},\mathrm{id})\right)
+e_{\widehat v_\alpha,\widehat v_\beta}= (L_{\gamma,\chi}^{(1)}\|\cdots\|L_{\gamma,\chi}^{(n)}\|\chi)\oplus\left(\bigoplus_{i\in[n]} H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})\right)
 $$
 
-并放在表格的 $(\rho_a,\rho_b)$ 处。
+并放在表格的 $(\widehat v_\alpha,\widehat v_\beta)$ 处。
 
-**Evaluate**: 假设对于这个门 $g$ ，拿到了两个 label $a_{\Lambda_a},b_{\Lambda_b}$ ，那么其末位 bit 分别是 $\Lambda_a,\Lambda_b$. 去表格中 $(\Lambda_a,\Lambda_b)$ 位置找即可得到 $e_{\Lambda_a,\Lambda_b}$.
+**Evaluate**: 假设对于这个门 $g$ ，拿到了两个 label $L_{\alpha,\widehat v_\alpha},L_{\beta,\widehat v_\beta}$ ，那么其末位 bit 分别是 $\widehat v_\alpha,\widehat v_\beta$. 去表格中 $(\widehat v_\alpha,\widehat v_\beta)$ 位置找即可得到 $e_{\widehat v_\alpha,\widehat v_\beta}$.
 
 根据 garbling 过程，我们可以得到
 
 $$
-c_{\Lambda_c}=c_\chi=e_{\Lambda_a,\Lambda_b}\oplus\left(\bigoplus_{i\in[n]} H(a^{(i)}_{\Lambda_a},b^{(i)}_{\Lambda_b},\mathrm{id})\right)
+L_{\gamma,\widehat v_\gamma}=L_{\gamma,\chi}=e_{\widehat v_\alpha,\widehat v_\beta}\oplus\left(\bigoplus_{i\in[n]} H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})\right)
 $$
 
 其中
 
 $$
-\Lambda_c=\chi=g(\lambda_a\oplus\Lambda_a,\lambda_b\oplus\Lambda_b)\oplus\lambda_c
+\widehat v_\gamma=\chi=g(\lambda_\alpha\oplus\widehat v_\alpha,\lambda_\beta\oplus\widehat v_\beta)\oplus\lambda_\gamma
 $$
 
-我们发现， $\Lambda_c$ 正好是 wire 真实值 $v_c$ 经过掩码的结果，即 $\Lambda_c=v_c\oplus \lambda_c$, 这样上面的式子正好在说 $v_c=g(v_a,v_b)$.
+这正好和 $\widehat v_\gamma$ 的定义 $v_\gamma\oplus\lambda_\gamma$ 吻合，这样上面的式子正好在说 $v_\gamma=g(v_\alpha,v_\beta)$.
 
-**Bootstrapping**: 对于 input wire $w$, 其所有者 $P_{j_w}$ 广播 $\Lambda_w=v_w\oplus \lambda_w^{(j_w)}$. 注意这里换了定义，我们不用 $\Lambda_w=v_w\oplus \lambda_w$ 是因为这样还需要额外多一轮通信.
+**Bootstrapping**: 对于 input wire $\omega$, 其所有者 $P_{j_\omega}$ 广播 $\widehat v_\omega=v_\omega\oplus \lambda_\omega^{(j_\omega)}$. 注意这里换了定义，我们不用 $\widehat v_\omega=v_\omega\oplus \lambda_\omega$ 是因为这样还需要额外多一轮通信.
 
 > 由于以上的原因，在 Garbling 的时候也需要对不同的 wire 设置不同的掩码规则。具体来说就是
 >
 > $$
-> \lambda_w = \begin{cases} \lambda_w^{(j_w)} & w \in \mathsf{Input} \\ \lambda_w^{(1)} \oplus \cdots \oplus \lambda_w^{(n)} & \text{otherwise} \end{cases}
+> \lambda_\omega = \begin{cases} \lambda_\omega^{(j_\omega)} & \omega \in \mathsf{Input} \\ \lambda_\omega^{(1)} \oplus \cdots \oplus \lambda_\omega^{(n)} & \text{otherwise} \end{cases}
 > $$
 >
 > 一个直观的解释是，掩码的存在是让不该看到明文的人看不到明文（label的最后一位就是明文加掩码，所以如果不用掩码，直接看最后一位就知道明文了）
 >
-> 对于 input wire w， $P_{j_w}$ 已经知道明文，因此目的就是不让任何剩下 $n-1$ 方的子集能够恢复明文。因此只需要让掩码全部由 $j_w$ 提供即可。（如果 $P_{j_w}$ 被腐化，那么 adversary 本身就可以串通，互相知道明文，也不需要保护）。
+> 对于 input wire $\omega$， $P_{j_\omega}$ 已经知道明文，因此目的就是不让任何剩下 $n-1$ 方的子集能够恢复明文。因此只需要让掩码全部由 $j_\omega$ 提供即可。（如果 $P_{j_\omega}$ 被腐化，那么 adversary 本身就可以串通，互相知道明文，也不需要保护）。
 >
 > 对于内部 wire ，为了保证任何一个子集都不能恢复明文，才需要所有人参与分享掩码。
 
-然后大家都得到 $\Lambda_w$, 于是可以互相广播拼凑出
+然后大家都得到 $\widehat v_\omega$, 于是可以互相广播拼凑出
 
 $$
-w_{\Lambda_w}=w_{\Lambda_w}^{(1)}\|\cdots\|w_{\Lambda_w}^{(n)}\|\Lambda_w.
+L_{\omega,\widehat v_\omega}=L_{\omega,\widehat v_\omega}^{(1)}\|\cdots\|L_{\omega,\widehat v_\omega}^{(n)}\|\widehat v_\omega.
 $$
 
 然后直接开始 Evaluation 即可.
 
 ### **FreeXOR**
 
-每个 party 选一个全局偏移 $\Delta^{(i)}$, 对于每条 wire $a$, $a_1^{(i)}$ 不随机采样而是满足 $a_x^{(i)}=a_0^{(i)}\oplus x\Delta^{(i)}$. Garbling 生成的标签满足对于一个 XOR gate 输入 $a,b$ 输出 $c$,
+每个 party 选一个全局偏移 $\Delta^{(i)}$, 对于每条 wire $\omega$, $L_{\omega,1}^{(i)}$ 不随机采样而是满足 $L_{\omega,x}^{(i)}=L_{\omega,0}^{(i)}\oplus x\Delta^{(i)}$. Garbling 生成的标签满足对于一个 XOR gate 输入 $\alpha,\beta$ 输出 $\gamma$,
 
 $$
-a_0^{(i)}\oplus b_0^{(i)}=c_0^{(i)},\quad
-\lambda_a^{(i)}\oplus \lambda_b^{(i)}=\lambda_c^{(i)}
+L_{\alpha,0}^{(i)}\oplus L_{\beta,0}^{(i)}=L_{\gamma,0}^{(i)},\quad
+\lambda_\alpha^{(i)}\oplus \lambda_\beta^{(i)}=\lambda_\gamma^{(i)}
 $$
 
 聚合起来就是
 
 $$
-a_{x}=a_0\oplus x(\Delta\|1),\quad a_0\oplus b_0=c_0,\quad \lambda_a\oplus\lambda_b=\lambda_c,
+L_{\omega,x}=L_{\omega,0}\oplus x(\Delta\|1),\quad L_{\alpha,0}\oplus L_{\beta,0}=L_{\gamma,0},\quad \lambda_\alpha\oplus\lambda_\beta=\lambda_\gamma,
 $$
 
-其中对于 $w\in\mathsf{Input}$ 我们约定 $\lambda_w^{(i)}=1$ 当仅当 $i=j_w$, 否则 $\lambda_w^{(i)}=0$. 因此有
+其中对于 $\omega\in\mathsf{Input}$ 我们约定 $\lambda_\omega^{(i)}=0$ 当 $i\neq j_\omega$（不贡献），而 $\lambda_\omega^{(j_\omega)}=\lambda_\omega$ 由 $j_\omega$ 自己随机采样；这样聚合公式 $\lambda_\omega=\bigoplus_i\lambda_\omega^{(i)}$ 才能退化为上面 input wire 的特例. 因此有
 
 $$
-a_{\Lambda_a}\oplus b_{\Lambda_b}=c_0\oplus (\Lambda_a\oplus\Lambda_b)(\Delta\|1)=c_0\oplus (\lambda_c\oplus v_a\oplus v_b)(\Delta\|1)=c_{\Lambda_c}.
+L_{\alpha,\widehat v_\alpha}\oplus L_{\beta,\widehat v_\beta}=L_{\gamma,0}\oplus (\widehat v_\alpha\oplus\widehat v_\beta)(\Delta\|1)=L_{\gamma,0}\oplus (\lambda_\gamma\oplus v_\alpha\oplus v_\beta)(\Delta\|1)=L_{\gamma,\widehat v_\gamma}.
 $$
 
 也就是遇到 XOR 的时候可以简单把两个 label 进行 XOR 得到输出的 label. AND 门不变.
@@ -437,6 +445,8 @@ Therefore the outcomes of at most $k$ corrupted OTs are independent of $y$.
 
 ### Authenticated garbling: WRK
 
+**Sharing.**
+
 令 $G$ 为 garbler，$E$ 为 evaluator。对于 wire $\omega$，令 $v_\omega\in\mathbb F_2$ 为其真实值。双方分别持有随机 mask share $\lambda_\omega^{(G)}$ 和 $\lambda_\omega^{(E)}$，并定义
 
 $$
@@ -456,9 +466,9 @@ $$
 \left(\widehat v_\omega,L_{\omega,\widehat v_\omega}\right).
 $$
 
-其中 $\widehat v_\omega$ 是 masked bit，不是 $v_\omega$。实现时可以把 $\widehat v_\omega$ 编码在 label 的 permutation bit 中。
+其中 $\widehat v_\omega$ 是 masked bit，不是 $v_\omega$；这个 pair $(\widehat v_\omega,L_{\omega,\widehat v_\omega})$ 就是 $E$ 在 wire $\omega$ 上持有的全部信息，和最前面 Point-and-Permute 里"label 是一个 pair"的约定一致。
 
-双方还分别持有全局 MAC key $\Delta^{(G)}$ 和 $\Delta^{(E)}$。$G$ 持有的 mask share $\lambda_\omega^{(G)}$ 由 $E$ 认证：
+双方还分别持有全局 MAC key $\Delta^{(G)}$ 和 $\Delta^{(E)}$。这里的 $\Delta^{(G)}$ 与上面 FreeXOR 意义下的 label offset 是**同一个对象**——WRK 的设计就是让 $G$ 的 label offset 同时充当"$E$ 认证 $G$ 持有的值"时所用的 MAC key，从而不必维护两套全局差值。$\Delta^{(E)}$ 则纯粹是一个 MAC key：$E$ 不 garble，没有对应的 label 结构可复用。$G$ 持有的 mask share $\lambda_\omega^{(G)}$ 由 $E$ 认证：
 
 $$
 M_\omega^{(G)}
@@ -492,7 +502,9 @@ $$
 
 由于 $G$ 不知道 $\Delta^{(E)}$，伪造成功的概率为 $2^{-\kappa}$。另一方向同理。
 
-**Garbling.** 考虑输入 wires 为 $\alpha,\beta$、输出 wire 为 $\gamma$ 的 AND gate $g$.
+**Garbling.**
+
+考虑输入 wires 为 $\alpha,\beta$、输出 wire 为 $\gamma$ 的 AND gate $g$.
 
 对于由 masked input bits $(p,q)$ 选中的一行，令 $r_{g,p,q}$ 表示该行应产生的 masked output。于是
 
@@ -506,7 +518,7 @@ r_{g,p,q}
 \end{aligned}
 $$
 
-其中唯一的非线性项是 $\lambda_\alpha\lambda_\beta$。我们假设 preprocessing 已经能提供 $t=\lambda_\alpha\lambda_\beta$ 的 authenticated sharing。
+其中唯一的非线性项是 $\lambda_\alpha\lambda_\beta$。我们假设 preprocessing 已经能提供 $t=\lambda_\alpha\lambda_\beta$ 的 authenticated sharing——这份 sharing 来自预处理阶段的 $\mathcal F_{\mathrm{pre}}$（一个基于 OT extension 的、TinyOT 式的 authenticated AND triple 生成协议）。这是整个协议里**唯一**的非线性 / OT 开销来源：一旦拿到这些 triple，剩下的在线计算全部是线性的异或组合。
 
 $$
 t=t^{(G)}\oplus t^{(E)},\quad
@@ -574,7 +586,7 @@ K_{g,p,q}^{(E)}
 $$
 
 
-令 $g$ 为 gate identifier，$H_g$ 为该 gate 使用的 garbling hash。对于每一行 $(p,q)$，$G$ 计算
+令 $g$ 为 gate identifier，$H$ 为 garbling 用的哈希函数。为了不在不同 gate、或同一 gate 内不同行之间意外复用同一次 hash 查询，显式地把 $(g,p,q)$ 作为 tweak 一并输入哈希（而不是含糊地写成"每个 gate 一个 $H_g$"）。对于每一行 $(p,q)$，$G$ 计算
 
 $$
 Q_{g,p,q}
@@ -587,7 +599,7 @@ $$
 
 $$
 C_{g,p,q}
-=H_g\left(L_{\alpha,p},L_{\beta,q}\right)
+=H\left(L_{\alpha,p},L_{\beta,q},g\|p\|q\right)
  \oplus
  \left(
  r_{g,p,q}^{(G)}
@@ -597,7 +609,9 @@ C_{g,p,q}
 \qquad (p,q)\in\mathbb F_2^2.
 $$
 
-**Evaluation.** $E$ 持有 $(p,L_{\alpha,p})$ 和 $(q,L_{\beta,q})$，所以只能解开第 $(p,q)$ 行，得到 $r_{g,p,q}^{(G)}, M_{g,p,q}^{(G)}, Q_{g,p,q}.$ 首先检查
+**Evaluation.**
+
+$E$ 持有 $(p,L_{\alpha,p})$ 和 $(q,L_{\beta,q})$，所以只能解开第 $(p,q)$ 行，得到 $r_{g,p,q}^{(G)}, M_{g,p,q}^{(G)}, Q_{g,p,q}.$ 首先检查
 
 $$
 M_{g,p,q}^{(G)}
@@ -636,7 +650,11 @@ $$
 
 恶意 $G$ 若改变 $r_{g,p,q}^{(G)}$，还必须在不知道 $\Delta^{(E)}$ 的情况下伪造 $M_{g,p,q}^{(G)}$。同时，$Q_{g,p,q}$ 只有与 $E$ 持有的 $M_{g,p,q}^{(E)}$ 结合，才能得到正确的 output label。
 
-**Free-XOR.** 依旧要求
+这只说明了被打开的行不能被篡改，但 $G$ 完全可以在**没被打开**的行里塞垃圾——为什么这不构成 selective failure？关键在于：被打开的行下标就是 $E$ 实际持有的 $(\widehat v_\alpha,\widehat v_\beta)$，而 $\widehat v_\alpha=v_\alpha\oplus\lambda_\alpha^{(G)}\oplus\lambda_\alpha^{(E)}$ 中的 $\lambda_\alpha^{(E)}$（以及 $\lambda_\beta^{(E)}$）对 $G$ 隐藏且均匀随机。因此，无论真实输入 $v_\alpha,v_\beta$ 是什么，从恶意 $G$ 的视角看，被打开的行在 $\mathbb F_2^2$ 上都是均匀分布的：$G$ 污染某一行导致 abort 的概率恒为 $1/4$，与真实输入值无关。这正是排除 selective failure 攻击所需要的性质，否则 authenticity 的论证是不完整的。
+
+**Free-XOR.**
+
+依旧要求
 
 $$
 L_{\gamma,0}=L_{\alpha,0}\oplus L_{\beta,0},\quad \lambda_\gamma=\lambda_\alpha\oplus\lambda_\beta.
@@ -648,7 +666,9 @@ $$
 L_{\alpha,p}\oplus L_{\beta,q}=L_{\gamma,p\oplus q}.
 $$
 
-**Bootstrapping.** 与 BMR 类似，问题在于 $E$ 如何在 input wire $\omega$ 上得到初始状态 $(\widehat v_\omega,L_{\omega,\widehat v_\omega})$。由于 $\lambda_\omega$ 是 shared 的，input 的所有者需要先从对方拿到 mask share，且这个 share 必须带 MAC。
+**Bootstrapping.**
+
+与 BMR 类似，问题在于 $E$ 如何在 input wire $\omega$ 上得到初始状态 $(\widehat v_\omega,L_{\omega,\widehat v_\omega})$。由于 $\lambda_\omega$ 是 shared 的，input 的所有者需要先从对方拿到 mask share，且这个 share 必须带 MAC。
 
 若 $\omega$ 是 $G$ 的 input wire，$E$ 向 $G$ 发送 $(\lambda_\omega^{(E)},M_\omega^{(E)})$，$G$ 检查
 
@@ -660,7 +680,9 @@ $$
 
 若 $\omega$ 是 $E$ 的 input wire，则反过来：$G$ 向 $E$ 发送 $(\lambda_\omega^{(G)},M_\omega^{(G)})$，$E$ 用 $K_\omega^{(E)},\Delta^{(E)}$ 检查后计算 $\widehat v_\omega$ 发给 $G$，$G$ 回复 $L_{\omega,\widehat v_\omega}$。$G$ 得到的只是 masked bit，而 $\lambda_\omega^{(E)}$ 对它是隐藏的，所以 $v_\omega$ 不泄露。若 $G$ 回复错误的 label，$E$ 在后续 gate 上解出的行无法通过 MAC 检查，只能导致 abort，且 abort 与否和 $v_\omega$ 无关，因此没有 selective failure。
 
-**Output.** 对 output wire $\omega$，$E$ 已持有 $\widehat v_\omega$。$G$ 向 $E$ 发送 $(\lambda_\omega^{(G)},M_\omega^{(G)})$，$E$ 检查后计算
+**Output.**
+
+对 output wire $\omega$，$E$ 已持有 $\widehat v_\omega$。$G$ 向 $E$ 发送 $(\lambda_\omega^{(G)},M_\omega^{(G)})$，$E$ 检查后计算
 
 $$
 v_\omega=\widehat v_\omega\oplus\lambda_\omega^{(G)}\oplus\lambda_\omega^{(E)}.
@@ -670,10 +692,216 @@ $$
 
 注意这里 $G$ 可以在 Garbling 的时候就向 $E$ 发送，可以说如果目的只是让 Evaluator 知道结果的话，打开并不需要 Online 通信.
 
-## Multi-party computation with a secure core
+### WRK in $n$ parties
+
+令 $P_1$ 为 evaluator，$P_2,\dots,P_n$ 为 garbler。两方情形对应 $P_1=E$，$P_2=G$。
+
+符号沿用前面的约定：上标 $(i)$ 表示持有者，下标表示该值属于哪条 wire / 哪个 gate。唯一的新增是**认证方向**：两方时"谁认证谁"无须写出（只有一个对手），$n$ 方必须写，因此在下标中加上 $i\to j$，表示"$P_i$ 的份额，由 $P_j$ 用 $\Delta^{(j)}$ 认证"。于是
+
+$$
+M^{(G)}_{x}=K^{(E)}_{x}\oplus x^{(G)}\Delta^{(E)}
+\qquad\longrightarrow\qquad
+M^{(i)}_{i\to j,\,x}=K^{(j)}_{i\to j,\,x}\oplus x^{(i)}\Delta^{(j)} .
+$$
+
+**Sharing.**
+
+每方 $P_i$ 持有全局 $\Delta^{(i)}\in\mathbb F_2^\kappa$。对 $i\ge 2$ 它同时是 label offset 和 MAC key（与两方情形中 $\Delta^{(G)}$ 的双重身份完全一致）；$\Delta^{(1)}$ 则纯粹是 MAC key，因为 evaluator 不 garble。
+
+对于 wire $\omega$，
+
+$$
+\lambda_\omega=\bigoplus_{i=1}^{n}\lambda^{(i)}_\omega,\qquad
+\widehat v_\omega=v_\omega\oplus\lambda_\omega,
+$$
+
+每个 garbler $P_i\ (i\ge 2)$ 自选 $L^{(i)}_{\omega,0}$ 并令 $L^{(i)}_{\omega,1}=L^{(i)}_{\omega,0}\oplus\Delta^{(i)}$。注意 $n-1$ 组 label 共用**同一个** $\widehat v_\omega$ 作为下标——这是把各 garbler 的 label 域粘在一起的唯一机制。$P_1$ 在 wire $\omega$ 上的状态为
+
+$$
+\left(\widehat v_\omega,\ L^{(2)}_{\omega,\widehat v_\omega},\ \dots,\ L^{(n)}_{\omega,\widehat v_\omega}\right).
+$$
+
+**Authentication.**
+
+任何被 share 的值 $x=\bigoplus_{i=1}^n x^{(i)}$，对**每一个有序对** $i\ne j$ 都要有
+
+$$
+M^{(i)}_{i\to j,\,x}=K^{(j)}_{i\to j,\,x}\oplus x^{(i)}\Delta^{(j)},
+$$
+
+共 $n(n-1)$ 份材料。$P_i$ 持 MAC，$P_j$ 持 key。伪造论证不变：$P_i$ 翻转 $x^{(i)}$ 一个 bit 就必须在不知 $\Delta^{(j)}$ 的情况下算出 $M^{(i)}_{i\to j,x}\oplus\Delta^{(j)}$，成功概率 $2^{-\kappa}$。
+
+**关键引理。** 把上式移项，即得：对任意 $j$，各方**零通信**地已经持有 $x\Delta^{(j)}$ 的一个 XOR sharing，
+
+$$
+x\,\Delta^{(j)}
+=\underbrace{\left(x^{(j)}\Delta^{(j)}\oplus\bigoplus_{i\ne j}K^{(j)}_{i\to j,\,x}\right)}_{P_j\ \text{持有}}
+\ \oplus\ \bigoplus_{i\ne j}\underbrace{M^{(i)}_{i\to j,\,x}}_{P_i\ \text{持有}} .
+$$
+
+这条引理是整个推广的枢纽。两方时 $G$ 自己知道 $r^{(G)}$ 和 $\Delta^{(G)}$，可以直接把它们相乘；$n$ 方时没有任何一方知道 $r$，但 MAC 材料本身已经免费提供了这个乘积的分享。前面 $Q_{g,p,q}$ 与 $M^{(E)}_{g,p,q}$ 这一对，正是该引理在 $n=2$ 时的两个份额。
+
+**Garbling.**
+
+AND gate $g$ 的行值定义不变：
+
+$$
+r_{g,p,q}=(p\oplus\lambda_\alpha)(q\oplus\lambda_\beta)\oplus\lambda_\gamma
+=pq\oplus p\lambda_\beta\oplus q\lambda_\alpha\oplus\lambda_\alpha\lambda_\beta\oplus\lambda_\gamma .
+$$
+
+非线性项 $t=\lambda_\alpha\lambda_\beta$ 依旧由 $\mathcal F_{\mathrm{pre}}$ 提供 authenticated sharing，只是现在
+
+$$
+\lambda_\alpha\lambda_\beta=\Big(\bigoplus_i\lambda^{(i)}_\alpha\Big)\Big(\bigoplus_j\lambda^{(j)}_\beta\Big)
+=\bigoplus_{i,j}\lambda^{(i)}_\alpha\lambda^{(j)}_\beta ,
+$$
+
+对角项本地计算，$\binom n2$ 个交叉项每对跑一次 OT。这仍是唯一的非线性 / OT 开销来源。
+
+固定一个指定方 $P_{i_0}$ 承担公开项 $pq$（两方笔记中取 $i_0=G$）。各方的份额与认证材料由已有材料线性组合：
+
+$$
+\begin{aligned}
+r^{(i)}_{g,p,q}
+&=[\,i=i_0\,]\,pq
+ \oplus p\lambda^{(i)}_\beta
+ \oplus q\lambda^{(i)}_\alpha
+ \oplus t^{(i)}
+ \oplus\lambda^{(i)}_\gamma,\\[2pt]
+M^{(i)}_{i\to j,\,g,p,q}
+&=pM^{(i)}_{i\to j,\,\beta}
+ \oplus qM^{(i)}_{i\to j,\,\alpha}
+ \oplus M^{(i)}_{i\to j,\,g}
+ \oplus M^{(i)}_{i\to j,\,\gamma},\\[2pt]
+K^{(j)}_{i\to j,\,g,p,q}
+&=pK^{(j)}_{i\to j,\,\beta}
+ \oplus qK^{(j)}_{i\to j,\,\alpha}
+ \oplus K^{(j)}_{i\to j,\,g}
+ \oplus K^{(j)}_{i\to j,\,\gamma}
+ \oplus[\,i=i_0\,]\,pq\,\Delta^{(j)} .
+\end{aligned}
+$$
+
+最后那个 $pq\Delta^{(j)}$ 修正项的位置与两方情形同理：公开常量只加在 $P_{i_0}$ 的份额上，因此只有认证 $P_{i_0}$ 的那些 key 需要相应平移。
+
+目标是让 $P_1$ 能恢复**每个** garbler 的输出 label
+
+$$
+L^{(j)}_{\gamma,\widehat v_\gamma}=L^{(j)}_{\gamma,0}\oplus r_{g,p,q}\,\Delta^{(j)},\qquad j\ge 2 .
+$$
+
+右端用关键引理拆成 $n$ 份。把 $L^{(j)}_{\gamma,0}$ 并入 $P_j$ 自己那一份，得到
+
+$$
+Q^{(j)}_{g,p,q}
+=L^{(j)}_{\gamma,0}
+ \oplus r^{(j)}_{g,p,q}\Delta^{(j)}
+ \oplus\bigoplus_{i\ne j}K^{(j)}_{i\to j,\,g,p,q},
+$$
+
+其余 $n-1$ 份就是 MAC 本身，即 $P_i$ 持有的 $M^{(i)}_{i\to j,\,g,p,q}$。$Q^{(j)}$ 仍是 $P_j$ **纯本地**可算的：$L^{(j)}_{\gamma,0},r^{(j)},\Delta^{(j)}$ 和那 $n-1$ 个 key 它全部持有。两方情形中求和只剩一项 $K^{(G)}_{E\to G,\,g,p,q}$，退化回原来的 $Q_{g,p,q}$。
+
+于是每个 garbler $P_i\ (i\ge2)$ 对每一行 $(p,q)$ 送出一条密文，用自己的 label 遮住自己产出的全部材料：
+
+$$
+C^{(i)}_{g,p,q}
+=H\!\left(L^{(i)}_{\alpha,p},L^{(i)}_{\beta,q},\,g\|p\|q\right)
+\oplus
+\left(
+r^{(i)}_{g,p,q}
+\ \big\|\ Q^{(i)}_{g,p,q}
+\ \big\|\ \left(M^{(i)}_{i\to j,\,g,p,q}\right)_{j\ne i}
+\right).
+$$
+
+这里两个下标含义不同，务必分清：$C$ 的上标 $i$ 是"谁发的"，共 $n-1$ 条；内部 $M^{(i)}_{i\to j}$ 的 $j$ 是"拿去补谁的 label"，共 $n-1$ 项。$P_1$ 自己那一份 $M^{(1)}_{1\to j,\,g,p,q}$ 本地即有，不需传输。
+
+> 与 BMR 对照：结构上就是 BMR 的"每 garbler 一段 label、拼接后交给单一 evaluator"，但 BMR 需要跑一个通用 MPC 来生成表格，而这里由于 $\lambda_\alpha\lambda_\beta$ 已在预处理解决，表格的每一项都只是本地值的异或，garbling 阶段没有任何交互式计算。
+
+**Evaluation.**
+
+$P_1$ 取 $(p,q)=(\widehat v_\alpha,\widehat v_\beta)$，用手上的 $L^{(i)}_{\alpha,p},L^{(i)}_{\beta,q}$ 解开每一条 $C^{(i)}_{g,p,q}$。其他行打不开：只要存在一个诚实的 garbler $P_i$，$P_1$ 就缺 $L^{(i)}_{\alpha,1\oplus\widehat v_\alpha}$，因此 all-but-one 腐化下仍然安全。
+
+**验证。** 对每个 $i\ge 2$，本地算出 $K^{(1)}_{i\to 1,\,g,p,q}$ 后检查
+
+$$
+M^{(i)}_{i\to 1,\,g,p,q}
+\stackrel{?}{=}
+K^{(1)}_{i\to 1,\,g,p,q}\oplus r^{(i)}_{g,p,q}\Delta^{(1)} .
+$$
+
+**masked bit。**
+
+$$
+\widehat v_\gamma=\bigoplus_{i=1}^{n} r^{(i)}_{g,p,q}.
+$$
+
+**label。** 对每个 $j\ge 2$，把 $n$ 个份额加起来（key 逐项相消）：
+
+$$
+\begin{aligned}
+Q^{(j)}_{g,p,q}\oplus\bigoplus_{i\ne j}M^{(i)}_{i\to j,\,g,p,q}
+&=L^{(j)}_{\gamma,0}
+ \oplus r^{(j)}_{g,p,q}\Delta^{(j)}
+ \oplus\bigoplus_{i\ne j}K^{(j)}_{i\to j,\,g,p,q}\\
+&\quad\oplus\bigoplus_{i\ne j}\left(K^{(j)}_{i\to j,\,g,p,q}\oplus r^{(i)}_{g,p,q}\Delta^{(j)}\right)\\
+&=L^{(j)}_{\gamma,0}\oplus\Big(\bigoplus_{i=1}^{n} r^{(i)}_{g,p,q}\Big)\Delta^{(j)}\\
+&=L^{(j)}_{\gamma,\widehat v_\gamma}.
+\end{aligned}
+$$
+
+于是状态回到 $\left(\widehat v_\gamma,\{L^{(j)}_{\gamma,\widehat v_\gamma}\}_{j\ge2}\right)$。$n=2$ 时求和只剩 $M^{(E)}_{E\to G,\,g,p,q}$，正是前面那三行推导。
+
+**安全性的两点变化。** 其一，selective failure 的论证照旧：被打开的行下标 $(\widehat v_\alpha,\widehat v_\beta)$ 中含有诚实方的 $\lambda^{(i)}_\alpha,\lambda^{(i)}_\beta$，对腐化方均匀随机，故污染某行导致 abort 的概率恒为 $1/4$，与真实输入无关。其二，$P_1$ 只能验证 $j=1$ 方向的 MAC；$j\ne 1$ 的交叉 MAC $M^{(i)}_{i\to j}$ 它无法验证（不知 $K^{(j)}_{i\to j}$）。腐化的 $P_i$ 翻转其中一位，会使 $P_j$ 的输出 label 出错，后果是下一个 gate 解出的行通不过 MAC 检查而 abort——同样与真值独立，因此只是 abort 而非 selective failure。
+
+**Free-XOR.**
+
+$$
+L^{(i)}_{\gamma,0}=L^{(i)}_{\alpha,0}\oplus L^{(i)}_{\beta,0},\quad
+\lambda^{(i)}_\gamma=\lambda^{(i)}_\alpha\oplus\lambda^{(i)}_\beta,
+$$
+
+MAC 与 key 同步逐项异或。各 $\Delta^{(i)}$ 必须**互相独立且保密**：若所有 garbler 共用一个全局 $\Delta$，则任何一个腐化 garbler 与 $P_1$ 串通即可同时得到某条 wire 上的两个 label，obliviousness 立刻失效。
+
+**Bootstrapping.**
+
+设 input wire $\omega$ 属于 $P_k$。其余各方 $P_i\ (i\ne k)$ 把 $(\lambda^{(i)}_\omega,M^{(i)}_{i\to k,\,\omega})$ 发给 $P_k$，$P_k$ 逐个检查
+
+$$
+M^{(i)}_{i\to k,\,\omega}\stackrel{?}{=}K^{(k)}_{i\to k,\,\omega}\oplus\lambda^{(i)}_\omega\Delta^{(k)} ,
+$$
+
+然后广播 $\widehat v_\omega=v_\omega\oplus\bigoplus_i\lambda^{(i)}_\omega$；最后每个 garbler $P_j\ (j\ge2)$ 把 $L^{(j)}_{\omega,\widehat v_\omega}$ 发给 $P_1$。共两个 flight，且第一步与输入值无关，可放进 preprocessing。
+
+若该 wire 上的值最终是公开的，则可以把 $\lambda_\omega$ 的全部 $n$ 个份额提前打开；此后 $v_\omega$ 一出现，每个 garbler 立刻本地算出 $\widehat v_\omega$ 并直接送 label，省掉中间那一轮。
+
+**Output.**
+
+对 output wire $\omega$，每个 garbler $P_j\ (j\ge2)$ 把 $(\lambda^{(j)}_\omega,M^{(j)}_{j\to 1,\,\omega})$ 发给 $P_1$，$P_1$ 检查后计算
+
+$$
+v_\omega=\widehat v_\omega\oplus\bigoplus_{i=1}^{n}\lambda^{(i)}_\omega .
+$$
+
+与两方情形同理，这些材料与输入无关，可在 garbling 阶段就发出，因此若只需 evaluator 知道结果，打开不需要 online 通信。
+
+**Cost.**
+
+每条 authenticated bit 需 $n(n-1)$ 份 MAC/key。每个 AND gate 每行每个 garbler 的密文载荷为 $1+n\kappa$ 比特（$r^{(i)}$ 一位，$Q^{(i)}$ 一个 $\kappa$，$n-1$ 个交叉 MAC），故每个 AND gate 总通信
+
+$$
+4(n-1)(1+n\kappa)=\Theta(n^2\kappa).
+$$
+
+XOR gate 免费。真正的主导开销在 preprocessing：$\binom n2$ 对之间的 authenticated AND triple 生成。
+
+需要强调的是，这个 $n^2$ 并不是 $\binom n2$ 个独立的两方 WRK 拼起来——那样做会失效，因为若对 $(P_i,P_1)$ 各跑一份两方协议，其 mask 只是 $\lambda^{(i)}\oplus\lambda^{(1)}$，$P_1$ 与 $P_i$ 串通即可恢复该电路上的全部真值。必须使用单一的 $n$-out-of-$n$ mask $\lambda_\omega=\bigoplus_i\lambda^{(i)}_\omega$，而这立刻迫使每一行由全体参与方联合产生。这里的两个指标跑的是不同的对象：$n-1$ 个 label 域 $\times$ $n$ 个份额持有者。
+
+<!-- ## Multi-party computation with a secure core
 
 “In practice, a typical way to build a multi-party protocol is to start with a secure 3-party protocol, and to use that protocol as a service provided to a larger set of parties.”
 
 Here we consider (for example) how to use Beaver’s 2.5-party maliciously secure protocol to obtain an $N$ -party protocol.
 
-I have many problems with this part, especially with some certain interactions that I do not consider necessary. So I leave it blank. Check out the textbook [A Graduate Course in Applied Cryptography](https://algebraic-arima.github.io/books/appliedcrypto.pdf).
+I have many problems with this part, especially with some certain interactions that I do not consider necessary. So I leave it blank. Check out the textbook [A Graduate Course in Applied Cryptography](https://algebraic-arima.github.io/books/appliedcrypto.pdf). -->

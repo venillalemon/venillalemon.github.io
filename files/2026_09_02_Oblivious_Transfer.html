@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en" data-shell="venillalemon">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Oblivious Transfer &middot; venillalemon</title>
+<link rel="icon" href="/images/favicon.ico">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+<link rel="stylesheet" href="/assets/css/post.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+  delimiters: [
+    {left: '$$', right: '$$', display: true},
+    {left: '\\[', right: '\\]', display: true},
+    {left: '$', right: '$', display: false},
+    {left: '\\(', right: '\\)', display: false}
+  ],
+  ignoredClasses: ['katex'],
+  throwOnError: false
+})"></script>
+</head>
+<body>
+
+<header class="site-head">
+  <div class="col site-head__bar">
+    <a class="brand" href="/">venillalemon</a>
+    <nav class="site-nav">
+      <a href="/">About</a>
+      <a href="/blog/">Blog Posts</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light / dark theme">&#9689; theme</button>
+    </nav>
+  </div>
+</header>
+
+<main class="site-main">
+  <div class="col">
+    <div class="post-head">
+      <p class="eyebrow">September 2, 2026 · Markdown notes</p>
+      <h1>Oblivious Transfer</h1>
+      <hr class="rule">
+    </div>
+
+    <article class="prose markdown" data-src="markdown">
+<h2>\(1\)-out-of-\(2\) OT</h2>
+<p>Sender \(S\) holds \((m_0,m_1)\); receiver \(R\) holds \(b\in\{0,1\}\):</p>
+<p>\[
+\begin{aligned}
+S &amp;: (m_0,m_1), &amp; R &amp;: b,\\
+\mathsf{OT}((m_0,m_1),b)&amp;\longrightarrow (\bot,m_b).
+\end{aligned}
+\]</p>
+<ul>
+<li>\(S\) learns nothing about \(b\).</li>
+<li>\(R\) learns nothing about \(m_{1-b}\) beyond its input and \(m_b\).</li>
+</ul>
+<p>For bits, \(m_b=m_0\oplus b(m_0\oplus m_1)\). This gives a sharing of a product:</p>
+<p>\[
+S:\ x,\ r\leftarrow\mathbb F_2,\ (m_0,m_1)=(r,r\oplus x),
+\qquad R:\ y,
+\]</p>
+<p>\[
+s=m_y=r\oplus xy,\qquad r\oplus s=xy.
+\]</p>
+<p>\(S\) keeps \(r\); \(R\) keeps \(s\).</p>
+<h2>Direct constructions</h2>
+<p>OT can be instantiated with public-key constructions:</p>
+<ul>
+<li><strong>Naor–Pinkas:</strong> DDH.</li>
+<li><strong>Chou–Orlandi (Simplest OT):</strong> Diffie–Hellman groups + hashing.</li>
+<li><strong>PVW:</strong> DDH / quadratic residuosity / LWE.</li>
+</ul>
+<p>The bottleneck is repeating expensive public-key operations. For example, <a href="/files/2026_03_15_MPC:_Secret_Sharing.html">GMW</a> uses \(n(n-1)\) OTs per AND gate:</p>
+<p>\[
+\#\mathrm{OT}=n(n-1)N_\land,\qquad
+n=2,\ N_\land=10^6\ \Longrightarrow\ \#\mathrm{OT}=2\cdot10^6.
+\]</p>
+<h2>IKNP extension</h2>
+<p><strong>IKNP</strong> bootstraps many OTs from a few base OTs:</p>
+<p>\[
+\kappa\text{ base OTs}+\text{PRG, hash, XOR}
+\quad\Longrightarrow\quad m\gg\kappa\text{ OTs}.
+\]</p>
+<p>Let \(S\) hold \(\ell\)-bit message pairs \((m_{i,0},m_{i,1})\), \(R\) hold choices \(r\in\mathbb F_2^m\), and \(G:\{0,1\}^\kappa\to\{0,1\}^m\) be a PRG.</p>
+<ul>
+<li><strong>Base OTs (roles reversed).</strong> \(R\) samples seeds \(k_j^0,k_j^1\); \(S\) samples \(s\in\mathbb F_2^\kappa\). For \(j\in[\kappa]\):
+\[
+R:(k_j^0,k_j^1)
+  \quad\xrightarrow{\mathrm{OT},\ \text{choice }s_j}\quad
+  S:k_j^{s_j}.
+\]</li>
+<li><strong>Expand.</strong> \(R\) computes and sends \(u^j\); \(S\) computes \(q^j\):
+\[
+\begin{aligned}
+  t^j&amp;=G(k_j^0),\\
+  u^j&amp;=G(k_j^0)\oplus G(k_j^1)\oplus r,\\
+  q^j&amp;=G(k_j^{s_j})\oplus s_j u^j=t^j\oplus s_j r.
+  \end{aligned}
+\]</li>
+<li><strong>Transpose.</strong> \(t^j,q^j\) are columns of \(T,Q\in\mathbb F_2^{m\times\kappa}\); their rows satisfy
+\[
+q_i=t_i\oplus r_i s
+  \quad\Longrightarrow\quad
+  t_i=\begin{cases}q_i&amp;r_i=0,\\q_i\oplus s&amp;r_i=1.\end{cases}
+\]</li>
+<li><strong>Transfer.</strong> \(S\) sends \((c_{i,0},c_{i,1})\); \(R\) decrypts:
+\[
+\begin{aligned}
+  c_{i,0}&amp;=m_{i,0}\oplus H(i,q_i),\\
+  c_{i,1}&amp;=m_{i,1}\oplus H(i,q_i\oplus s),\\
+  m_{i,r_i}&amp;=c_{i,r_i}\oplus H(i,t_i).
+  \end{aligned}
+\]</li>
+</ul>
+<p>Here \(H\) is modeled as a random oracle with \(\ell\)-bit output; \(i\) includes the batch identifier. \(S\) lacks the other seeds, hiding \(r\); \(R\) lacks \(s\), hiding the other pad.</p>
+<p><strong>Cost.</strong> Per batch between two parties, excluding base-OT communication:</p>
+<p>\[
+\begin{aligned}
+\text{base OTs:}&amp;\quad m\ \longrightarrow\ \kappa,\\
+\text{hash calls:}&amp;\quad 2m\ (S)+m\ (R),\\
+\text{communication:}&amp;\quad m\kappa+2m\ell\text{ bits}.
+\end{aligned}
+\]</p>
+<p>The public-key cost is amortized to \(\kappa/m\) base OTs per transfer; the remaining work is PRG expansion, transposition, XOR, and hashing. This is the semi-honest version; malicious security needs additional consistency checks.</p>
+<p>References: <a href="https://www.iacr.org/archive/crypto2003/27290145/27290145.pdf">IKNP03</a>, <a href="https://eprint.iacr.org/2014/692.pdf">seed-based extension</a>, <a href="https://www.iacr.org/archive/crypto2008/51570556/51570556.pdf">Naor–Pinkas / PVW</a>, <a href="https://eprint.iacr.org/2015/267.pdf">Chou–Orlandi</a>.</p>
+</article>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="col">
+    <div class="site-foot__links">
+      <a href="/blog/">&larr; All posts</a>
+      <a href="https://github.com/venillalemon">GitHub</a>
+      <a href="mailto:lifangke@sjtu.edu.cn">Email</a>
+    </div>
+    <div>Fangke Li &middot; September 2, 2026</div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    function current() {
+      return root.getAttribute('data-theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    }
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var next = current() === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+      });
+    });
+  })();
+</script>
+
+<script data-goatcounter="https://venillalemon.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>
