@@ -680,10 +680,10 @@ v_\omega=\widehat v_\omega\oplus\bigoplus_{i=1}^{n}\lambda^{(i)}_\omega .
 \]</p>
 <p>XOR gate 免费。真正的主导开销在 preprocessing：\(\binom n2\) 对之间的 authenticated AND triple 生成。</p>
 <p>需要强调的是，这个 \(n^2\) 并不是 \(\binom n2\) 个独立的两方 WRK 拼起来——那样做会失效，因为若对 \((P_i,P_1)\) 各跑一份两方协议，其 mask 只是 \(\lambda^{(i)}\oplus\lambda^{(1)}\)，\(P_1\) 与 \(P_i\) 串通即可恢复该电路上的全部真值。必须使用单一的 \(n\)-out-of-\(n\) mask \(\lambda_\omega=\bigoplus_i\lambda^{(i)}_\omega\)，而这立刻迫使每一行由全体参与方联合产生。这里的两个指标跑的是不同的对象：\(n-1\) 个 label 域 \(\times\) \(n\) 个份额持有者。</p>
-<h2>Multi-party computation with a secure core</h2>
+<!-- ## Multi-party computation with a secure core
 <p>“In practice, a typical way to build a multi-party protocol is to start with a secure 3-party protocol, and to use that protocol as a service provided to a larger set of parties.”</p>
 <p>Here we consider (for example) how to use Beaver’s 2.5-party maliciously secure protocol to obtain an \(N\) -party protocol.</p>
-<p>I have many problems with this part, especially with some certain interactions that I do not consider necessary. So I leave it blank. Check out the textbook <a href="https://algebraic-arima.github.io/books/appliedcrypto.pdf">A Graduate Course in Applied Cryptography</a>.</p>
+<p>I have many problems with this part, especially with some certain interactions that I do not consider necessary. So I leave it blank. Check out the textbook <a href="https://algebraic-arima.github.io/books/appliedcrypto.pdf">A Graduate Course in Applied Cryptography</a>. --&gt;</p>
 </article>
   </div>
 </main>

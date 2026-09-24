@@ -22,6 +22,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 KATEX_CSS = "https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css"
 KATEX_JS = "https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"
 KATEX_AUTORENDER = "https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"
+# syntax highlighting for fenced code blocks; token colours live in post.css
+HLJS_JS = "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"
 
 # posts whose math is still written as $...$ (i.e. built by md_to_post.py)
 # get KaTeX's auto-render pass; exports already ship rendered spans.
@@ -95,6 +97,10 @@ def build(basename, title, iso_date, human_date, flavour, body, title_html=None)
   ignoredClasses: ['katex'],
   throwOnError: false
 }})"></script>"""
+    highlight = ""
+    if 'class="language-' in body:
+        highlight = f"""
+<script defer src="{HLJS_JS}" onload="hljs.highlightAll()"></script>"""
     return f"""<!doctype html>
 <html lang="en" {NEW_MARKER}>
 <head>
@@ -112,7 +118,7 @@ def build(basename, title, iso_date, human_date, flavour, body, title_html=None)
   }})();
 </script>
 <link rel="stylesheet" href="{KATEX_CSS}">
-<link rel="stylesheet" href="/assets/css/post.css">{auto_math}
+<link rel="stylesheet" href="/assets/css/post.css">{auto_math}{highlight}
 </head>
 <body>
 
