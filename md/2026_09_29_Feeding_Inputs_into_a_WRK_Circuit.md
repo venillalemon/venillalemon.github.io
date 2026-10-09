@@ -36,7 +36,7 @@ $$
 \left(\widehat v_\omega,\ L^{(2)}_{\omega,\widehat v_\omega},\ \dots,\ L^{(n)}_{\omega,\widehat v_\omega}\right).
 $$
 
-这正是 [Garbled Circuits](/files/2026_07_02_Garbled_Circuits.html) 中 WRK bootstrapping 之后 input wire 的状态，后续 gate 的 evaluation 不需要任何改动。
+我们全文将会借用 [Garbled Circuits](/files/2026_07_02_Garbled_Circuits.html) 的记号。
 
 ## Input from a public bit
 
@@ -75,7 +75,7 @@ wire $\omega$ 的值为所有 party 已知的 $x$。
 
 步骤 1–2 与 $x$ 无关，可放进 preprocessing，online 只剩步骤 3–4。若建电路时就知道 $\omega$ 是 public wire，可直接取 $[\lambda_\omega]=[0]$（份额、MAC、key 全为零），此时 $\widehat v_\omega=x$，只剩步骤 4。
 
-## Input from a BDOZ share
+## Input from a BDOZ share (trivial)
 
 wire $\omega$ 的值为 $x$，各 party 持有 $[x]$，其 MAC key 与 WRK 的 $\Delta^{(1)},\dots,\Delta^{(n)}$ 相同（例如 $[x]$ 来自同一组 key 下的 TinyOT preprocessing，或前一段电路的 authenticated 输出）。没有 party 知道 $x$。
 
@@ -124,3 +124,62 @@ $$
 $$
 
 **Security.** 被公开的是 $x^{(i)}\oplus\lambda_\omega^{(i)}$。诚实 party 的 $\lambda_\omega^{(i)}$ 均匀随机且从未公开，所以这些份额对对手均匀，$x$ 不泄露；$[x]$ 本身没有被打开，之后仍可使用。腐化 $P_i$ 若篡改 $\widehat v_\omega^{(i)}$，需在不知 $\Delta^{(j)}$ 的情况下伪造 MAC，成功概率 $2^{-\kappa}$。腐化 garbler 若发错 label，下一个用到 $\omega$ 的 gate 会因 MAC 检查失败而 abort；garbler 做选择时只知道公开的 $\widehat v_\omega$，所以 abort 与 $x$ 无关，没有 selective failure。
+
+
+## Input from a BDOZ share (one round)
+
+wire $\omega$ 的值为 $x$，各 party 持有 $[x]$，其 MAC key 与 WRK 的 $\Delta^{(1)},\dots,\Delta^{(n)}$ 相同。没有 party 知道 $x$。$P_1$ 是 evaluator，$P_2,\dots,P_n$ 是 garbler，$L^{(j)}_{\omega,1}=L^{(j)}_{\omega,0}\oplus\Delta^{(j)}$。
+
+1. 每个 $P_i$ 本地计算 $[\widehat v_\omega]=[x]\oplus[\lambda_\omega]$，即
+
+   $$
+   \widehat v_\omega^{(i)}=x^{(i)}\oplus\lambda_\omega^{(i)},\qquad
+   M^{(i)}_{i\to j,\,\widehat v_\omega}=M^{(i)}_{i\to j,\,x}\oplus M^{(i)}_{i\to j,\,\lambda_\omega},\qquad
+   K^{(j)}_{i\to j,\,\widehat v_\omega}=K^{(j)}_{i\to j,\,x}\oplus K^{(j)}_{i\to j,\,\lambda_\omega}
+   \quad(j\ne i).
+   $$
+
+2. 以下消息之间互不依赖，对于所有 $i\ge 2$：
+
+   $$
+   \begin{aligned}
+   P_i\longrightarrow P_1:&\quad \widehat v_\omega^{(i)},\ M^{(i)}_{i\to 1,\,\widehat v_\omega},\\
+   P_i\longrightarrow P_1:&\quad S^{(i)}_\omega
+     =L^{(i)}_{\omega,0}\oplus\widehat v_\omega^{(i)}\Delta^{(i)}
+      \oplus\bigoplus_{j\ne i}K^{(i)}_{j\to i,\,\widehat v_\omega},\\
+   P_i\longrightarrow P_1:&\quad M^{(i)}_{i\to j,\,\widehat v_\omega}\quad\text{for all }j\notin\{1,i\}.
+   \end{aligned}
+   $$
+
+3. $P_1$ 对所有 $i\ge2$ 检查
+
+   $$
+   M^{(i)}_{i\to 1,\,\widehat v_\omega}\stackrel{?}{=}K^{(1)}_{i\to 1,\,\widehat v_\omega}\oplus\widehat v_\omega^{(i)}\Delta^{(1)},
+   $$
+
+   失败则 abort。然后计算 $\widehat v_\omega=\bigoplus_{i=1}^n\widehat v_\omega^{(i)}$。
+
+4. $P_1$ 对每个 garbler $j\ge2$ 本地计算
+
+   $$
+   S^{(j)}_\omega\oplus\bigoplus_{i\ne j}M^{(i)}_{i\to j,\,\widehat v_\omega},
+   $$
+
+   其中 $i=1$ 的那一项 $M^{(1)}_{1\to j,\,\widehat v_\omega}$ 是 $P_1$ 自己持有的。
+
+**Claim.** $P_1$ 持有 $\left(\widehat v_\omega,L^{(2)}_{\omega,\widehat v_\omega},\dots,L^{(n)}_{\omega,\widehat v_\omega}\right)$，$\widehat v_\omega=x\oplus\lambda_\omega$。其他 party 不知道 $\widehat v_\omega$。
+
+**Correctness.** 由 $M^{(i)}_{i\to j}=K^{(j)}_{i\to j}\oplus\widehat v^{(i)}_\omega\Delta^{(j)}$，
+
+$$
+S^{(j)}_\omega\oplus\bigoplus_{i\ne j}M^{(i)}_{i\to j,\,\widehat v_\omega}
+=L^{(j)}_{\omega,0}\oplus\widehat v_\omega^{(j)}\Delta^{(j)}\oplus\bigoplus_{i\ne j}\widehat v_\omega^{(i)}\Delta^{(j)}
+=L^{(j)}_{\omega,0}\oplus\widehat v_\omega\Delta^{(j)}
+=L^{(j)}_{\omega,\widehat v_\omega}.
+$$
+
+**Security.**
+
+- *隐私。* $P_1$ 看到的 $\widehat v_\omega^{(i)}$ 被诚实方均匀随机、从未公开的 $\lambda_\omega^{(i)}$ 遮住，$x$ 不泄露；$[x]$ 没有被打开，之后仍可使用。$S^{(j)}_\omega$ 被新鲜的 $L^{(j)}_{\omega,0}$ 遮住，不泄露 $K^{(j)}_{i\to j}$；$M^{(i)}_{i\to j}$ 的 key 是一次性的，不泄露 $\Delta^{(j)}$。$P_1$ 从诚实 garbler $j$ 处只能得到 $L^{(j)}_{\omega,\widehat v_\omega}$，得到另一个 label 需要 $\Delta^{(j)}$。
+- *$\widehat v_\omega$ 的完整性。* 腐化 $P_i$ 篡改 $\widehat v_\omega^{(i)}$ 需在不知 $\Delta^{(1)}$ 的情况下伪造 MAC，成功概率 $2^{-\kappa}$。
+- *label 的完整性。* $P_1$ 不知道 $\Delta^{(j)}$（$j\ge2$），所以第 2 步中 $S^{(j)}_\omega$ 和 $M^{(i)}_{i\to j}$ **不检查**。若腐化方把其中任一项加上 $e$，$P_1$ 得到 $L^{(j)}_{\omega,\widehat v_\omega}\oplus e$；下一个用到 $\omega$ 的 gate 会因 row 的 MAC 检查失败而 abort，除非 $e\in\{0,\Delta^{(j)}\}$。对诚实 garbler $j$，$e=\Delta^{(j)}$ 的概率为 $2^{-\kappa}$；若 garbler $j$ 本身腐化，它能把自己那份 label 翻成 $L^{(j)}_{\omega,\widehat v_\omega\oplus1}$，但这与诚实 garbler 的 label 不一致，同样在下一个 gate 失败。发送方做决定时连 $\widehat v_\omega$ 都不知道（它不再公开），所以 abort 与 $x$ 无关，没有 selective failure。
