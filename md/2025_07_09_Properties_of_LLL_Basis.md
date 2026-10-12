@@ -6,7 +6,7 @@
 
 首先回顾 $\delta$ -LLL reduced basis 的定义 ($\frac{1}{4}\leq\delta\leq1$)
 
-**Def.** For linearly independent basis $b_1,\dots, b_n\in\mathbb{R}^n$, we have for all $1\leq j\lt i\leq n$, $\mu_{i,j}=\frac{\langle b_i,\tilde{b_j}\rangle}{\langle\tilde{b_j},\tilde{b_j}\rangle}$, and **Gram-Schmidt orthogonalization** $\tilde{b_i}=b_i-\sum_{j=1}^{i-1}\mu_{i,j}\tilde{b_j}$. Such a basis $B=\{b_1,\dots,b_n\}$ is a ** $\delta$ -LLL reduced basis** if the following holds:
+**Definition.** For linearly independent basis $b_1,\dots, b_n\in\mathbb{R}^n$, we have for all $1\leq j\lt i\leq n$, $\mu_{i,j}=\frac{\langle b_i,\tilde{b_j}\rangle}{\langle\tilde{b_j},\tilde{b_j}\rangle}$, and **Gram-Schmidt orthogonalization** $\tilde{b_i}=b_i-\sum_{j=1}^{i-1}\mu_{i,j}\tilde{b_j}$. Such a basis $B=\{b_1,\dots,b_n\}$ is a ** $\delta$ -LLL reduced basis** if the following holds:
 
 - **Size Reduction** For all $1 \leq j \lt i \leq n$, $|\mu_{i,j}| \leq \frac{1}{2}$.
 
@@ -20,11 +20,11 @@ $$
 
 ### **Property 1.** $\|b_1\|\leq2^{\frac{n-1}{4}}\det^{\frac{1}{n}}\Lambda$
 
-**Pf.** 对于每个 $i$, $2^{\frac{1}{2}}\|\tilde{b_{1}}\| \leq 2^{\frac{i}{2}}\|\tilde{b_{i}}\|$, 再应用 $b_1=\tilde{b_1}$, 累乘即可.
+**Proof.** 对于每个 $i$, $2^{\frac{1}{2}}\|\tilde{b_{1}}\| \leq 2^{\frac{i}{2}}\|\tilde{b_{i}}\|$, 再应用 $b_1=\tilde{b_1}$, 累乘即可.
 
 ### **Property 2.** For all $1\leq i\leq n,\;\|b_i\|\leq2^{\frac{i-1}{2}}\|\tilde{b_i}\|$
 
-**Pf.** $\|b_i\|^2=\|\tilde{b_i}\|^2+\sum_{j=1}^{i-1}|\mu_{i,j}|^2\|\tilde{b_j}\|^2\leq\|\tilde{b_i}\|^2+\frac{1}{4}\sum_{j=1}^{i-1}2^{i-j}\|\tilde{b_i}\|^2\leq\frac{1+2^{i-1}}{2}\|\tilde{b_i}\|^2$.
+**Proof.** $\|b_i\|^2=\|\tilde{b_i}\|^2+\sum_{j=1}^{i-1}|\mu_{i,j}|^2\|\tilde{b_j}\|^2\leq\|\tilde{b_i}\|^2+\frac{1}{4}\sum_{j=1}^{i-1}2^{i-j}\|\tilde{b_i}\|^2\leq\frac{1+2^{i-1}}{2}\|\tilde{b_i}\|^2$.
 
 做累乘即可得到 $\prod_{i=1}^n\|b_i\|\leq2^{\frac{n(n-1)}{4}}\det\Lambda$
 
@@ -32,17 +32,17 @@ $$
 
 ### **Property 3.** For all $1\leq i\leq j\leq n$, $\|b_i\|\leq2^{\frac{j-1}{2}}\|\tilde{b_j}\|$
 
-**Pf.** $\|b_i\|\leq2^{\frac{i-1}{2}}\|\tilde{b_i}\|\leq2^{\frac{i-1}{2}}2^{\frac{j-i}{2}}\|\tilde{b_j}\|$.
+**Proof.** $\|b_i\|\leq2^{\frac{i-1}{2}}\|\tilde{b_i}\|\leq2^{\frac{i-1}{2}}2^{\frac{j-i}{2}}\|\tilde{b_j}\|$.
 
 ### **Property 4.** For all $1\leq i\leq n$, $\lambda_i(\Lambda)\leq2^{\frac{i-1}{2}}\|\tilde{b_i}\|$
 
-**Pf.** 根据 (d) 问，只要有一个 $k\leq i$ 满足 $\lambda_i(\Lambda)\leq \|b_k\|$ 即可.
+**Proof.** 根据 (d) 问，只要有一个 $k\leq i$ 满足 $\lambda_i(\Lambda)\leq \|b_k\|$ 即可.
 
 假设不存在这样的 $k$, 那么对任意 $1\leq k\leq i$, $\lambda_i(\Lambda)\gt \|b_k\|$. 由于 $b_1,\dots,b_i$ 是线性独立的格中向量, $\dim(\text{span}(b_1,\dots,b_i))=i$ ，和 $\lambda_i(\Lambda)=\inf\{r:\dim(\text{span}(\Lambda\cap\overline{B}(0,r)))\geq i\}$ 矛盾.
 
 ### **Property 5.** For all $1\leq i\leq n$, $\lambda_i(\Lambda)\geq2^{-\frac{n-1}{2}}\|b_i\|$
 
-**Pf.** 根据 (d) 问，对于任意 $j\geq i$, $\|b_i\|\leq2^{\frac{j-1}{2}}\|\tilde{b_j}\|\leq2^{\frac{n-1}{2}}\|\tilde{b_j}\|$. 因此只要证存在 $j\geq i$ 使得 $\lambda_i(\Lambda)\geq\|\tilde{b_j}\|$ 即可.
+**Proof.** 根据 (d) 问，对于任意 $j\geq i$, $\|b_i\|\leq2^{\frac{j-1}{2}}\|\tilde{b_j}\|\leq2^{\frac{n-1}{2}}\|\tilde{b_j}\|$. 因此只要证存在 $j\geq i$ 使得 $\lambda_i(\Lambda)\geq\|\tilde{b_j}\|$ 即可.
 
 考虑格 $\Lambda_0=\{b_i,\dots,b_n\}$, 在 $V_0=\text{span}(b_i,\dots,b_n)$ 中进行 Gram-Schmidt 正交化得到 $b_i^*,\dots,b_n^*$.
 
@@ -58,13 +58,13 @@ $$
 
 这段时间看了 LLL 的原论文，里面就有写到关于 **Property 5** 的证明.
 
-**Lem.** 给定格 $L\subset\mathbb{R}^n$ 上的约简基 $\{b_1,\dots,b_n\}$ 和线性无关组 $\{x_1,\dots,x_t\}\subset L$, 对任意 $1\leq j\leq t$, 有
+**Lemma.** 给定格 $L\subset\mathbb{R}^n$ 上的约简基 $\{b_1,\dots,b_n\}$ 和线性无关组 $\{x_1,\dots,x_t\}\subset L$, 对任意 $1\leq j\leq t$, 有
 
 $$
 \|b_j\|^2\leq2^{n-1}\max\{\|x_1\|^2,\dots,\|x_t\|^2\}.
 $$
 
-**Pf.** 设 $x_j=\sum_{i=1}^{n} r_{ij} b_i$, $r_{ij}\in\mathbb{Z}$. 同时我们根据给定的约简基 $\{b_i\}$ 可以得到 Gram-Schimidt 基 $\{\tilde{b_i}\}$ ， 有 $x_j=\sum_{i=1}^n \tilde{r_{ij}} \tilde{b_i}$
+**Proof.** 设 $x_j=\sum_{i=1}^{n} r_{ij} b_i$, $r_{ij}\in\mathbb{Z}$. 同时我们根据给定的约简基 $\{b_i\}$ 可以得到 Gram-Schimidt 基 $\{\tilde{b_i}\}$ ， 有 $x_j=\sum_{i=1}^n \tilde{r_{ij}} \tilde{b_i}$
 
 对于每个 $j$, 定义 $i(j)$ 为满足 $r_{i(j)j}\neq 0$ 的最大的 $i$.
 
@@ -82,7 +82,7 @@ $$
 
 ### **Property 5.** For all $1\leq i\leq n$, $\lambda_i(\Lambda)\geq2^{-\frac{n-1}{2}}\|b_i\|$
 
-**Pf.** 设 successive minima 得到的基为 $\{v_1,\dots,v_n\}$, $\|v_i\|=\lambda_i$. 在 **Lem.** 中取 $t=i$ ，线性无关组为 $\{v_1,\dots,v_t\}$, 有 $\|b_i\|^2\leq2^{n-1}\max\{\|v_1\|^2,\dots,\|v_i\|^2\}=2^{n-1}\lambda_i^2$, 得证.
+**Proof.** 设 successive minima 得到的基为 $\{v_1,\dots,v_n\}$, $\|v_i\|=\lambda_i$. 在 **Lemma.** 中取 $t=i$ ，线性无关组为 $\{v_1,\dots,v_t\}$, 有 $\|b_i\|^2\leq2^{n-1}\max\{\|v_1\|^2,\dots,\|v_i\|^2\}=2^{n-1}\lambda_i^2$, 得证.
 
 **Comment.** 由 **Property 4**, $\lambda_i(\Lambda)\leq2^{\frac{i-1}{2}}\|\tilde{b_i}\|\leq2^{\frac{i-1}{2}}\|{b_i}\|$. 因此
 

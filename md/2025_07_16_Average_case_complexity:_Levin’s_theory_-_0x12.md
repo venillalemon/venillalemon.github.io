@@ -12,7 +12,7 @@ $\mathbf{NP}$ 是用最坏复杂性定义的：一个语言 $L\in\{0,1\}^*$, 如
 
 > 复习一下 $CLIQUE$ 难于 $VERTEXCOVER$:
 >
-> **Pf.** 给定一个 instance $\langle G,k\rangle$, 目标输出 $G$ 是否有大小为 $k$ 的顶点覆盖.
+> **Proof.** 给定一个 instance $\langle G,k\rangle$, 目标输出 $G$ 是否有大小为 $k$ 的顶点覆盖.
 >
 > 如果 $G$ 有一个大小为 $k$ 的 vertex cover, 那么这个顶点集的补集一定是独立集（否则一定有边没有被覆盖到）. 反之某个独立集补集的诱导子图也一定是顶点覆盖.
 >
@@ -46,7 +46,7 @@ $\mathbf{distNP}$ 相当于为 $\mathbf{NP}$ 中的每个语言添加了一种�
 
 ## Average-case Reduction
 
-**Def.** We say $\langle L,\mathcal{D}\rangle\leq_p\langle L^\prime,\mathcal{D}^\prime\rangle$, if and only if there is a polynomial-time computable function $f$ and polynomials $p,q:\mathbb{N}\mapsto\mathbb{N}$, such that
+**Definition.** We say $\langle L,\mathcal{D}\rangle\leq_p\langle L^\prime,\mathcal{D}^\prime\rangle$, if and only if there is a polynomial-time computable function $f$ and polynomials $p,q:\mathbb{N}\mapsto\mathbb{N}$, such that
 
 - **Correctness**: $\forall x\in\{0,1\}^*,x\in L\iff f(x)\in L^\prime$;
 

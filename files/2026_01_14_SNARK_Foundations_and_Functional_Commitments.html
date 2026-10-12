@@ -52,7 +52,7 @@
     <article class="prose markdown" data-src="markdown">
 <h2>Introduction to SNARK</h2>
 <p><strong>Interactive proofs</strong> are complete and (statistically) sound, while <strong>interactive arguments</strong> are sound w.r.t computationally bounded prover (computational soundness).</p>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Definition (SNARK).</strong> A <strong>succinct</strong> (preprocessing) non-interactive argument of knowledge (<strong>SNARK</strong>) is a triple of algorithms \((S, P, V)\) :</p>
 <ul>
 <li><strong>Setup</strong> \(S(C;r)=(pp,vp)\) : Generates public parameters \((pp, vp)\)  for the prover and verifier respectively, given a circuit \(C\) .</li>
@@ -81,7 +81,7 @@
 </ul>
 <h3>Argument of Knowledge</h3>
 <p>Here we use trusted but universal setup.</p>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Definition (Adaptive Knowledge Soundness).</strong> A preprocessing NARK \((S, P, V)\)  is <strong>(adaptively) knowledge sound</strong> for a circuit \(C\)  if for every <strong>polynomial-time</strong> adversary \(A = (A_0, A_1)\)  such that:</p>
 <p>\[
 \begin{aligned}
@@ -111,7 +111,7 @@
 <p>Adversary chooses \((C, x)\)  after seeing \(gp\)  (adaptive), then produces a proof \(\pi\) . If \(A\)  produces an accepting proof with non-negligible probability, then \(E\)  can extract a valid witness \(w\)  with essentially the same probability (up to negligible \(\varepsilon\) ).</p>
 <p>After intro, we proceed to constructing a SNARK, which uses 2 building blocks, one is functional commitment scheme, and the other is interactive oracle proof. The former is a cryptographic object and the latter is an information-theoretical object.</p>
 <h3>Building Blocks 1: functional commitment scheme</h3>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Definition (Commitment Scheme)</strong>. A commitment scheme consists of</p>
 <ul>
 <li>\(\mathsf{setup}(1^\lambda)\to gp\) , outputs public parameters \(gp\)</li>
@@ -158,7 +158,7 @@ b' \leftarrow \mathcal{A}_2(st, com_f)
 </blockquote>
 <p>After sender’s commitment, the sender should also send \((x,r)\)  for the receiver to verify. For example, if I want to play paper-scissors-rock with a friend remotely: first we determine our choices; then we send the commitments to each other; finally we send the choice and the random bits used and verify the commitments sent by one another.</p>
 <p>To hide the message along the interaction (also, to make the proof short instead of \((x,r)\) ), we define functional commitment scheme.</p>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Definition (Functional Commitment Scheme)</strong>. A <strong>functional commitment scheme</strong> for \(\mathcal{F}=\{f:X\mapsto Y\}\) :</p>
 <ul>
 <li>\(\mathsf{setup}(1^\lambda)\to gp\) , outputs public parameters \(gp\)</li>
@@ -200,7 +200,7 @@ b' \leftarrow \mathcal{A}_2(st, com_f)
 </ul>
 <h3>Building Blocks 2: \(\mathcal{F}\) -Interactive Oracle Proof</h3>
 <p>IOP is a proof system that proves the prover knows \(w\)  such that \(C(x,w)=0\) . The verifier uses oracles of \(f\in\mathcal{F}\) , which is later replaced by functional commitments to construct a SNARK; here we use oracles.</p>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Definition (</strong> \(\mathcal{F}\) <strong>-IOP)</strong>: An \(\mathcal{F}\) -IOP is a proof system that proves \(\exists w,\;C(x,w)=0\)  and consists of</p>
 <ul>
 <li>\(\mathsf{setup}(1^\lambda)\to pp,vp=(\mathsf{Oracle}_{f_{-s}},\dots,\mathsf{Oracle}_{f_{0}})\)</li>

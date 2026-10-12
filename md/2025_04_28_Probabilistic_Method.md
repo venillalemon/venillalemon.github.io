@@ -30,7 +30,7 @@ $G_n=(V,E),V={[n]\choose 2},E=\{(ij,jk):i\lt j\lt k\}$ 相当于将 $K_n$ 的边
 
 > 求 $\chi(G_{2025})$. 思路：取 $i,j$ 二进制表示， $\varphi(i,j)=$ 两者的相同前缀长度, 得到 11 染色. 如何证明 $\chi(G_{2025})=11$?
 
-**Pf.** (proposed by [modist](https://github.com/ModistAndrew)) 考虑 $G_{2025}$ 所有边的 c-染色，记 $C(j)=\{\phi(i,j):1\leq i\leq j-1\}$, 那么不同的 $C(j)$ 一定互不相同, 但是颜色只有 $c$ 种. 得到 $2025\leq 2^c$, 即 $c>10$. 剩下的就是说明 $C(j)\not=C(i)$ for $j>i$: 如果两个集合相等，那么 $\phi(i,j)\in C(j)$ 可以推导出 $\phi(i,j)\in C(i)$, 则存在一个 $z\lt i$ $\phi(z,i)=\phi(i,j)$, 矛盾.
+**Proof.** (proposed by [modist](https://github.com/ModistAndrew)) 考虑 $G_{2025}$ 所有边的 c-染色，记 $C(j)=\{\phi(i,j):1\leq i\leq j-1\}$, 那么不同的 $C(j)$ 一定互不相同, 但是颜色只有 $c$ 种. 得到 $2025\leq 2^c$, 即 $c>10$. 剩下的就是说明 $C(j)\not=C(i)$ for $j>i$: 如果两个集合相等，那么 $\phi(i,j)\in C(j)$ 可以推导出 $\phi(i,j)\in C(i)$, 则存在一个 $z\lt i$ $\phi(z,i)=\phi(i,j)$, 矛盾.
 
 ### 求证 $\chi\geq\omega+2\Rightarrow|G|\geq 10$ (finale de autumne 2023)
 

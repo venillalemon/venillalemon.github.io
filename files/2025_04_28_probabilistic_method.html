@@ -66,7 +66,7 @@
 <blockquote>
 <p>求 \(\chi(G_{2025})\). 思路：取 \(i,j\) 二进制表示， \(\varphi(i,j)=\) 两者的相同前缀长度, 得到 11 染色. 如何证明 \(\chi(G_{2025})=11\)?</p>
 </blockquote>
-<p><strong>Pf.</strong> (proposed by <a href="https://github.com/ModistAndrew">modist</a>) 考虑 \(G_{2025}\) 所有边的 c-染色，记 \(C(j)=\{\phi(i,j):1\leq i\leq j-1\}\), 那么不同的 \(C(j)\) 一定互不相同, 但是颜色只有 \(c\) 种. 得到 \(2025\leq 2^c\), 即 \(c&gt;10\). 剩下的就是说明 \(C(j)\not=C(i)\) for \(j&gt;i\): 如果两个集合相等，那么 \(\phi(i,j)\in C(j)\) 可以推导出 \(\phi(i,j)\in C(i)\), 则存在一个 \(z\lt i\) \(\phi(z,i)=\phi(i,j)\), 矛盾.</p>
+<p><strong>Proof.</strong> (proposed by <a href="https://github.com/ModistAndrew">modist</a>) 考虑 \(G_{2025}\) 所有边的 c-染色，记 \(C(j)=\{\phi(i,j):1\leq i\leq j-1\}\), 那么不同的 \(C(j)\) 一定互不相同, 但是颜色只有 \(c\) 种. 得到 \(2025\leq 2^c\), 即 \(c&gt;10\). 剩下的就是说明 \(C(j)\not=C(i)\) for \(j&gt;i\): 如果两个集合相等，那么 \(\phi(i,j)\in C(j)\) 可以推导出 \(\phi(i,j)\in C(i)\), 则存在一个 \(z\lt i\) \(\phi(z,i)=\phi(i,j)\), 矛盾.</p>
 <h3>求证 \(\chi\geq\omega+2\Rightarrow|G|\geq 10\) (finale de autumne 2023)</h3>
 <p>我们已经有 \(C_5\cup C_5\) 的例子, 两个 \(C_5\) 之间全部连边， \(\chi=6,\omega=4\). 往证 \(|G|\leq 9\) 的图必定 \(\chi\leq\omega+1\) ，如果 \(|G|=9\) 的图满足，那么任何小于 9 的图 \(G\) 也满足（添加两个孤立点或者添加两个全连接点）. 因此讨论 \(|G|=9\), 对 \(\omega\) 分类讨论，逐个证明 \(\chi\leq\omega+1\).</p>
 <h3>否定 \(\chi\geq\omega+k\Rightarrow|G|\geq 5k\)</h3>

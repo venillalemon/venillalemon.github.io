@@ -123,6 +123,29 @@ math{font-family:var(--math)}
 .prose th{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);font-weight:600;background:var(--code-bg)}
 .prose tr:nth-child(even) td{background:color-mix(in srgb,var(--code-bg) 45%,transparent)}
 
+/* ---------------------------------------------------------------- columns */
+/* md2html `::: columns`: cells fill two columns left to right, so paired
+   cells line up row by row; wider than .col so formulas fit side by side */
+.prose .columns{
+  --cw:min(1120px,calc(100vw - 56px));
+  width:var(--cw);margin:20px 0 20px calc(50% - var(--cw)/2);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);font-size:15.5px;line-height:1.6;
+}
+.prose .column{min-width:0;padding:4px 0}
+.prose .column:nth-child(odd){padding-right:24px;border-right:1px solid var(--line)}
+.prose .column:nth-child(even){padding-left:24px}
+.prose .column>:first-child{margin-top:0}
+.prose .column>:last-child{margin-bottom:0}
+.prose .column h3{margin-top:0}
+.prose .column .katex-display{margin:10px 0}
+.prose .column ol,.prose .column ul{padding-left:22px}
+@media (max-width:900px){
+  .prose .columns{width:auto;margin:20px 0;grid-template-columns:minmax(0,1fr);font-size:inherit}
+  .prose .column:nth-child(odd){order:0;padding-right:0;border-right:0}
+  .prose .column:nth-child(even){order:1;padding-left:0}
+  .prose .column:nth-child(2){margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}
+}
+
 /* ------------------------------------------------------------------- math */
 .katex-display{overflow-x:auto;overflow-y:hidden;padding:6px 0;margin:14px 0}
 .katex{font-size:1.03em}

@@ -129,11 +129,11 @@ $M$ is weakly normalising. And since the reductiong cannot go on indefinitely, s
 
 ***Corollary 14.*** If $M=_\beta N$ then there is $L$ s.t. $M\twoheadrightarrow_\beta L$ and $N\twoheadrightarrow_\beta L$.
 
-**(induction on the length of the reduction path, using CR Thm)**
+**(induction on the length of the reduction path, using CR Theorem)**
 
 ## Fixed Point Thms
 
-***Theorem 15.*** (Fixed Point Thm) For any $\lambda$ -term $F$, there is a $\lambda$ -term $X$ s.t. $X=_\beta FX$.
+***Theorem 15.*** (Fixed Point Theorem) For any $\lambda$ -term $F$, there is a $\lambda$ -term $X$ s.t. $X=_\beta FX$.
 
 ***Proof.*** Take $X\equiv(\lambda x.F(xx))(\lambda x.F(xx))\to_\beta F(\lambda x.F(xx))(\lambda x.F(xx))\equiv FX$.
 

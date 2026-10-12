@@ -32,11 +32,11 @@ $$
 
 (不过我用的是补图+Turan)
 
-> **Thm.** $\alpha\geq\frac{n}{\Delta+1}$.
+> **Theorem.** $\alpha\geq\frac{n}{\Delta+1}$.
 
 直观上，先选出独立集 $D$ ，剩下所有的点一定是某个独立集内点的邻居。因此 $n\leq\sum_{v\in D}(N(v)+1)\leq\alpha(\Delta+1)$.
 
-> **Thm.** (Turan) $\alpha\geq\frac{n}{\overline{d}+1}$.
+> **Theorem.** (Turan) $\alpha\geq\frac{n}{\overline{d}+1}$.
 
 之前证明 Turan 定理的时候用到了 $\sum_{v}\frac{1}{\deg v+1}\leq \alpha$, 用jensen即可.
 

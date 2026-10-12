@@ -42,13 +42,13 @@ $G$ 没有诱导子图是 $P_3$ $\iff$ $G$ 的每个连通块都是团.
 
 ### Turan 定理八股文
 
-> **Thm.** (Turan, 1941) n 阶图 $\omega\leq p$, 那么 $m\leq t(n,p)$, $t(n,p)$ 为完全 $p$ 部图 $T(n,p)$ 的边数.
+> **Theorem.** (Turan, 1941) n 阶图 $\omega\leq p$, 那么 $m\leq t(n,p)$, $t(n,p)$ 为完全 $p$ 部图 $T(n,p)$ 的边数.
 
 ![](https://notes.sjtu.edu.cn/uploads/upload_02e1b8cee07df6a6ee8b69b55f9ed5af.png)
 
 我们可估计 $t(n,p)\sim (1-\frac{1}{p})\frac{n^2}{2}$, 一种方法是直接计算，还有一种是看每一个点都被砍了 $1/p$ 条出边.
 
-**证1.** (from the last proof of Mantel's Thm)
+**证1.** (from the last proof of Mantel's Theorem)
 
 $$
 \rho=\sum_{uv\in E}f(u)f(v)

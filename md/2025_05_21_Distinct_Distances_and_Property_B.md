@@ -24,7 +24,7 @@ $n^2 M^2\geq \text{Cr}\geq\frac{m^3}{4000kn^2}\sim\frac{n^4}{4000k}$
 
 为了解决这个问题，有 Szemeredi-Trotter 定理，它限制了坏线的个数.
 
-> **Thm.** (Szemeredi-Trotter, another form) $2\leq k\leq \sqrt{n}$, $|G|=n$, 如果 $\geq k$ 个点共线，计入这条线，最终的线数量 $\leq O\big(\frac{n^2}{k^3}\big)$
+> **Theorem.** (Szemeredi-Trotter, another form) $2\leq k\leq \sqrt{n}$, $|G|=n$, 如果 $\geq k$ 个点共线，计入这条线，最终的线数量 $\leq O\big(\frac{n^2}{k^3}\big)$
 
 那么这样一来，去掉的边数=坏线数*每条线扔边数 $\sim\frac{n^2}{n^{0.4\times3}}\times 2M(M+1)>n^2$, 失败。
 

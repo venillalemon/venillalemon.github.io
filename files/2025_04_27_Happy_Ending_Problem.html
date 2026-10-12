@@ -52,15 +52,15 @@
     <article class="prose markdown" data-src="markdown">
 <p><em>Lecture Notes for CS477 combinatorics on 2025/04/27</em></p>
 <h3>Ramsey equation</h3>
-<blockquote>
-<p><strong>Def.</strong> 整数方程 \(E\) 是 Ramsey 的，当且仅当 \(\forall c\;\exists N\;\forall \phi:[N]\to[c]\;\exists\) 一个 \(E\) 的同色解</p>
+<blockquote class="thm">
+<p><strong>Definition.</strong> 整数方程 \(E\) 是 Ramsey 的，当且仅当 \(\forall c\;\exists N\;\forall \phi:[N]\to[c]\;\exists\) 一个 \(E\) 的同色解</p>
 </blockquote>
 <p>Trivially, \(x+2y=3z\) 等等是 Ramsey 的； \(x=py\) 不是.</p>
 <p>首先 \(x_1+\dots+x_{k-1}=x_k\) 一定是 Ramsey 的，因为对任意 \(c\) 考虑 \(r(k,\dots,k)\), c个k，相当于这么大的图, c染色必有同色 \(K_k\), 而同色 \(K_k\) 自然包含了一组解（每条边的差值对应了某个 \(x_i\) ）。</p>
 <h4>\(x+ty=z\) 是 Ramsey 方程</h4>
 <p>从 \(x+6y=z\) 开始, 我们想到了 van der Waerden 定理：</p>
-<blockquote>
-<p><strong>Thm.</strong> (van der Waerden) \(\forall c,k\;\exists N\;\forall\phi:[N]\to[c]\;\exists\) a monochromatic AP of length \(k\) in \([n]\). The least \(N\) is \(W(c,k)\).</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (van der Waerden) \(\forall c,k\;\exists N\;\forall\phi:[N]\to[c]\;\exists\) a monochromatic AP of length \(k\) in \([n]\). The least \(N\) is \(W(c,k)\).</p>
 </blockquote>
 <p>\(\forall c\;\exists N\;\forall\phi:[N]\to[c]\;\exists x,d\), 所有 \(x,x+d,\dots，x+6kd\) 同色. 如果 d 也同色，done；否则看 2d；最后假设所有 d~kd 都和 x+id 不同色.</p>
 <p><img src="https://notes.sjtu.edu.cn/uploads/upload_ee61b2a500c9b82f144a145120dd1d55.png" alt=""></p>
@@ -70,8 +70,8 @@
 <h3>Rado Theorem</h3>
 <p>\(4x+7y+2z=2a+21b+3c\) 每个数可以拆成 \(a=101^rq,101\not|\;q\), \(\phi(a)=q\mod 101\) 即可(100染色)</p>
 <p>假设有一个同色q解，两边约去等量的101因数，至少剩一个，假设剩余x,y,b，再模101，得到 \(4q+7q=21q\), 得到 \(q=0\) ，矛盾. （这里已经证了必要性）</p>
-<blockquote>
-<p><strong>Thm.</strong> (Rado) 存在 \(I\subseteq[n],J\subseteq[m]\), \(\sum_Ia_i=\sum_Jb_j\), 当且仅当方程 \(\sum_{i=1}^n a_ix_i=\sum_{j=1}^m b_jy_j\) 是 Ramsey 的.</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (Rado) 存在 \(I\subseteq[n],J\subseteq[m]\), \(\sum_Ia_i=\sum_Jb_j\), 当且仅当方程 \(\sum_{i=1}^n a_ix_i=\sum_{j=1}^m b_jy_j\) 是 Ramsey 的.</p>
 </blockquote>
 <p>充分性：每次假定两个变量相等，用其中一个替换另一个. 示例： \(3x+2y+5z=a+6b+4c\to^{x=y,a=c}5x+5z=5a+6b\to^{z=b}5x=5a+b\), 如果 \(5x=5a+b\) 有同色解，那么原方程也有同色解.</p>
 <p><img src="https://notes.sjtu.edu.cn/uploads/upload_bb833845aed449b80872293a0908c36d.png" alt=""></p>
@@ -80,24 +80,24 @@
 <p>我们估计 \(R(15,26,31,17;5)\), 目标：给出的图对于任意5染色 \(\phi\) 存在15大小的同1色5子集，或者26大小的同2色5子集，...，或者存在17大小的同4色5子集。</p>
 <p>假设挑出一个 \(v\) ，剩下 \(n-1\) 个点的4子集进行4染色，要求这个4染色是induced，i.e. \(\sigma(\{a,b,c,d\})=i\iff\phi(\{v,a,b,c,d\})=i\) ，如果要求存在 \(R(14,26,31,17;5)\) 个同1色，或...或 \(R(15,26,31,16;5)\) 同4色, 那么对于这个4-子集同1色的完全图，或者同1色5子集至少14，或者同2色5子集至少26...如果加上v，由于4子集同1色完全图中，任意4-子集加上v就是同1色5子集，因此这个完全图加上v就是5子集同1色完全图。其他同理，满足条件。 \(R(15,26,31,17;5)\leq R(R(14,...;5),R(...,25,...;5),R(...,30,...;5),R(...,15;5);4)\)</p>
 <h3>Happy Ending Problem</h3>
-<blockquote>
-<p><strong>Thm.</strong> (Esther Klein \(\to\) Esther Szekeres) 平面上不三点共线的5个点必有4个点构成凸四边形.</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (Esther Klein \(\to\) Esther Szekeres) 平面上不三点共线的5个点必有4个点构成凸四边形.</p>
 </blockquote>
 <p>考虑convex hull的形状</p>
-<blockquote>
-<p><strong>Thm.</strong> (Erdos-Szekeres 1935) 任意k，存在足够大的n，平面上任意n个不三点共线的点，存在k点是convex的. 最小的n定义为 \(N(k)\).</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (Erdos-Szekeres 1935) 任意k，存在足够大的n，平面上任意n个不三点共线的点，存在k点是convex的. 最小的n定义为 \(N(k)\).</p>
 </blockquote>
-<p><strong>Pf.</strong> by Szekeres, 1931</p>
-<blockquote>
-<p><strong>Lem.</strong> In \(\mathbb{R}^2\), k pts (no 3 pts share a line) convex \(\iff\) all 4 pts subset is convex.</p>
+<p><strong>Proof.</strong> by Szekeres, 1931</p>
+<blockquote class="thm">
+<p><strong>Lemma.</strong> In \(\mathbb{R}^2\), k pts (no 3 pts share a line) convex \(\iff\) all 4 pts subset is convex.</p>
 </blockquote>
 <p>用一个点对凸包其他顶点连线，进行三角形划分，每个点总在一个三角形内部.</p>
 <p>因此考虑4超图的染色，四个点是凸的染y，非凸染b， \(N\geq R(k,5;4)\) 即可. 意思是，对 \(N\) 点的4超图进行2染色，必有k大小的同y色4子图，或者5大小的同b色4子图，但是我们知道5个点必有凸的四边形，因此第二种情况不可能，一定存在k大小的同y色4子图. \(\blacksquare\)</p>
-<p><strong>Pf.</strong> by Taski, 1971, 于某一次组合数学考试中憋出来</p>
+<p><strong>Proof.</strong> by Taski, 1971, 于某一次组合数学考试中憋出来</p>
 <p>旋转使得没有两个点同x，左到右编号. 任意3个点 \(i\lt j\lt k,a_i,a_j,a_k\) 有两种形态: 左转y/右转b，对这个3超图染yb色. \(N\geq R(k,k;3)\), k个点中任意三个转向相同即可 \(\blacksquare\)</p>
-<p><strong>Pf.</strong> 1978</p>
+<p><strong>Proof.</strong> 1978</p>
 <p>任意三个点连成三角形，内部奇数个点染y，偶数个点染b. \(N\geq R(k,k;3)\), 意味着对这种染色，存在k个点，任意3子集都是y色或者任意3子集都是b色. 这k点中，不存在4点非凸子集，因为 \(奇+奇+奇+1=偶\) ， \(偶+偶+偶+1=奇\). 因此k点是凸的 (别忘了加上中间的点!).</p>
-<p><strong>Pf.</strong> by Erdos and Szekeres, 1935<img src="https://notes.sjtu.edu.cn/uploads/upload_c3a2165004a917bb09c856f5b477bce8.png" alt=""></p>
+<p><strong>Proof.</strong> by Erdos and Szekeres, 1935<img src="https://notes.sjtu.edu.cn/uploads/upload_c3a2165004a917bb09c856f5b477bce8.png" alt=""></p>
 <p>\(N(p,q)\) 表示最小的 \(N\), 平面上N个点(不共线，不共x)总存在p+2个上凸或者q+2个下凸. \(N(0,\_)=2\), \(N(n,1)=n+2\)</p>
 <p>\(N_1+1=N(p-1,q),N_2+1=N(p,q-1)\). 考虑 \(N_1+N_2+1\) 个点, 即证存在p+2个上凸或者q+2个下凸. 首先抓前 \(N_1\) 个，如果存在q+2下凸，done; 如果存在p+1上凸，还差1; 如果运气够好可以加点，done;</p>
 <p>(如果运气好，阴影部分存在点，就可以加上)<img src="https://notes.sjtu.edu.cn/uploads/upload_155200e1578e2a07934a328124c02f29.jpg" alt=""></p>

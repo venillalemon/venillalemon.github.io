@@ -24,15 +24,15 @@ $ALPHA\in\mathbf{\Sigma}_2^p$, 一个 verifier 只需要 check 输入的两个 w
 
 ![](https://notes.sjtu.edu.cn/uploads/upload_f63460c01382764cf2fc18c8d8526328.png)
 
-**Pf. for 1.** Assuming $\mathbf{\Sigma}_i^p=\mathbf{\Pi}_{i}^p$, by induction on $j\geq i$ we proof that $\mathbf{\Sigma}_j^p,\mathbf{\Pi}_j^p\subseteq\mathbf{\Sigma}_i^p$. For $j=i$ it is true, and we assume for all $i\leq j\lt k$ it is true. Consider $j=k$. If $\mathbf{\Sigma}_k^p\subseteq\mathbf{\Sigma}_i^p$ ， then $\mathbf{\Pi}_k^p\subseteq\mathbf{\Pi}_i^p$. So the goal is to prove $\mathbf{\Sigma}_k^p\subseteq\mathbf{\Sigma}_i^p$.
+**Proof for 1.** Assuming $\mathbf{\Sigma}_i^p=\mathbf{\Pi}_{i}^p$, by induction on $j\geq i$ we proof that $\mathbf{\Sigma}_j^p,\mathbf{\Pi}_j^p\subseteq\mathbf{\Sigma}_i^p$. For $j=i$ it is true, and we assume for all $i\leq j\lt k$ it is true. Consider $j=k$. If $\mathbf{\Sigma}_k^p\subseteq\mathbf{\Sigma}_i^p$ ， then $\mathbf{\Pi}_k^p\subseteq\mathbf{\Pi}_i^p$. So the goal is to prove $\mathbf{\Sigma}_k^p\subseteq\mathbf{\Sigma}_i^p$.
 
 接下来和下面所示的步骤相同.
 
-**Pf. for 2.**![](https://notes.sjtu.edu.cn/uploads/upload_d1bc2a4d73aae6f793430fc70144941a.png)
+**Proof for 2.**![](https://notes.sjtu.edu.cn/uploads/upload_d1bc2a4d73aae6f793430fc70144941a.png)
 
-**Thm 1.** 如果对于某一 $i\in\mathbb{N}$, $\mathbf{\Sigma}_i^p=\mathbf{\Sigma}_{i+1}^p$, 那么 $\mathbf{PH}=\mathbf{\mathbf{\Sigma}}_i^p$
+**Theorem 1.** 如果对于某一 $i\in\mathbb{N}$, $\mathbf{\Sigma}_i^p=\mathbf{\Sigma}_{i+1}^p$, 那么 $\mathbf{PH}=\mathbf{\mathbf{\Sigma}}_i^p$
 
-**Pf.** We know that $\mathbf{\Sigma}_i^p\subseteq\mathbf{\Pi}_{i+1}^p=\mathbf{\Pi}_{i}^p$, the second equality follows from $\mathbf{\Sigma}_i^p=\mathbf{\Sigma}_{i+1}^p$. Similarly $\mathbf{\Pi}_i^p\subseteq\mathbf{\Sigma}_{i+1}^p=\mathbf{\Sigma}_{i}^p$. The conclusion follows from **Theorem 5.4**.
+**Proof.** We know that $\mathbf{\Sigma}_i^p\subseteq\mathbf{\Pi}_{i+1}^p=\mathbf{\Pi}_{i}^p$, the second equality follows from $\mathbf{\Sigma}_i^p=\mathbf{\Sigma}_{i+1}^p$. Similarly $\mathbf{\Pi}_i^p\subseteq\mathbf{\Sigma}_{i+1}^p=\mathbf{\Sigma}_{i}^p$. The conclusion follows from **Theorem 5.4**.
 
 ## $\mathbf{PH}$ -complete
 

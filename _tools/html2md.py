@@ -94,6 +94,7 @@ class MDConverter(HTMLParser):
         self.buf = []
         self.list_stack = []
         self.ol_counters = []
+        self.div_stack = []          # class of each open <div>, for ::: columns
         self.href = None
         self.skip_depth = 0
         # code blocks
@@ -200,9 +201,18 @@ class MDConverter(HTMLParser):
                 self.flush()
             self.list_stack.append(tag)
             if tag == "ol":
-                self.ol_counters.append(0)
+                self.ol_counters.append(int(attrs.get("start") or 1) - 1)
         elif tag == "li":
             self.buf = []
+        elif tag == "div":
+            cls = (attrs.get("class") or "").split()
+            self.div_stack.append(cls)
+            if "columns" in cls:
+                self.flush()
+                self.blocks.append("::: columns")
+            elif "column" in cls:
+                self.flush()
+                self.blocks.append("::: column")
         elif tag == "strong" or tag == "b":
             self.buf.append("**")
         elif tag == "em" or tag == "i":
@@ -272,6 +282,13 @@ class MDConverter(HTMLParser):
                     self.ol_counters.pop()
         elif tag == "li":
             self.emit_li()
+        elif tag == "div":
+            cls = self.div_stack.pop() if self.div_stack else []
+            if "columns" in cls:
+                self.flush()
+                self.blocks.append(":::")
+            elif "column" in cls:
+                self.flush()
         elif tag == "strong" or tag == "b":
             self.buf.append("**")
         elif tag == "em" or tag == "i":

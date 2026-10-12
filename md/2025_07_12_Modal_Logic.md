@@ -58,7 +58,7 @@ Modes of Truth: 命题逻辑和谓词逻辑不允许真/假之外的可能性，
 
 回到上面说的边界情况，我们得到 $\Box\phi\not\equiv\Diamond\phi$. 然而我们有 $\Box\top\equiv\top$ 和 $\Diamond\bot\equiv\bot$. 前者很显然，而后者有点费解，稍微证明一下.
 
-**Pf. of $\Diamond\bot\equiv\bot$:**
+**Proof of $\Diamond\bot\equiv\bot$:**
 
 首先没有 $x$ 满足 $\bot$, 有 $\bot\vdash\Diamond\bot$. 反过来如果 $x\vdash\Diamond\bot$, 那么存在一个 $x$ 的可达世界 $y\vdash\bot$, 没有这样的 $x$, 就算 $x$ 没有后继也不存在. 双向奔赴了属于是. $\blacksquare$
 

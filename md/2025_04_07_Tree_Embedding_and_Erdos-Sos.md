@@ -30,7 +30,7 @@ $p\in(0,1)$ 均匀分布，求100次中50次成功的概率
 
 ![](https://notes.sjtu.edu.cn/uploads/upload_a99c99411e1bbaf05fffbf3567c60c01.png)
 
-> **Thm.** $\overline{d}(G)\geq 2k-2\Rightarrow$ 任意一个 $k+1$ 阶树是 $G$ 的子图.
+> **Theorem.** $\overline{d}(G)\geq 2k-2\Rightarrow$ 任意一个 $k+1$ 阶树是 $G$ 的子图.
 
 > **Lemma.** $\overline{d}(G)\geq 2k-2$ 那么存在 $\delta(H)\geq k$ 的诱导子图.
 
@@ -88,19 +88,19 @@ $\chi=\Delta+1$: $K_n$, $C_{2k+1}$
 
 ### 定理 0407 系列
 
-> **Thm 040701.** $\chi(G)=k$, 则 $G$ 至少有一个点 $\deg\geq k-1$.
+> **Theorem 040701.** $\chi(G)=k$, 则 $G$ 至少有一个点 $\deg\geq k-1$.
 
 总有人被逼着染 k 色.
 
-> **Thm 040702.** $\chi(G)=100$, 则 $G$ 至少有 100 个点 $\deg\geq99$.
+> **Theorem 040702.** $\chi(G)=100$, 则 $G$ 至少有 100 个点 $\deg\geq99$.
 
 把度数 $\geq99$ 的点提到前面，如果有 $\lt 100$ 个这样的点，那么我可以拿着99种颜色，先给度数 $\geq 99$ 的点一人一个. 后面的点，因为度数 $\leq 98$, 用 99 个颜色一定可以染完, 得到 $\chi\leq99$, 矛盾.
 
 归纳法：按照 $G$ 的阶数归纳，归纳起点是 $K_{100}$. 如果对任意 $|G|\lt n$ 成立，那么 $|G|=n,\chi(G)=100$ 时，若存在一个度数 $\deg v\leq98$, 那么 $\chi(G-v)=100$, $v$ 由于最多只看到98种颜色，它的染色不会影响 $G$ 的染色. 由归纳假设 $G-v$ 至少100个点 $\deg\geq k-1$.
 
-> **Thm 040703'.** $\chi(G)=100$, $\phi$ 最优，则 $G$ 每种颜色都有一个点 $\deg\geq 99$.
+> **Theorem 040703'.** $\chi(G)=100$, $\phi$ 最优，则 $G$ 每种颜色都有一个点 $\deg\geq 99$.
 
-> **Thm 040703.** $\chi(G)=100$, $\phi$ 最优，则 $G$ 每种颜色都有一个点和其他所有颜色相邻.
+> **Theorem 040703.** $\chi(G)=100$, $\phi$ 最优，则 $G$ 每种颜色都有一个点和其他所有颜色相邻.
 
 否则可以把这个颜色给分裂掉.
 
@@ -124,11 +124,11 @@ $\Delta=4\Rightarrow\chi\leq 5$
 
 四色定理 $\Rightarrow\chi\leq4$ (大炮打蚊子)
 
-> **Thm. (K. Wagner, 1936; I. Fáry, 1948; Sherman K. Stein, 1951, independently)** 任意一个简单平面图总可以用直线段画出来.
+> **Theorem. (K. Wagner, 1936; I. Fáry, 1948; Sherman K. Stein, 1951, independently)** 任意一个简单平面图总可以用直线段画出来.
 
-或者 Brooks Thm
+或者 Brooks Theorem
 
-> **Thm. (Brooks)** Connected graph in which every vertex has at most $\Delta$ neighbors, the vertices can be colored with only $\Delta$ colors, except for two cases, complete graphs and cycle graphs of odd length, which require $\Delta+1$ colors.
+> **Theorem. (Brooks)** Connected graph in which every vertex has at most $\Delta$ neighbors, the vertices can be colored with only $\Delta$ colors, except for two cases, complete graphs and cycle graphs of odd length, which require $\Delta+1$ colors.
 
 这启发我们，无脑染色时的“脑子”只需要保证每个点前面有足够少的邻居即可.
 

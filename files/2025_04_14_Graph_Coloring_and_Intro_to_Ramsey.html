@@ -68,14 +68,14 @@
 <p>考虑干涉图，按照时间顺序对每个变量染色， \(v_i\) 和前面哪些变量干涉取决于活跃区域是否相交，因此 \(\{v_j:v_iv_j\in E, j\lt i\}\) 一定构成一个完全图， \(d_\pi(v)\lt \omega(G)\), 归纳可得每个染色都 \(\phi(v)\leq\omega(G)\), 即 \(\chi(G)=\omega(G)\).</p>
 </blockquote>
 <h3>Erdös-Sós: 证明 \(\overline{d}\geq k\Rightarrow \exists P_{k+1}\)</h3>
-<blockquote>
-<p><strong>Thm.</strong> (Dirac) 连通且 \(\delta\geq k\Rightarrow \exists P_{2k+1}\) 或 Hamilton Cycle</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (Dirac) 连通且 \(\delta\geq k\Rightarrow \exists P_{2k+1}\) 或 Hamilton Cycle</p>
 </blockquote>
 <p>为什么这么奇怪？考虑 k=100, \(K_{100}+K_{100}\) 即可没有 \(2k+1\) path 且无 H.C.</p>
 <h3>Hamilton Cycle</h3>
 <p><img src="https://notes.sjtu.edu.cn/uploads/upload_a247342bc418ab5cf991d9927ef339be.png" alt=""></p>
 <p>无需连通，因为如果 \(d(u)+d(v)\geq n\), 那么一定有公共邻居.</p>
-<p><strong>Pf.</strong> of Dirac</p>
+<p><strong>Proof.</strong> of Dirac</p>
 <p>\(C_t(t\lt n)\to P_{t+1}\)</p>
 <p>\(P_{t}(t\leq 2k)\to P_{t+1}\text{ or }C_t\)</p>
 <p><img src="https://notes.sjtu.edu.cn/uploads/upload_52f87e116b4dad668760ec69917f29b5.png" alt=""></p>
@@ -90,14 +90,14 @@
 <p>\(n=100,\chi=10\) \(\min m=45,\max m=4500\)</p>
 <p>根据定理 040702， \(\chi=10\), 那么存在10个点 \(\deg\geq 9\) ，握手</p>
 <h3>Nordhaus-Gaddum 关于补图染色的定理</h3>
-<blockquote>
-<p><strong>Thm.</strong> (Nordhaus-Gaddum) \(G,H\) 互为补图，那么 \(\chi_1\chi_2\geq n\), \(\chi_1+\chi_2\leq n+1\).</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (Nordhaus-Gaddum) \(G,H\) 互为补图，那么 \(\chi_1\chi_2\geq n\), \(\chi_1+\chi_2\leq n+1\).</p>
 </blockquote>
 <p>推论： \(n\leq\chi_1\chi_2\leq\frac{(n+1)^2}{4}\), \(2\sqrt{n}\leq\chi_1+\chi_2\leq n+1\)</p>
 <p>\(\chi_1\chi_2=n,\chi_1+\chi_2=n+1\): \(G=K_n,H=K_1\times n\)</p>
 <p>\(\chi_1\chi_2=\frac{(n+1)^2}{4}\): 令 \(n=2k-1\), 例子是 \(G=K_{k}\cup k-1\) 个孤立点.</p>
 <p>\(\chi_1+\chi_2=2\sqrt{n}\): 令 \(n=k^2\), 例子是 \(G=K_{k}\times k\).</p>
-<p><strong>Pf.</strong></p>
+<p><strong>Proof.</strong></p>
 <p>\[
 \chi(G)\geq\frac{n}{\alpha(G)}=\frac{n}{\omega(H)}\geq\frac{n}{\chi(H)}
 \]</p>

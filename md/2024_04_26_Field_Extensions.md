@@ -46,7 +46,7 @@ Similarly we have for $u\in K/F$, $\text{frac}(F[u])=F(u)$.
 
 - $u$ is transcendental. Then $F(u)\cong F(x)$.
 
-***Sketch of Proof.*** Consider ring homomorphism $\pi:F[x]\mapsto F(u)$ with $\pi(g(x))=g(u)$. With isomorphism thm we have $F(u)\cong F[x]/\text{Im}\;\pi$.
+***Sketch of Proof.*** Consider ring homomorphism $\pi:F[x]\mapsto F(u)$ with $\pi(g(x))=g(u)$. With isomorphism theorem we have $F(u)\cong F[x]/\text{Im}\;\pi$.
 
 ***Corollary 6.*** $u,v\in K/F$ are algebraic on $F$. There exists $\sigma:F(u)\cong F(v)$ where $\sigma(u)=v$, $\sigma|_F=\mathbf{Id}$ if and only if $u$ and $v$ share the same minimal polynomial.
 

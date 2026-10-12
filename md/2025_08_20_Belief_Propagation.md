@@ -236,7 +236,7 @@ $$
 
 ### Entropy
 
-First, a surprising Thm:
+First, a surprising Theorem:
 
 Theorem 14.2
 

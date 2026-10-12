@@ -34,7 +34,7 @@ $\exists \pi, \;\chi_\pi=\chi$, 将每个颜色按顺序排即可，可得到 $\
 
 ### Erdös-Sós: 证明 $\overline{d}\geq k\Rightarrow \exists P_{k+1}$
 
-> **Thm.** (Dirac) 连通且 $\delta\geq k\Rightarrow \exists P_{2k+1}$ 或 Hamilton Cycle
+> **Theorem.** (Dirac) 连通且 $\delta\geq k\Rightarrow \exists P_{2k+1}$ 或 Hamilton Cycle
 
 为什么这么奇怪？考虑 k=100, $K_{100}+K_{100}$ 即可没有 $2k+1$ path 且无 H.C.
 
@@ -44,7 +44,7 @@ $\exists \pi, \;\chi_\pi=\chi$, 将每个颜色按顺序排即可，可得到 $\
 
 无需连通，因为如果 $d(u)+d(v)\geq n$, 那么一定有公共邻居.
 
-**Pf.** of Dirac
+**Proof.** of Dirac
 
 $C_t(t\lt n)\to P_{t+1}$
 
@@ -74,7 +74,7 @@ $n=100,\chi=10$ $\min m=45,\max m=4500$
 
 ### Nordhaus-Gaddum 关于补图染色的定理
 
-> **Thm.** (Nordhaus-Gaddum) $G,H$ 互为补图，那么 $\chi_1\chi_2\geq n$, $\chi_1+\chi_2\leq n+1$.
+> **Theorem.** (Nordhaus-Gaddum) $G,H$ 互为补图，那么 $\chi_1\chi_2\geq n$, $\chi_1+\chi_2\leq n+1$.
 
 推论： $n\leq\chi_1\chi_2\leq\frac{(n+1)^2}{4}$, $2\sqrt{n}\leq\chi_1+\chi_2\leq n+1$
 
@@ -84,7 +84,7 @@ $\chi_1\chi_2=\frac{(n+1)^2}{4}$: 令 $n=2k-1$, 例子是 $G=K_{k}\cup k-1$ 个�
 
 $\chi_1+\chi_2=2\sqrt{n}$: 令 $n=k^2$, 例子是 $G=K_{k}\times k$.
 
-**Pf.**
+**Proof.**
 
 $$
 \chi(G)\geq\frac{n}{\alpha(G)}=\frac{n}{\omega(H)}\geq\frac{n}{\chi(H)}

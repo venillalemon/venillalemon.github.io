@@ -65,17 +65,17 @@
 <p>成功= \(X(\omega)\lt p\), 因此这个概率等价为 rand 101 个数字，第一个数字排在第51位（or 任意位）的概率：1/101</p>
 <h3>tree embedding</h3>
 <p><img src="https://notes.sjtu.edu.cn/uploads/upload_a99c99411e1bbaf05fffbf3567c60c01.png" alt=""></p>
-<blockquote>
-<p><strong>Thm.</strong> \(\overline{d}(G)\geq 2k-2\Rightarrow\) 任意一个 \(k+1\) 阶树是 \(G\) 的子图.</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> \(\overline{d}(G)\geq 2k-2\Rightarrow\) 任意一个 \(k+1\) 阶树是 \(G\) 的子图.</p>
 </blockquote>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Lemma.</strong> \(\overline{d}(G)\geq 2k-2\) 那么存在 \(\delta(H)\geq k\) 的诱导子图.</p>
 </blockquote>
 <p>\(m\geq n(k-1)\), 每次去掉度数 \(\leq k-1\) 的点和它的邻边, \(m-d(v)\geq m-(k-1)\geq(n-1)(k-1)\). 去掉的过程中， \(m\geq n(k-1)\) 一直保持. 停止的时候，没有度数 \(\leq k-1\) 的点，因此 \(\delta(G)\geq k\).</p>
 <p>问题：k还能再大吗？假设k=51，要求一个 \(\delta\geq52\) 的诱导子图</p>
 <p>左到右足够多的点排成一行，每个点到左边51点、右边51点连边，可以expect它平均度数大于100. 但是最左边的点度数51，去掉；因此按照这个方法会被全部去掉。</p>
 <p>或者考虑 \(K_{51,N},N\gg 51,\overline{d}=2\times\frac{51N}{51+N}\geq100\), 因此一个 \(\delta\geq 52\) 的诱导子图一定不包含右边 \(N\) 个点. 左边剩51个点，更不可能.</p>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Lemma.</strong> \(\delta(G)\geq k\), 那么任意一个 \(k+1\) 阶树是 \(G\) 的子图.</p>
 </blockquote>
 <p>容易看到，一定存在k+1阶的星星图 or \(P_{k+1}\). 树任选根，每个点由于存在至少 \(k\) 个邻居，总是可以逐步拓展embedding. 如果挑到x，它的朋友都在已经选的集合中，那么已经完成.</p>
@@ -104,20 +104,20 @@
 <p>\(\chi=\Delta+1\): \(K_n\), \(C_{2k+1}\)</p>
 <p>奇妙的图 by xiaomin<img src="https://notes.sjtu.edu.cn/uploads/upload_4d3b1cd886eb17b06dcac1a3fdb72342.png" alt=""></p>
 <h3>定理 0407 系列</h3>
-<blockquote>
-<p><strong>Thm 040701.</strong> \(\chi(G)=k\), 则 \(G\) 至少有一个点 \(\deg\geq k-1\).</p>
+<blockquote class="thm">
+<p><strong>Theorem 040701.</strong> \(\chi(G)=k\), 则 \(G\) 至少有一个点 \(\deg\geq k-1\).</p>
 </blockquote>
 <p>总有人被逼着染 k 色.</p>
-<blockquote>
-<p><strong>Thm 040702.</strong> \(\chi(G)=100\), 则 \(G\) 至少有 100 个点 \(\deg\geq99\).</p>
+<blockquote class="thm">
+<p><strong>Theorem 040702.</strong> \(\chi(G)=100\), 则 \(G\) 至少有 100 个点 \(\deg\geq99\).</p>
 </blockquote>
 <p>把度数 \(\geq99\) 的点提到前面，如果有 \(\lt 100\) 个这样的点，那么我可以拿着99种颜色，先给度数 \(\geq 99\) 的点一人一个. 后面的点，因为度数 \(\leq 98\), 用 99 个颜色一定可以染完, 得到 \(\chi\leq99\), 矛盾.</p>
 <p>归纳法：按照 \(G\) 的阶数归纳，归纳起点是 \(K_{100}\). 如果对任意 \(|G|\lt n\) 成立，那么 \(|G|=n,\chi(G)=100\) 时，若存在一个度数 \(\deg v\leq98\), 那么 \(\chi(G-v)=100\), \(v\) 由于最多只看到98种颜色，它的染色不会影响 \(G\) 的染色. 由归纳假设 \(G-v\) 至少100个点 \(\deg\geq k-1\).</p>
-<blockquote>
-<p><strong>Thm 040703'.</strong> \(\chi(G)=100\), \(\phi\) 最优，则 \(G\) 每种颜色都有一个点 \(\deg\geq 99\).</p>
+<blockquote class="thm">
+<p><strong>Theorem 040703'.</strong> \(\chi(G)=100\), \(\phi\) 最优，则 \(G\) 每种颜色都有一个点 \(\deg\geq 99\).</p>
 </blockquote>
-<blockquote>
-<p><strong>Thm 040703.</strong> \(\chi(G)=100\), \(\phi\) 最优，则 \(G\) 每种颜色都有一个点和其他所有颜色相邻.</p>
+<blockquote class="thm">
+<p><strong>Theorem 040703.</strong> \(\chi(G)=100\), \(\phi\) 最优，则 \(G\) 每种颜色都有一个点和其他所有颜色相邻.</p>
 </blockquote>
 <p>否则可以把这个颜色给分裂掉.</p>
 <h3>贪心染色</h3>
@@ -134,12 +134,12 @@
 <p><img src="https://notes.sjtu.edu.cn/uploads/upload_a0ab3b004a8522a59fe1ea777e94eaf8.png" alt=""></p>
 <p>\(\Delta=4\Rightarrow\chi\leq 5\)</p>
 <p>四色定理 \(\Rightarrow\chi\leq4\) (大炮打蚊子)</p>
-<blockquote>
-<p><strong>Thm. (K. Wagner, 1936; I. Fáry, 1948; Sherman K. Stein, 1951, independently)</strong> 任意一个简单平面图总可以用直线段画出来.</p>
+<blockquote class="thm">
+<p><strong>Theorem. (K. Wagner, 1936; I. Fáry, 1948; Sherman K. Stein, 1951, independently)</strong> 任意一个简单平面图总可以用直线段画出来.</p>
 </blockquote>
-<p>或者 Brooks Thm</p>
-<blockquote>
-<p><strong>Thm. (Brooks)</strong> Connected graph in which every vertex has at most \(\Delta\) neighbors, the vertices can be colored with only \(\Delta\) colors, except for two cases, complete graphs and cycle graphs of odd length, which require \(\Delta+1\) colors.</p>
+<p>或者 Brooks Theorem</p>
+<blockquote class="thm">
+<p><strong>Theorem. (Brooks)</strong> Connected graph in which every vertex has at most \(\Delta\) neighbors, the vertices can be colored with only \(\Delta\) colors, except for two cases, complete graphs and cycle graphs of odd length, which require \(\Delta+1\) colors.</p>
 </blockquote>
 <p>这启发我们，无脑染色时的“脑子”只需要保证每个点前面有足够少的邻居即可.</p>
 <hr>

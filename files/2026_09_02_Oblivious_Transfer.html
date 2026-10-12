@@ -53,7 +53,7 @@
 <h2>Definitions and equivalences</h2>
 <h3>1-out-of-2 OT</h3>
 <p>全文取 \(\kappa\) 为安全参数，消息长度为 \(\kappa\)。Sender 记 \(S\)，receiver 记 \(R\)。</p>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Definition (1-out-of-2 OT).</strong> \(S\) 输入 \((m_0,m_1)\in\{0,1\}^\kappa\times\{0,1\}^\kappa\)，\(R\) 输入 choice bit \(b\in\{0,1\}\)：</p>
 <p>\[
 \mathsf{OT}\big((m_0,m_1);\,b\big)\longrightarrow(\bot;\,m_b).
@@ -65,7 +65,7 @@
 </blockquote>
 <h3>Random OT and correlated OT</h3>
 <p>下面两个变体依次拿掉 party 的选择权。</p>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Definition (Random OT).</strong> 双方无输入。functionality 采样 \((a_0,a_1)\xleftarrow{\\)}\{0,1\}^\kappa\times\{0,1\}^\kappa$ 和 \(r\xleftarrow{\\)}\{0,1\}$：</p>
 <p>\[
 \mathsf{ROT}(\bot;\,\bot)\longrightarrow\big((a_0,a_1);\ (r,\,a_r)\big).

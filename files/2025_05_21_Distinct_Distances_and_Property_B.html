@@ -61,8 +61,8 @@
 <p>一条坏线可能会导致重边数量超过 \(Cn^{0.4}\) ，因此考虑坏线上点产生的弧线（这些弧线段其实是 \(H\) 的边），去掉它们。假设 \(s\) 个点，每个点 \(M\) 个圆，最多扔掉 \(2sM\) 条边。同时 \(s\leq M+1\) ，因为否则，最左边的点看到距离数量就大于 \(M\) ，矛盾了.</p>
 <h4>组合方法</h4>
 <p>为了解决这个问题，有 Szemeredi-Trotter 定理，它限制了坏线的个数.</p>
-<blockquote>
-<p><strong>Thm.</strong> (Szemeredi-Trotter, another form) \(2\leq k\leq \sqrt{n}\), \(|G|=n\), 如果 \(\geq k\) 个点共线，计入这条线，最终的线数量 \(\leq O\big(\frac{n^2}{k^3}\big)\)</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (Szemeredi-Trotter, another form) \(2\leq k\leq \sqrt{n}\), \(|G|=n\), 如果 \(\geq k\) 个点共线，计入这条线，最终的线数量 \(\leq O\big(\frac{n^2}{k^3}\big)\)</p>
 </blockquote>
 <p>那么这样一来，去掉的边数=坏线数*每条线扔边数 \(\sim\frac{n^2}{n^{0.4\times3}}\times 2M(M+1)&gt;n^2\), 失败。</p>
 <p>究其原因，我们对于 \(s\) 和 \(M\) 的估计太粗糙了, 分段倍增。</p>

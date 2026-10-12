@@ -10,13 +10,13 @@
 
 规定不能三边交叉于一点， $G$ 的 crossing number 定义为最小交叉数量，例如 $K_5$ 至少一个， $\text{Cr}(K_5)=1$.
 
-> **Thm.** $\text{Cr}(G)\geq m-3n$
+> **Theorem.** $\text{Cr}(G)\geq m-3n$
 
 证1. 交点变成点，点+1，边+2，得到平面图 证2. 一个交点去一条边，至少少一个交点，因此至多去掉 $\text{Cr}$ 条边
 
 Somehow when $m\geq 4n, \;\text{Cr}\geq\frac{3}{64}{n\choose 4}\Big(\frac{m}{n\choose 2}\Big)^3$
 
-> **Thm.** (1980, Crossing Lemma) $\text{Cr}(G)\geq\frac{m^3}{64n^2}(m\geq 4n)$
+> **Theorem.** (1980, Crossing Lemma) $\text{Cr}(G)\geq\frac{m^3}{64n^2}(m\geq 4n)$
 
 $\text{Cr}(K_n)$: 每5个点有1个交点；每个交点被算 $n-4$ 次
 
@@ -24,7 +24,7 @@ $\text{Cr}(K_n)$: 每5个点有1个交点；每个交点被算 $n-4$ 次
 
 ### crossing lemma 应用: 好边
 
-> **Thm.** (Szemeredi-Trotter) $n$ points $\in\mathbb{R}^2$, 定义一条直线为好边当且仅当线上有 $\geq k\;(2\leq k\leq \sqrt{n})$ 个点. 这样的好边最多 $O\big(\frac{n^2}{k^3}\big)$ 个.
+> **Theorem.** (Szemeredi-Trotter) $n$ points $\in\mathbb{R}^2$, 定义一条直线为好边当且仅当线上有 $\geq k\;(2\leq k\leq \sqrt{n})$ 个点. 这样的好边最多 $O\big(\frac{n^2}{k^3}\big)$ 个.
 
 将好线上的相邻点 (consecutive) 连边，点数 $n$, 边数 $\geq l(k-1)$, 交叉数 $\leq{l\choose 2}$. 比较 $m$ 和 $4n$ 大小.
 
@@ -38,7 +38,7 @@ $m\geq 4n\Rightarrow$ crossing lemma $\frac{l^2}{2}\geq\frac{l^3(k-1)^3}{64n^2}$
 
 $I(P,L)=\{(p,l):p\in P,l\in L,p\in l\}$
 
-> **Thm.** (Szemeredi-Trotter) $|P|=n,|L|=m,|I(P,L)|\leq 4(m^{\frac{2}{3}}n^{\frac{2}{3}}+m+n)$
+> **Theorem.** (Szemeredi-Trotter) $|P|=n,|L|=m,|I(P,L)|\leq 4(m^{\frac{2}{3}}n^{\frac{2}{3}}+m+n)$
 
 连接线上的相邻点，不放假设每条边至少1个点（否则直接删除， $m$ 减少，不影响待证不等式）。点数 $n$, 边数：每条线如果有 $n>1$ 个点，那么有 $n-1$ 条边，共 $|I|-m$ 条. 交点最多 ${m\choose 2}$
 

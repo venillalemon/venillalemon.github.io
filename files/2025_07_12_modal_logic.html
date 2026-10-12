@@ -84,7 +84,7 @@
 <p>等价的意思是 \(\{\phi\}\vdash\psi\) 且 \(\{\psi\}\vdash\phi\). \(\{\}\) 可以去掉.</p>
 <p>考虑分配律和 De Moegan 律， \(\Box\Diamond\) 和 \(\forall\exists\) 很相像，这里省略.</p>
 <p>回到上面说的边界情况，我们得到 \(\Box\phi\not\equiv\Diamond\phi\). 然而我们有 \(\Box\top\equiv\top\) 和 \(\Diamond\bot\equiv\bot\). 前者很显然，而后者有点费解，稍微证明一下.</p>
-<p><strong>Pf. of \(\Diamond\bot\equiv\bot\):</strong></p>
+<p><strong>Proof of \(\Diamond\bot\equiv\bot\):</strong></p>
 <p>首先没有 \(x\) 满足 \(\bot\), 有 \(\bot\vdash\Diamond\bot\). 反过来如果 \(x\vdash\Diamond\bot\), 那么存在一个 \(x\) 的可达世界 \(y\vdash\bot\), 没有这样的 \(x\), 就算 \(x\) 没有后继也不存在. 双向奔赴了属于是. \(\blacksquare\)</p>
 <p>还有一个有趣的等价 \(\Diamond\top\equiv\Box\phi\to\Diamond\phi\), 证明显然，对任意 \(\phi\) 成立.</p>
 <p>类似一阶逻辑，模态逻辑也有 validity，定义为对任意模型、任意世界都成立，记作 \(\vdash\phi\).</p>

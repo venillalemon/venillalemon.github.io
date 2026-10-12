@@ -66,12 +66,12 @@
 <p>5050 阶图若 \(\alpha\leq 99\), 那么边数一定大于 \(c(5050,99)\), 考虑平均度数, &gt;50即可.</p>
 <p>5050 阶图若 \(\Delta\leq50\), 那么 \(\alpha\geq 100\). 选一个点杀掉最多其他50个点, 99轮之后至少还剩1个 survivor + 99 个 selected, 构成一个 100 阶独立集.</p>
 <p>(不过我用的是补图+Turan)</p>
-<blockquote>
-<p><strong>Thm.</strong> \(\alpha\geq\frac{n}{\Delta+1}\).</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> \(\alpha\geq\frac{n}{\Delta+1}\).</p>
 </blockquote>
 <p>直观上，先选出独立集 \(D\) ，剩下所有的点一定是某个独立集内点的邻居。因此 \(n\leq\sum_{v\in D}(N(v)+1)\leq\alpha(\Delta+1)\).</p>
-<blockquote>
-<p><strong>Thm.</strong> (Turan) \(\alpha\geq\frac{n}{\overline{d}+1}\).</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (Turan) \(\alpha\geq\frac{n}{\overline{d}+1}\).</p>
 </blockquote>
 <p>之前证明 Turan 定理的时候用到了 \(\sum_{v}\frac{1}{\deg v+1}\leq \alpha\), 用jensen即可.</p>
 <h3>树的个数</h3>

@@ -100,7 +100,7 @@ p_{\max} \;\le\; \tilde p_{\max} \;\le\; 4 p_{\max}
 <li>each \(i \in \{1,\dots,N\}\) appears at least twice as often in the input as in the output; and</li>
 <li>if the input consists of \(M \ge 10\kappa^2 / \max p_i\) independent samples from the distribution that assigns probability \(p_i\) to element \(i\), then the output is within statistical distance \(C_1 M N \log N \exp(-C_2 \kappa)\) of \(m\) independent samples with respective probabilities \(\mathbf{p}^2\), where \(m \ge M \cdot \sum_i p_i^2 / (32 \kappa \max p_i)\) is a random variable.</li>
 </ol>
-<details>
+<details class="proof">
 <summary>Proof</summary>
 <p>The algorithm first runs the procedure from Proposition 3.1 on the first \(M/2\) elements from its input sequence, receiving as output \(\tilde p_{\max}\). The algorithm then reads the remaining elements in sequence. If it ever reads the last element of the input, it fails. For \(j = 1,\dots,M\tilde p_{\max}/4\), the algorithm samples \(r\) according to \(\operatorname{Pois}(1/\tilde p_{\max})\) and takes the next \(r\) unused elements in the input. For \(i = 1,\dots,N\), let \(a_{i,j}\) be the number of times element \(i\) appears in the \(j\)th such subsequence. For each \(i,j\) let \(b_{i,j}\) be \(1\) with probability \(\min\{1,\, a_{i,j}/\kappa\}\) and \(0\) otherwise. (To achieve the correct running time, we do not actually explicitly store these values when \(a_{i,j} = b_{i,j} = 0\).)</p>
 <p>Finally, the algorithm looks through the next \(M/6\) elements, one element at a time (or it fails if there are not \(M/6\) elements remaining). When it sees element \(i\), it adds it to its output if \(b_{i,j} = 1\) where \(j \ge 1\) is the smallest index such that \(b_{i,j}\) is unused (or it fails if there is no unused \(b_{i,j}\)). \(\square\)</p>
@@ -127,7 +127,7 @@ m \;\ge\; M \cdot \frac{1}{32\kappa} \cdot \frac{\rho_{s/\sqrt{2}}(\mathcal{L})^
 \]</p>
 <p>The running time of the algorithm is at most \(M \cdot \operatorname{poly}(n, \log \kappa)\).</p>
 <p>注意这里是先从原始 sample 中 extract 出陪集的信息，然后对陪集进行平方采样（注意得到的样本全都来自原来的样本）。然后再遍历平方采样后的样本，去找同一个陪集的 sample （就来自原来的样本）进行消去即可。</p>
-<details>
+<details class="proof">
 <summary>Proof of Proposition 3.5</summary>
 <p>Let \((\mathbf{X}_1,\dots,\mathbf{X}_M)\) be the input vectors. For each \(i\), let \(\mathbf{c}_i \in \mathcal{L}/(2\mathcal{L})\) be the coset of \(\mathbf{X}_i\). The combiner runs the algorithm from Theorem 3.3 with input \(\kappa\) and \((\mathbf{c}_1,\dots,\mathbf{c}_M)\), receiving output \((\mathbf{c}'_1,\dots,\mathbf{c}'_m)\). (Formally, we must encode the cosets as integers in \(\{1,\dots,2^n\}\).) Finally, for each \(\mathbf{c}'_i\), it chooses a pair of unpaired vectors \(\mathbf{X}_j, \mathbf{X}_k\) with \(\mathbf{c}_j = \mathbf{c}_k = \mathbf{c}'_i\) and outputs \(\mathbf{Y}_i = (\mathbf{X}_j + \mathbf{X}_k)/2\).</p>
 <p>The running time of the algorithm follows from Item 1 of Theorem 3.3. Furthermore, we note that by Item 2 of the same theorem, there will always be a pair of indices \(j,k\) for each \(i\) as above.</p>

@@ -30,6 +30,7 @@ $$
 
 - Do not introduce `\(...\)` or `\[...\]`.
 - Use `aligned` inside `$$...$$` when multiline equations are needed.
+- Side-by-side comparison: `::: columns` … `:::`, each cell opened by `::: column`. Cells fill two columns left to right, so write paired cells (left step 1, right step 1, left step 2, …) to align rows; they stack left-then-right on narrow screens.
 
 ## Language
 

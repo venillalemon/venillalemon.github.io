@@ -58,7 +58,7 @@ Prob0. optimize the bound? (or refine the $\leq$?) Prob1. Does there exist limit
 
 ### Ramsey Problem on Integers
 
-> **Thm.** (Schur, also known as **broken chalk theorem**, 2025.04.21 15:28:03) $\forall c\;\exists N \;\forall \phi:[N]\to[c],\;\exists x+y=z$ with the same color. The minimum $N=S(c)$.
+> **Theorem.** (Schur, also known as **broken chalk theorem**, 2025.04.21 15:28:03) $\forall c\;\exists N \;\forall \phi:[N]\to[c],\;\exists x+y=z$ with the same color. The minimum $N=S(c)$.
 
 $S(1)=2,S(2)=5$
 

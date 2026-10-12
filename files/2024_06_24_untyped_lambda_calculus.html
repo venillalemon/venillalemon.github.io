@@ -120,9 +120,9 @@ a     x
 <p><strong><em>Theorem 13.(Church-Rosser)</strong></em> If \(M\twoheadrightarrow_\beta N_1\) and \(M\twoheadrightarrow_\beta N_2\), then there is a \(\lambda\) -term L s.t. \(N_1\twoheadrightarrow_\beta L\) and \(N_2\twoheadrightarrow_\beta L\).</p>
 <p>(For a given group \(G\), if \(N_1\lhd G,N_2\lhd G\) then \(N_1\lhd N_1N_2\) and \(N_1\cap N_2\lhd N_2\lhd G\).)</p>
 <p><strong><em>Corollary 14.</strong></em> If \(M=_\beta N\) then there is \(L\) s.t. \(M\twoheadrightarrow_\beta L\) and \(N\twoheadrightarrow_\beta L\).</p>
-<p><strong>(induction on the length of the reduction path, using CR Thm)</strong></p>
+<p><strong>(induction on the length of the reduction path, using CR Theorem)</strong></p>
 <h2>Fixed Point Thms</h2>
-<p><strong><em>Theorem 15.</strong></em> (Fixed Point Thm) For any \(\lambda\) -term \(F\), there is a \(\lambda\) -term \(X\) s.t. \(X=_\beta FX\).</p>
+<p><strong><em>Theorem 15.</strong></em> (Fixed Point Theorem) For any \(\lambda\) -term \(F\), there is a \(\lambda\) -term \(X\) s.t. \(X=_\beta FX\).</p>
 <p><strong><em>Proof.</strong></em> Take \(X\equiv(\lambda x.F(xx))(\lambda x.F(xx))\to_\beta F(\lambda x.F(xx))(\lambda x.F(xx))\equiv FX\).</p>
 <p>\(X\equiv(\lambda x.F(xx))(\lambda x.F(xx))\leftarrow_\beta \lambda y.(\lambda x.y(xx))(\lambda x.y(xx))F:\equiv LF\)</p>
 <p>Thus \(LF\to_\beta X\to_\beta FX\leftarrow_\beta FLF\), and \(LF=_\beta FLF\).</p>

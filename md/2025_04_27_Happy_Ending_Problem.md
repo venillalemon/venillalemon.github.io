@@ -6,7 +6,7 @@
 
 ### Ramsey equation
 
-> **Def.** 整数方程 $E$ 是 Ramsey 的，当且仅当 $\forall c\;\exists N\;\forall \phi:[N]\to[c]\;\exists$ 一个 $E$ 的同色解
+> **Definition.** 整数方程 $E$ 是 Ramsey 的，当且仅当 $\forall c\;\exists N\;\forall \phi:[N]\to[c]\;\exists$ 一个 $E$ 的同色解
 
 Trivially, $x+2y=3z$ 等等是 Ramsey 的； $x=py$ 不是.
 
@@ -16,7 +16,7 @@ Trivially, $x+2y=3z$ 等等是 Ramsey 的； $x=py$ 不是.
 
 从 $x+6y=z$ 开始, 我们想到了 van der Waerden 定理：
 
-> **Thm.** (van der Waerden) $\forall c,k\;\exists N\;\forall\phi:[N]\to[c]\;\exists$ a monochromatic AP of length $k$ in $[n]$. The least $N$ is $W(c,k)$.
+> **Theorem.** (van der Waerden) $\forall c,k\;\exists N\;\forall\phi:[N]\to[c]\;\exists$ a monochromatic AP of length $k$ in $[n]$. The least $N$ is $W(c,k)$.
 
 $\forall c\;\exists N\;\forall\phi:[N]\to[c]\;\exists x,d$, 所有 $x,x+d,\dots，x+6kd$ 同色. 如果 d 也同色，done；否则看 2d；最后假设所有 d~kd 都和 x+id 不同色.
 
@@ -34,7 +34,7 @@ $4x+7y+2z=2a+21b+3c$ 每个数可以拆成 $a=101^rq,101\not|\;q$, $\phi(a)=q\mo
 
 假设有一个同色q解，两边约去等量的101因数，至少剩一个，假设剩余x,y,b，再模101，得到 $4q+7q=21q$, 得到 $q=0$ ，矛盾. （这里已经证了必要性）
 
-> **Thm.** (Rado) 存在 $I\subseteq[n],J\subseteq[m]$, $\sum_Ia_i=\sum_Jb_j$, 当且仅当方程 $\sum_{i=1}^n a_ix_i=\sum_{j=1}^m b_jy_j$ 是 Ramsey 的.
+> **Theorem.** (Rado) 存在 $I\subseteq[n],J\subseteq[m]$, $\sum_Ia_i=\sum_Jb_j$, 当且仅当方程 $\sum_{i=1}^n a_ix_i=\sum_{j=1}^m b_jy_j$ 是 Ramsey 的.
 
 充分性：每次假定两个变量相等，用其中一个替换另一个. 示例： $3x+2y+5z=a+6b+4c\to^{x=y,a=c}5x+5z=5a+6b\to^{z=b}5x=5a+b$, 如果 $5x=5a+b$ 有同色解，那么原方程也有同色解.
 
@@ -50,29 +50,29 @@ $R(a_1,\dots,a_k;1)=\sum_{[k]}(a_i-1)+1$
 
 ### Happy Ending Problem
 
-> **Thm.** (Esther Klein $\to$ Esther Szekeres) 平面上不三点共线的5个点必有4个点构成凸四边形.
+> **Theorem.** (Esther Klein $\to$ Esther Szekeres) 平面上不三点共线的5个点必有4个点构成凸四边形.
 
 考虑convex hull的形状
 
-> **Thm.** (Erdos-Szekeres 1935) 任意k，存在足够大的n，平面上任意n个不三点共线的点，存在k点是convex的. 最小的n定义为 $N(k)$.
+> **Theorem.** (Erdos-Szekeres 1935) 任意k，存在足够大的n，平面上任意n个不三点共线的点，存在k点是convex的. 最小的n定义为 $N(k)$.
 
-**Pf.** by Szekeres, 1931
+**Proof.** by Szekeres, 1931
 
-> **Lem.** In $\mathbb{R}^2$, k pts (no 3 pts share a line) convex $\iff$ all 4 pts subset is convex.
+> **Lemma.** In $\mathbb{R}^2$, k pts (no 3 pts share a line) convex $\iff$ all 4 pts subset is convex.
 
 用一个点对凸包其他顶点连线，进行三角形划分，每个点总在一个三角形内部.
 
 因此考虑4超图的染色，四个点是凸的染y，非凸染b， $N\geq R(k,5;4)$ 即可. 意思是，对 $N$ 点的4超图进行2染色，必有k大小的同y色4子图，或者5大小的同b色4子图，但是我们知道5个点必有凸的四边形，因此第二种情况不可能，一定存在k大小的同y色4子图. $\blacksquare$
 
-**Pf.** by Taski, 1971, 于某一次组合数学考试中憋出来
+**Proof.** by Taski, 1971, 于某一次组合数学考试中憋出来
 
 旋转使得没有两个点同x，左到右编号. 任意3个点 $i\lt j\lt k,a_i,a_j,a_k$ 有两种形态: 左转y/右转b，对这个3超图染yb色. $N\geq R(k,k;3)$, k个点中任意三个转向相同即可 $\blacksquare$
 
-**Pf.** 1978
+**Proof.** 1978
 
 任意三个点连成三角形，内部奇数个点染y，偶数个点染b. $N\geq R(k,k;3)$, 意味着对这种染色，存在k个点，任意3子集都是y色或者任意3子集都是b色. 这k点中，不存在4点非凸子集，因为 $奇+奇+奇+1=偶$ ， $偶+偶+偶+1=奇$. 因此k点是凸的 (别忘了加上中间的点!).
 
-**Pf.** by Erdos and Szekeres, 1935![](https://notes.sjtu.edu.cn/uploads/upload_c3a2165004a917bb09c856f5b477bce8.png)
+**Proof.** by Erdos and Szekeres, 1935![](https://notes.sjtu.edu.cn/uploads/upload_c3a2165004a917bb09c856f5b477bce8.png)
 
 $N(p,q)$ 表示最小的 $N$, 平面上N个点(不共线，不共x)总存在p+2个上凸或者q+2个下凸. $N(0,\_)=2$, $N(n,1)=n+2$
 

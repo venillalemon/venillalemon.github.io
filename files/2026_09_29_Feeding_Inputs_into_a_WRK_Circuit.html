@@ -75,7 +75,7 @@ M^{(i)}_{i\to j,\,x}=K^{(j)}_{i\to j,\,x}\oplus x^{(i)}\Delta^{(j)}
 <p>\[
 \left(\widehat v_\omega,\ L^{(2)}_{\omega,\widehat v_\omega},\ \dots,\ L^{(n)}_{\omega,\widehat v_\omega}\right).
 \]</p>
-<p>这正是 <a href="/files/2026_07_02_Garbled_Circuits.html">Garbled Circuits</a> 中 WRK bootstrapping 之后 input wire 的状态，后续 gate 的 evaluation 不需要任何改动。</p>
+<p>我们全文将会借用 <a href="/files/2026_07_02_Garbled_Circuits.html">Garbled Circuits</a> 的记号。</p>
 <h2>Input from a public bit</h2>
 <p>wire \(\omega\) 的值为所有 party 已知的 \(x\)。</p>
 <ol>
@@ -146,16 +146,15 @@ P_j\longrightarrow P_1:\quad L^{(j)}_{\omega,\widehat v_\omega}\qquad(j\ge2).
    K^{(j)}_{i\to j,\,\widehat v_\omega}=K^{(j)}_{i\to j,\,x}\oplus K^{(j)}_{i\to j,\,\lambda_\omega}
    \quad(j\ne i).
 \]</li>
-<li>以下消息之间互不依赖：
+<li>以下消息之间互不依赖，对于所有 \(i\ge 2\)：
 \[
-P_i\longrightarrow P_1:\quad
-   \widehat v_\omega^{(i)},\quad
-   M^{(i)}_{i\to 1,\,\widehat v_\omega},\quad
-   \left\{M^{(i)}_{i\to j,\,\widehat v_\omega}\right\}_{j\ge2,\ j\ne i},\quad
-   S^{(i)}_\omega
+\begin{aligned}
+   P_i\longrightarrow P_1:&amp;\quad \widehat v_\omega^{(i)},\ M^{(i)}_{i\to 1,\,\widehat v_\omega},\\
+   P_i\longrightarrow P_1:&amp;\quad S^{(i)}_\omega
      =L^{(i)}_{\omega,0}\oplus\widehat v_\omega^{(i)}\Delta^{(i)}
-      \oplus\bigoplus_{j\ne i}K^{(i)}_{j\to i,\,\widehat v_\omega}
-   \qquad(i\ge2).
+      \oplus\bigoplus_{j\ne i}K^{(i)}_{j\to i,\,\widehat v_\omega},\\
+   P_i\longrightarrow P_1:&amp;\quad M^{(i)}_{i\to j,\,\widehat v_\omega}\quad\text{for all }j\notin\{1,i\}.
+   \end{aligned}
 \]</li>
 <li>\(P_1\) 对所有 \(i\ge2\) 检查
 \[

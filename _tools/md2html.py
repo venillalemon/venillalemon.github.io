@@ -5,8 +5,9 @@ Inverse of html2md.py: understands exactly the Markdown dialect that tool
 emits (and that the notes in md/ are written in) — `# Title` + `*date*`
 header, *em* / **strong** / ~~del~~, inline `code`, fenced code blocks,
 nested `-` / `1.` lists, `> ` blockquotes, pipe tables, images, links,
-`---` rules, raw HTML blocks (<details> etc.), and math left as
-$...$ / $$...$$ for KaTeX to render in the browser.
+`---` rules, raw HTML blocks (<details> etc.), side-by-side columns
+(`::: columns` / `::: column` ... `:::`, see parse_columns), and math left
+as $...$ / $$...$$ for KaTeX to render in the browser.
 
 The document shell (head, masthead, footer, theme toggle, analytics) comes
 from restyle_posts.build(), so a change to the chrome there flows into
@@ -39,6 +40,8 @@ INLINE_MATH_RE = re.compile(r"\$(?![\s$])([^$\n]*?)(?<!\s)\$")
 PAREN_MATH_RE = re.compile(r"\\\((.+?)\\\)")
 
 KEY_RE = re.compile(r"\x00(\d+)\x00")
+DETAILS_RE = re.compile(r"^<details>\s*$")
+THM_RE = re.compile(r"^\s*\*\*(Theorem|Lemma|Corollary|Fact|Proposition|Definition|Claim)\b")
 
 
 def unquote(latex):
@@ -131,7 +134,9 @@ def parse_list(lines, i, indent):
             sub, i = parse_list(lines, i, depth)
             items[-1] += sub
             continue
-        tag = tag or ("ol" if m.group(2) != "-" else "ul")
+        if tag is None:
+            tag = "ol" if m.group(2) != "-" else "ul"
+            start = int(m.group(2)[:-1]) if tag == "ol" else 1
         pad = depth + len(m.group(2)) + 1
         body = [m.group(3)]
         i += 1
@@ -148,7 +153,31 @@ def parse_list(lines, i, indent):
             nxt = LIST_ITEM_RE.match(lines[i])
             if nxt and len(nxt.group(1)) < indent:
                 break
-    return f"<{tag}>\n" + "\n".join(items) + f"\n</{tag}>", i
+    attr = f' start="{start}"' if start != 1 else ""
+    return f"<{tag}{attr}>\n" + "\n".join(items) + f"\n</{tag}>", i
+
+
+COLUMNS_OPEN, COLUMN_SEP, COLUMNS_CLOSE = "::: columns", "::: column", ":::"
+
+
+def parse_columns(lines, i):
+    """`::: columns` ... `:::` with cells introduced by `::: column`.
+
+    Cells fill a two-column grid left to right (post.css .columns), so a
+    step-by-step comparison is written as pairs of cells: left step 1,
+    right step 1, left step 2, ...  Each cell is ordinary Markdown."""
+    i += 1
+    cells, cur = [], None
+    while i < len(lines) and lines[i].strip() != COLUMNS_CLOSE:
+        if lines[i].strip() == COLUMN_SEP:
+            cur = []
+            cells.append(cur)
+        elif cur is not None:
+            cur.append(lines[i])
+        i += 1
+    body = "\n".join('<div class="column">\n' + parse_blocks("\n".join(c)) + "\n</div>"
+                     for c in cells)
+    return '<div class="columns">\n' + body + "\n</div>", i + 1
 
 
 def parse_blocks(text):
@@ -166,6 +195,9 @@ def parse_blocks(text):
         elif line.strip() == "---":
             out.append("<hr>")
             i += 1
+        elif line.strip() == COLUMNS_OPEN:
+            block, i = parse_columns(lines, i)
+            out.append(block)
         elif LIST_ITEM_RE.match(line) and not line.startswith((" ", "\t")):
             block, i = parse_list(lines, i, 0)
             out.append(block)
@@ -174,7 +206,9 @@ def parse_blocks(text):
             while i < len(lines) and lines[i].lstrip().startswith(">"):
                 quoted.append(re.sub(r"^\s*> ?", "", lines[i]))
                 i += 1
-            out.append("<blockquote>\n" + parse_blocks("\n".join(quoted)) + "\n</blockquote>")
+            # a quote opening with **Theorem n.** / **Lemma n.** ... is a theorem panel (post.css .thm)
+            cls = ' class="thm"' if quoted and THM_RE.match(quoted[0]) else ""
+            out.append(f"<blockquote{cls}>\n" + parse_blocks("\n".join(quoted)) + "\n</blockquote>")
         elif line.startswith("|") and i + 1 < len(lines) and TABLE_SEP_RE.match(lines[i + 1]):
             header = split_row(line)
             i += 2
@@ -190,7 +224,8 @@ def parse_blocks(text):
         elif line.startswith("<"):               # raw HTML block, verbatim
             raw = []
             while i < len(lines) and lines[i].strip():
-                raw.append(lines[i])
+                # bare <details> gets the collapsible-proof styling (post.css details.proof)
+                raw.append(DETAILS_RE.sub('<details class="proof">', lines[i]))
                 i += 1
             out.append("\n".join(raw))
         else:                                    # paragraph
@@ -199,7 +234,7 @@ def parse_blocks(text):
             while i < len(lines) and lines[i].strip() and not (
                 HEADING_RE.match(lines[i]) or lines[i].strip() == "---"
                 or LIST_ITEM_RE.match(lines[i]) or lines[i].lstrip().startswith(">")
-                or lines[i].startswith("<")
+                or lines[i].startswith("<") or lines[i].strip().startswith(":::")
             ):
                 para.append(lines[i])
                 i += 1

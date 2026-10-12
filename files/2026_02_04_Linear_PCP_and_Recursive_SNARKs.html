@@ -98,7 +98,7 @@ L_{\mathbf{c}}(x)=\sum_{i\in[m]}c_il_i(x),R_{\mathbf{c}}(x)=\sum_{i\in[m]}c_ir_i
 <p>Suppose there is a bunch of transactions to be proved. We need not wait the transactions all to take place; rather, we generate proofs on every arrival of batches. For example if the batch size is \(1\) , first \(\pi_1\)  proves the prover knows \(w_1\)  that \(C(x_1,w_1)=0\) ; then \(\pi_2\)  proves that the prover knows \(w_2\)  such that \(C(x_2,w_2)=0\) . Then a proof is generated to prove that the prover knows \(\pi_1,\pi_2,\dots\)  such that the verifier accepts them all.</p>
 <h3>Construction: alternating groups</h3>
 <p>Recall in KZG, the public parameter is a tuple \((p,G,q,g,e)\) , where \(G\)  is a group of order \(p\)  with \(g\)  its generator. And in this section, we regard the verifier algorithm as a circuit, so we had better embed \(G\)  into some vector space over \(\mathbb{F}_q\) .</p>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Definition (Algebraic Groups).</strong> Group \(G\leq\mathbb{F}_q^\ell\)  is an algebraic group if and only if</p>
 <ul>
 <li>there are polynomials \(f_1,\dots,f_\ell\in\mathbb{F}_q[X^\ell]\)  such that for all \(a,b\in G\) , \(a+b=\left(f_1(a,b),\dots,f_\ell(a,b)\right)\) ;</li>

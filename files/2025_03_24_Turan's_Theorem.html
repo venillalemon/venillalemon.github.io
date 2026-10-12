@@ -75,12 +75,12 @@
 <li>用等价关系来考虑，简单无向图——对称性，无 induced \(P_3\) ——传递性，再加上所有自环即可，由于等价关系 \(\iff\) 分划.</li>
 </ol>
 <h3>Turan 定理八股文</h3>
-<blockquote>
-<p><strong>Thm.</strong> (Turan, 1941) n 阶图 \(\omega\leq p\), 那么 \(m\leq t(n,p)\), \(t(n,p)\) 为完全 \(p\) 部图 \(T(n,p)\) 的边数.</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (Turan, 1941) n 阶图 \(\omega\leq p\), 那么 \(m\leq t(n,p)\), \(t(n,p)\) 为完全 \(p\) 部图 \(T(n,p)\) 的边数.</p>
 </blockquote>
 <p><img src="https://notes.sjtu.edu.cn/uploads/upload_02e1b8cee07df6a6ee8b69b55f9ed5af.png" alt=""></p>
 <p>我们可估计 \(t(n,p)\sim (1-\frac{1}{p})\frac{n^2}{2}\), 一种方法是直接计算，还有一种是看每一个点都被砍了 \(1/p\) 条出边.</p>
-<p><strong>证1.</strong> (from the last proof of Mantel's Thm)</p>
+<p><strong>证1.</strong> (from the last proof of Mantel's Theorem)</p>
 <p>\[
 \rho=\sum_{uv\in E}f(u)f(v)
 \]</p>
@@ -90,7 +90,7 @@
 <p>我们用定义即可证明 \(m\leq{p\choose2}+t(n-p,p)+(n-p)(p-1)=t(n,p)\), 考虑 p 部图 \(T(n,p)\), 只有国际边，每个国挑出一个代表，提出来，这些代表是 p-团. 剩下的 n-p 个点，每个点都连了 p 个代表中的 p-1 个；剩下的图是 \(T(n-p,p)\), 因此等号成立.</p>
 <p><strong>证3.</strong> 设我们要的图是 \(G\), 即 \(G\) 满足 n 阶， \(\omega\leq p\) 且 m 最大. 往证 \(G\) 是完全某部图.</p>
 <p>完全 p 部图中，边数最大的就是 \(T(n,p)\). 因此如果能证上面的命题，就成功了. 为什么是“某”部图？考虑 \(T(5,8)\).</p>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Lemma.</strong> \((x,y)\notin E\Rightarrow \deg x=\deg y\).</p>
 </blockquote>
 <p>否则可以通过复制的方法增加边数. 若 \(\deg x\lt \deg y\), 考虑 \(G-x+y^\prime\), 首先复制一个 \(y\) 不会增加 \(\omega\).</p>
@@ -112,7 +112,7 @@ m_G&amp;=\sum\text{AA 边}+\sum\text{BB 边}+\sum\text{AB 边}\nonumber\\
 \]</p>
 <p>由于 \(H\) 是 完全 p-部图，我们有 \(m_G\leq m_H\leq t(n,p)\).</p>
 <p><strong>证5.</strong></p>
-<blockquote>
+<blockquote class="thm">
 <p><strong>Lemma.</strong> 对任意图 \(G\), \(\sum_{v\in G}\frac{1}{\deg v+1}\leq\alpha\).</p>
 </blockquote>
 <p>将 \(G\) 中的点随机排在直线上，对于每个点来说，如果它的朋友都在它后面 (这件事有 \(\frac{1}{\deg v+1}\) 的概率发生)，那么它😊，否则😒. \(\mathbb{E}[\#😊]=\sum_{v\in G}\frac{1}{\deg v+1}\). 选出所有😊的点，它们一定构成独立集，因此 \(\sum_{v\in G}\frac{1}{\deg v+1}\leq\alpha(G)\)</p>

@@ -54,19 +54,19 @@
 <h3>Crossing number</h3>
 <p>平面图 \(m\geq 3n-6\)</p>
 <p>规定不能三边交叉于一点， \(G\) 的 crossing number 定义为最小交叉数量，例如 \(K_5\) 至少一个， \(\text{Cr}(K_5)=1\).</p>
-<blockquote>
-<p><strong>Thm.</strong> \(\text{Cr}(G)\geq m-3n\)</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> \(\text{Cr}(G)\geq m-3n\)</p>
 </blockquote>
 <p>证1. 交点变成点，点+1，边+2，得到平面图 证2. 一个交点去一条边，至少少一个交点，因此至多去掉 \(\text{Cr}\) 条边</p>
 <p>Somehow when \(m\geq 4n, \;\text{Cr}\geq\frac{3}{64}{n\choose 4}\Big(\frac{m}{n\choose 2}\Big)^3\)</p>
-<blockquote>
-<p><strong>Thm.</strong> (1980, Crossing Lemma) \(\text{Cr}(G)\geq\frac{m^3}{64n^2}(m\geq 4n)\)</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (1980, Crossing Lemma) \(\text{Cr}(G)\geq\frac{m^3}{64n^2}(m\geq 4n)\)</p>
 </blockquote>
 <p>\(\text{Cr}(K_n)\): 每5个点有1个交点；每个交点被算 \(n-4\) 次</p>
 <p>归纳法 \(W\subseteq V,H=G[W],X(H)=n,Y(H)=m,Z(H)=(H\text{在}G\text{的最优画法下的交点个数})\) 有 \(Z\geq \text{Cr}\geq Y-3X\). 将 \(V\) 中的点以概率 \(p\) 选入 \(W\), 算期望 \(p^4\text{Cr}(G)\geq p^2m-3pn\), 取 \(p=\frac{4n}{m}\leq1\) 即可</p>
 <h3>crossing lemma 应用: 好边</h3>
-<blockquote>
-<p><strong>Thm.</strong> (Szemeredi-Trotter) \(n\) points \(\in\mathbb{R}^2\), 定义一条直线为好边当且仅当线上有 \(\geq k\;(2\leq k\leq \sqrt{n})\) 个点. 这样的好边最多 \(O\big(\frac{n^2}{k^3}\big)\) 个.</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (Szemeredi-Trotter) \(n\) points \(\in\mathbb{R}^2\), 定义一条直线为好边当且仅当线上有 \(\geq k\;(2\leq k\leq \sqrt{n})\) 个点. 这样的好边最多 \(O\big(\frac{n^2}{k^3}\big)\) 个.</p>
 </blockquote>
 <p>将好线上的相邻点 (consecutive) 连边，点数 \(n\), 边数 \(\geq l(k-1)\), 交叉数 \(\leq{l\choose 2}\). 比较 \(m\) 和 \(4n\) 大小.</p>
 <p>已知 \(k\leq \sqrt{n}\), \(m\lt 4n\Rightarrow l\lt \frac{4n}{k-1}\leq O\big(\frac{n^2}{k^3}\big)\)</p>
@@ -74,8 +74,8 @@
 <p>这个界是紧的. 假设有均匀点阵 \(k\times\frac{n}{k}\), 最上面的一个点出发，有 \(\frac{n}{k^2}\) 条好边. 因此总共有 \(\frac{n^2}{k^3}\) 条</p>
 <h3>cl 应用：number of incidences</h3>
 <p>\(I(P,L)=\{(p,l):p\in P,l\in L,p\in l\}\)</p>
-<blockquote>
-<p><strong>Thm.</strong> (Szemeredi-Trotter) \(|P|=n,|L|=m,|I(P,L)|\leq 4(m^{\frac{2}{3}}n^{\frac{2}{3}}+m+n)\)</p>
+<blockquote class="thm">
+<p><strong>Theorem.</strong> (Szemeredi-Trotter) \(|P|=n,|L|=m,|I(P,L)|\leq 4(m^{\frac{2}{3}}n^{\frac{2}{3}}+m+n)\)</p>
 </blockquote>
 <p>连接线上的相邻点，不放假设每条边至少1个点（否则直接删除， \(m\) 减少，不影响待证不等式）。点数 \(n\), 边数：每条线如果有 \(n&gt;1\) 个点，那么有 \(n-1\) 条边，共 \(|I|-m\) 条. 交点最多 \({m\choose 2}\)</p>
 <p>crossing lemma: 要么 \(|I|-m\lt 4n\), 要么 \(\frac{m^2}{2}\geq\text{Cr}\geq\frac{(|I|-m)^3}{64n^2}\)</p>
