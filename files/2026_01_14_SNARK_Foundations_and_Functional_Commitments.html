@@ -204,7 +204,7 @@ b' \leftarrow \mathcal{A}_2(st, com_f)
 <p><strong>Definition (</strong> \(\mathcal{F}\) <strong>-IOP)</strong>: An \(\mathcal{F}\) -IOP is a proof system that proves \(\exists w,\;C(x,w)=0\)  and consists of</p>
 <ul>
 <li>\(\mathsf{setup}(1^\lambda)\to pp,vp=(\mathsf{Oracle}_{f_{-s}},\dots,\mathsf{Oracle}_{f_{0}})\)</li>
-<li>At round \(i\in[t]\) , prover \(P\)  sends \(\mathsf{Oracle}_{f_i}\)  where \(f_i\)  is based on the interaction history from view of \(P\) ; verifier sends \(r_i\xleftarrow{\\)} R$  unless \(i=t\) .</li>
+<li>At round \(i\in[t]\) , prover \(P\)  sends \(\mathsf{Oracle}_{f_i}\)  where \(f_i\)  is based on the interaction history from view of \(P\) ; verifier sends \(r_i\xleftarrow{\$} R\)  unless \(i=t\) .</li>
 <li>\(\mathsf{verify}^{\mathsf{Oracle}_{f_{-s}},\dots,\mathsf{Oracle}_{f_t}}(vp,x,r_1,\dots,r_{t-1})\)  uses \((f_i)_{i=-s}^t\)  as oracles and output the result.</li>
 </ul>
 <p>which satisfies</p>

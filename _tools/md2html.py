@@ -36,7 +36,7 @@ DISPLAY_RE = re.compile(r"\$\$(.+?)\$\$", re.S)
 BRACKET_DISPLAY_RE = re.compile(r"\\\[(.+?)\\\]", re.S)
 # content must not start/end with whitespace, so a literal $ in prose
 # (e.g. a stack symbol) cannot pair up with a real math delimiter
-INLINE_MATH_RE = re.compile(r"\$(?![\s$])([^$\n]*?)(?<!\s)\$")
+INLINE_MATH_RE = re.compile(r"\$(?![\s$])((?:\\.|[^$\\\n])*?)(?<!\s)\$")
 PAREN_MATH_RE = re.compile(r"\\\((.+?)\\\)")
 
 KEY_RE = re.compile(r"\x00(\d+)\x00")
