@@ -21,19 +21,6 @@
 
 下面两个变体依次拿掉 party 的选择权。
 
-> **Definition (Random OT).** 双方无输入。functionality 采样 $(a_0,a_1)\xleftarrow{\$}\{0,1\}^\kappa\times\{0,1\}^\kappa$ 和 $r\xleftarrow{\$}\{0,1\}$：
->
-> $$
-> \mathsf{ROT}(\bot;\,\bot)\longrightarrow\big((a_0,a_1);\ (r,\,a_r)\big).
-> $$
->
-> - **Sender security**：$R$ 学不到 $a_{1-r}$。
-> - **Receiver security**：$S$ 学不到 $r$。
->
-> 与 1-out-of-2 OT 的区别：$S$ 不能选择 $(a_0,a_1)$，$R$ 不能选择 $r$。
-> 
-
-> 
 > **Definition (Correlated OT).** $S$ 输入 correlation $\Delta\in\{0,1\}^\kappa$，$R$ 无输入。functionality 采样 $q\xleftarrow{\$}\{0,1\}^\kappa$ 和 $r\xleftarrow{\$}\{0,1\}$：
 >
 > $$
@@ -49,6 +36,19 @@
 > t_i=q_i\oplus r_i\Delta,\qquad i\in[m].
 > $$
 > 
+
+> **Definition (Random OT).** 双方无输入。functionality 采样 $(a_0,a_1)\xleftarrow{\$}\{0,1\}^\kappa\times\{0,1\}^\kappa$ 和 $r\xleftarrow{\$}\{0,1\}$：
+>
+> $$
+> \mathsf{ROT}(\bot;\,\bot)\longrightarrow\big((a_0,a_1);\ (r,\,a_r)\big).
+> $$
+>
+> - **Sender security**：$R$ 学不到 $a_{1-r}$。
+> - **Receiver security**：$S$ 学不到 $r$。
+>
+> 与 1-out-of-2 OT 的区别：$S$ 不能选择 $(a_0,a_1)$，$R$ 不能选择 $r$。
+> 
+
 
 COT 正是 MPC 需要的 correlation：取 $\kappa=1$，$\Delta=x$，并用下一小节的 derandomization 把 $r$ 换成 $R$ 想要的 $y$，则
 

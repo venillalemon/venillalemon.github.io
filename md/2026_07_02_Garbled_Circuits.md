@@ -22,54 +22,83 @@ $$
 \widehat v_\alpha=v_\alpha\oplus \lambda_\alpha,\ \widehat v_\beta=v_\beta\oplus \lambda_\beta,\ \widehat v_\gamma=g(v_\alpha,v_\beta)\oplus \lambda_\gamma
 $$
 
-Garble 的过程是对于所有 $(\widehat v_\alpha,\widehat v_\beta)\in\{0,1\}^2$,
+evaluator 在 wire $\omega$ 上拿到的是 $\widehat v_\omega\|L_{\omega,\widehat v_\omega}$：$L_{\omega,x}\in\{0,1\}^\kappa$ 是 label，首位是 masked bit，用来索引表格。Garble 的过程是对于所有 $(\widehat v_\alpha,\widehat v_\beta)\in\{0,1\}^2$,
 
 $$
-\left(\widehat v_\alpha,L_{\alpha,\widehat v_\alpha}\right),\left(\widehat v_\beta,L_{\beta,\widehat v_\beta}\right)
+\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha},\ \widehat v_\beta\|L_{\beta,\widehat v_\beta}
 \to
-H\left(L_{\alpha,\widehat v_\alpha},L_{\beta,\widehat v_\beta},i\right)\oplus L_{\gamma,\widehat v_\gamma}
+H\left(L_{\alpha,\widehat v_\alpha},L_{\beta,\widehat v_\beta},i\right)\oplus\bigl(\widehat v_\gamma\|L_{\gamma,\widehat v_\gamma}\bigr)
 $$
+
+### **FreeXOR**
+
+garbler 选一个全局偏移 $\Delta\in\{0,1\}^\kappa$，每条 wire 只随机选 $L_{\omega,0}$，令 $L_{\omega,1}=L_{\omega,0}\oplus\Delta$。配合 Point-and-Permute 把 masked bit 放在首位，evaluator 在 wire $\omega$ 上持有
+
+$$
+\widehat v_\omega\|L_{\omega,\widehat v_\omega}=(0\|L_{\omega,0})\oplus\widehat v_\omega(1\|\Delta).
+$$
+
+对 XOR gate $(\alpha,\beta,\gamma)$，garbler 不发任何东西，取
+
+$$
+L_{\gamma,0}=L_{\alpha,0}\oplus L_{\beta,0},\qquad\lambda_\gamma=\lambda_\alpha\oplus\lambda_\beta .
+$$
+
+evaluator 把手里两个串 XOR：
+
+$$
+(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha})\oplus(\widehat v_\beta\|L_{\beta,\widehat v_\beta})
+=(0\|L_{\gamma,0})\oplus(\widehat v_\alpha\oplus\widehat v_\beta)(1\|\Delta)
+=(0\|L_{\gamma,0})\oplus(\lambda_\gamma\oplus v_\alpha\oplus v_\beta)(1\|\Delta)
+=\widehat v_\gamma\|L_{\gamma,\widehat v_\gamma} .
+$$
+
+AND gate 不变，仍是 4 行表。代价是所有 wire 的两个 label 相差同一个 $\Delta$，$H$ 需要对这种相关输入仍像随机（correlation robustness）。
 
 ### **BMR**
 
-Point-and-Permute 在 $n$ 方的推广。一个 Evaluator，多个 Garbler。
+Point-and-Permute 加 FreeXOR 在 $n$ 方的推广。一个 Evaluator，多个 Garbler。
 
-**Garble**: 首先每个 $P_i$ 为每个 wire $\omega$ 随机选 label $L_{\omega,0}^{(i)},L_{\omega,1}^{(i)}$ 和 pad bit $\lambda_\omega^{(i)}$.
+**Garble**: 令 $P_1$ 为 evaluator，$P_2,\dots,P_n$ 为 garbler。每个 garbler $P_i$ 选全局偏移 $\Delta^{(i)}$，为每条 wire $\omega$ 随机选 $L_{\omega,0}^{(i)}$，令 $L_{\omega,1}^{(i)}=L_{\omega,0}^{(i)}\oplus\Delta^{(i)}$，并选 pad bit $\lambda_\omega^{(i)}$；evaluator 不选 label，也不贡献 pad bit（自己的 input wire 除外，见 Bootstrapping）。于是 $n=2$ 时就是 Point-and-Permute 加 FreeXOR：garbler 持有全部 label 和 mask。
 
 对于 gate $g$ 假设 input wire 是 $\alpha,\beta$ ，output wire 是 $\gamma$ 。令
 
 $$
-\lambda_\alpha:=\bigoplus_{i\in[n]}\lambda_\alpha^{(i)}.
+\lambda_\alpha:=\bigoplus_{i=2}^{n}\lambda_\alpha^{(i)}.
 $$
 
 并且令对于 $x\in\{0,1\}$,
 
 $$
-L_{\alpha,x}=L_{\alpha,x}^{(1)}\|\cdots\|L_{\alpha,x}^{(n)}\|x.
+L_{\alpha,x}=L_{\alpha,x}^{(2)}\|\cdots\|L_{\alpha,x}^{(n)},
 $$
 
-然后每方 $P_i$ 本地计算 $H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})$, 其中 $\widehat v_\alpha,\widehat v_\beta\in\{0,1\}$ 都要遍历到.
+evaluator 在 wire $\alpha$ 上持有的仍是 $\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha}$。
 
-接下来所有参与方运行 MPC 协议，获取电路的输出，对所有 $\widehat v_\alpha,\widehat v_\beta\in\{0,1\}$ 都重复一遍。电路输入是每个人的份额 $\lambda_\alpha^{(i)},\lambda_\beta^{(i)},\lambda_\gamma^{(i)},L_{\gamma,0}^{(i)},L_{\gamma,1}^{(i)},H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})$, 计算
+记 $\Delta=\Delta^{(2)}\|\cdots\|\Delta^{(n)}$，则 $x\|L_{\alpha,x}=(0\|L_{\alpha,0})\oplus x(1\|\Delta)$，与两方 FreeXOR 形状相同。**XOR gate** $(\alpha,\beta,\gamma)$ 因此不建表：每个 garbler 本地取 $L^{(i)}_{\gamma,0}=L^{(i)}_{\alpha,0}\oplus L^{(i)}_{\beta,0}$、$\lambda^{(i)}_\gamma=\lambda^{(i)}_\alpha\oplus\lambda^{(i)}_\beta$，evaluator 算 $(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha})\oplus(\widehat v_\beta\|L_{\beta,\widehat v_\beta})=\widehat v_\gamma\|L_{\gamma,\widehat v_\gamma}$ 即可；input wire 的 mask 只由所有者提供（见 Bootstrapping），其他 garbler 的份额视为 $0$，上式仍成立。下面只写 AND gate $g$。
+
+然后每个 garbler $P_i$ 本地计算 $H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})$, 其中 $\widehat v_\alpha,\widehat v_\beta\in\{0,1\}$ 都要遍历到.
+
+接下来所有参与方运行 MPC 协议，获取电路的输出，对所有 $\widehat v_\alpha,\widehat v_\beta\in\{0,1\}$ 都重复一遍。电路输入是 garbler $P_i$ 的份额（evaluator 只在自己的 input wire 上持有 $\lambda^{(1)}$，一并输入） $\lambda_\alpha^{(i)},\lambda_\beta^{(i)},\lambda_\gamma^{(i)},L_{\gamma,0}^{(i)},L_{\gamma,1}^{(i)},H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})$, 计算
 
 $$
-\chi=g(\lambda_\alpha\oplus\widehat v_\alpha,\lambda_\beta\oplus\widehat v_\beta)\oplus\lambda_\gamma=g\left(\bigoplus_{i\in[n]}\lambda_\alpha^{(i)}\oplus\widehat v_\alpha,\bigoplus_{i\in[n]}\lambda_\beta^{(i)}\oplus\widehat v_\beta\right)\oplus\bigoplus_{i\in[n]}\lambda_\gamma^{(i)}
+\chi=g(\lambda_\alpha\oplus\widehat v_\alpha,\lambda_\beta\oplus\widehat v_\beta)\oplus\lambda_\gamma=g\left(\bigoplus_{i=2}^{n}\lambda_\alpha^{(i)}\oplus\widehat v_\alpha,\bigoplus_{i=2}^{n}\lambda_\beta^{(i)}\oplus\widehat v_\beta\right)\oplus\bigoplus_{i=2}^{n}\lambda_\gamma^{(i)}
 $$
 
 以及
 
 $$
-e_{\widehat v_\alpha,\widehat v_\beta}= (L_{\gamma,\chi}^{(1)}\|\cdots\|L_{\gamma,\chi}^{(n)}\|\chi)\oplus\left(\bigoplus_{i\in[n]} H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})\right)
+e_{\widehat v_\alpha,\widehat v_\beta}=\bigl(\chi\|L_{\gamma,\chi}\bigr)\oplus\left(\bigoplus_{i=2}^{n} H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})\right)
 $$
 
 并放在表格的 $(\widehat v_\alpha,\widehat v_\beta)$ 处。
 
-**Evaluate**: 假设对于这个门 $g$ ，拿到了两个 label $L_{\alpha,\widehat v_\alpha},L_{\beta,\widehat v_\beta}$ ，那么其末位 bit 分别是 $\widehat v_\alpha,\widehat v_\beta$. 去表格中 $(\widehat v_\alpha,\widehat v_\beta)$ 位置找即可得到 $e_{\widehat v_\alpha,\widehat v_\beta}$.
+**Evaluate**: 对于这个门 $g$，evaluator 持有 $\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha}$ 和 $\widehat v_\beta\|L_{\beta,\widehat v_\beta}$，首位就是 $\widehat v_\alpha,\widehat v_\beta$. 去表格中 $(\widehat v_\alpha,\widehat v_\beta)$ 位置找即可得到 $e_{\widehat v_\alpha,\widehat v_\beta}$.
 
 根据 garbling 过程，我们可以得到
 
 $$
-L_{\gamma,\widehat v_\gamma}=L_{\gamma,\chi}=e_{\widehat v_\alpha,\widehat v_\beta}\oplus\left(\bigoplus_{i\in[n]} H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})\right)
+\widehat v_\gamma\|L_{\gamma,\widehat v_\gamma}=\chi\|L_{\gamma,\chi}=e_{\widehat v_\alpha,\widehat v_\beta}\oplus\left(\bigoplus_{i=2}^{n} H(L^{(i)}_{\alpha,\widehat v_\alpha},L^{(i)}_{\beta,\widehat v_\beta},\mathrm{id})\right)
 $$
 
 其中
@@ -85,49 +114,89 @@ $$
 > 由于以上的原因，在 Garbling 的时候也需要对不同的 wire 设置不同的掩码规则。具体来说就是
 >
 > $$
-> \lambda_\omega = \begin{cases} \lambda_\omega^{(j_\omega)} & \omega \in \mathsf{Input} \\ \lambda_\omega^{(1)} \oplus \cdots \oplus \lambda_\omega^{(n)} & \text{otherwise} \end{cases}
+> \lambda_\omega = \begin{cases} \lambda_\omega^{(j_\omega)} & \omega \in \mathsf{Input} \\ \lambda_\omega^{(2)} \oplus \cdots \oplus \lambda_\omega^{(n)} & \text{otherwise} \end{cases}
 > $$
 >
-> 一个直观的解释是，掩码的存在是让不该看到明文的人看不到明文（label的最后一位就是明文加掩码，所以如果不用掩码，直接看最后一位就知道明文了）
+> 一个直观的解释是，掩码的存在是让不该看到明文的人看不到明文（evaluator 拿到的串首位就是明文加掩码，不加掩码就直接看到明文）
 >
 > 对于 input wire $\omega$， $P_{j_\omega}$ 已经知道明文，因此目的就是不让任何剩下 $n-1$ 方的子集能够恢复明文。因此只需要让掩码全部由 $j_\omega$ 提供即可。（如果 $P_{j_\omega}$ 被腐化，那么 adversary 本身就可以串通，互相知道明文，也不需要保护）。
 >
-> 对于内部 wire ，为了保证任何一个子集都不能恢复明文，才需要所有人参与分享掩码。
+> 对于内部 wire ，为了保证任何一个子集都不能恢复明文，才需要所有 garbler 参与分享掩码。
 
-然后大家都得到 $\widehat v_\omega$, 于是可以互相广播拼凑出
+然后大家都得到 $\widehat v_\omega$, 每个 garbler 把 $L_{\omega,\widehat v_\omega}^{(i)}$ 发给 evaluator, 拼成
 
 $$
-L_{\omega,\widehat v_\omega}=L_{\omega,\widehat v_\omega}^{(1)}\|\cdots\|L_{\omega,\widehat v_\omega}^{(n)}\|\widehat v_\omega.
+\widehat v_\omega\|L_{\omega,\widehat v_\omega}=\widehat v_\omega\|L_{\omega,\widehat v_\omega}^{(2)}\|\cdots\|L_{\omega,\widehat v_\omega}^{(n)}.
 $$
 
 然后直接开始 Evaluation 即可.
 
-### **FreeXOR**
-
-每个 party 选一个全局偏移 $\Delta^{(i)}$, 对于每条 wire $\omega$, $L_{\omega,1}^{(i)}$ 不随机采样而是满足 $L_{\omega,x}^{(i)}=L_{\omega,0}^{(i)}\oplus x\Delta^{(i)}$. Garbling 生成的标签满足对于一个 XOR gate 输入 $\alpha,\beta$ 输出 $\gamma$,
-
-$$
-L_{\alpha,0}^{(i)}\oplus L_{\beta,0}^{(i)}=L_{\gamma,0}^{(i)},\quad
-\lambda_\alpha^{(i)}\oplus \lambda_\beta^{(i)}=\lambda_\gamma^{(i)}
-$$
-
-聚合起来就是
-
-$$
-L_{\omega,x}=L_{\omega,0}\oplus x(\Delta\|1),\quad L_{\alpha,0}\oplus L_{\beta,0}=L_{\gamma,0},\quad \lambda_\alpha\oplus\lambda_\beta=\lambda_\gamma,
-$$
-
-其中对于 $\omega\in\mathsf{Input}$ 我们约定 $\lambda_\omega^{(i)}=0$ 当 $i\neq j_\omega$（不贡献），而 $\lambda_\omega^{(j_\omega)}=\lambda_\omega$ 由 $j_\omega$ 自己随机采样；这样聚合公式 $\lambda_\omega=\bigoplus_i\lambda_\omega^{(i)}$ 才能退化为上面 input wire 的特例. 因此有
-
-$$
-L_{\alpha,\widehat v_\alpha}\oplus L_{\beta,\widehat v_\beta}=L_{\gamma,0}\oplus (\widehat v_\alpha\oplus\widehat v_\beta)(\Delta\|1)=L_{\gamma,0}\oplus (\lambda_\gamma\oplus v_\alpha\oplus v_\beta)(\Delta\|1)=L_{\gamma,\widehat v_\gamma}.
-$$
-
-也就是遇到 XOR 的时候可以简单把两个 label 进行 XOR 得到输出的 label. AND 门不变.
-
 ### **Half-Gates**
 
-TODO
+与 BMR 一样，把 evaluator 在 wire $\omega$ 上持有的东西写成 $\widehat v_\omega\|L_{\omega,\widehat v_\omega}$：$L_{\omega,x}\in\{0,1\}^\kappa$ 是 label，首位是 masked bit。FreeXOR 下 $L_{\omega,1}=L_{\omega,0}\oplus\Delta$，于是
+
+$$
+x\|L_{\omega,x}=(0\|L_{\omega,0})\oplus x(1\|\Delta),
+$$
+
+记号与 FreeXOR 一节相同。$H:\{0,1\}^*\to\{0,1\}^{\kappa+1}$ 为 hash，$g,g'$ 为同一个 AND gate 的两个不同 tweak。目标：AND gate $(\alpha,\beta,\gamma)$ 的 garbled table 只有两行。
+
+**分解.** garbler 知道 $\lambda_\beta$，evaluator 知道 $\widehat v_\beta$，于是
+
+$$
+v_\alpha v_\beta=v_\alpha\lambda_\beta\oplus v_\alpha\widehat v_\beta .
+$$
+
+第一项是 $v_\alpha$ 与 garbler 已知常数的 AND（generator half），第二项是 $v_\alpha$ 与 evaluator 已知 bit 的 AND（evaluator half）。每个半门一行，输出是 bit‖label 形式的 $\kappa+1$ bit 串，分别记为 $W_{G,x}=W_{G,0}\oplus x(1\|\Delta)$ 和 $W_{E,x}=W_{E,0}\oplus x(1\|\Delta)$。
+
+**Generator half：计算 $v_\alpha\lambda_\beta$.** 以 $\widehat v_\alpha$ 索引。garbler 令
+
+$$
+W_{G,0}=H(0\|L_{\alpha,0},g)\oplus\lambda_\alpha\lambda_\beta(1\|\Delta),\qquad
+T_G=H(0\|L_{\alpha,0},g)\oplus H(1\|L_{\alpha,1},g)\oplus\lambda_\beta(1\|\Delta),
+$$
+
+发送 $T_G$。evaluator 计算
+
+$$
+H(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha},g)\oplus\widehat v_\alpha T_G .
+$$
+
+$\widehat v_\alpha=0$ 时它等于 $H(0\|L_{\alpha,0},g)=W_{G,0}\oplus\lambda_\alpha\lambda_\beta(1\|\Delta)$；$\widehat v_\alpha=1$ 时它等于 $H(0\|L_{\alpha,0},g)\oplus\lambda_\beta(1\|\Delta)=W_{G,0}\oplus(1\oplus\lambda_\alpha)\lambda_\beta(1\|\Delta)$。两种情况都是 $W_{G,v_\alpha\lambda_\beta}$。这相当于把 $\widehat v_\alpha=0$ 的那一行取为全零（garbled row reduction），所以只需发一行。
+
+**Evaluator half：计算 $v_\alpha\widehat v_\beta$.** 以 $\widehat v_\beta$ 索引。garbler 令
+
+$$
+W_{E,0}=H(0\|L_{\beta,0},g'),\qquad
+T_E=H(0\|L_{\beta,0},g')\oplus H(1\|L_{\beta,1},g')\oplus\bigl(\lambda_\alpha\|L_{\alpha,\lambda_\alpha}\bigr),
+$$
+
+其中 $\lambda_\alpha\|L_{\alpha,\lambda_\alpha}$ 是 $\alpha$ 上真实值为 $0$ 时 evaluator 会持有的串。发送 $T_E$。evaluator 计算
+
+$$
+H(\widehat v_\beta\|L_{\beta,\widehat v_\beta},g')\oplus\widehat v_\beta\bigl(T_E\oplus(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha})\bigr).
+$$
+
+$\widehat v_\beta=0$ 时它等于 $W_{E,0}$；$\widehat v_\beta=1$ 时它等于 $H(0\|L_{\beta,0},g')\oplus(\lambda_\alpha\|L_{\alpha,\lambda_\alpha})\oplus(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha})=W_{E,0}\oplus(\lambda_\alpha\oplus\widehat v_\alpha)(1\|\Delta)=W_{E,0}\oplus v_\alpha(1\|\Delta)$。两种情况都是 $W_{E,v_\alpha\widehat v_\beta}$。evaluator 不知道 $v_\alpha$，但 XOR 自己手里的 $\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha}$ 就把 $v_\alpha(1\|\Delta)$ 加了进去。
+
+**输出.** garbler 取 $\lambda_\gamma$ 为 $W_{G,0}\oplus W_{E,0}$ 的首位，令
+
+$$
+0\|L_{\gamma,0}=W_{G,0}\oplus W_{E,0}\oplus\lambda_\gamma(1\|\Delta),
+$$
+
+右边首位确为 $0$，与约定一致；AND gate 的输出 mask 由 hash 决定，不再自由选择。evaluator 计算
+
+$$
+W_{G,v_\alpha\lambda_\beta}\oplus W_{E,v_\alpha\widehat v_\beta}
+=W_{G,0}\oplus W_{E,0}\oplus v_\alpha v_\beta(1\|\Delta)
+=(0\|L_{\gamma,0})\oplus(\lambda_\gamma\oplus v_\alpha v_\beta)(1\|\Delta)
+=\widehat v_\gamma\|L_{\gamma,\widehat v_\gamma} .
+$$
+
+**Security.** evaluator 只有 $\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha}$ 和 $\widehat v_\beta\|L_{\beta,\widehat v_\beta}$。$T_G$ 中的 $H((1\oplus\widehat v_\alpha)\|L_{\alpha,1\oplus\widehat v_\alpha},g)$ 和 $T_E$ 中的 $H((1\oplus\widehat v_\beta)\|L_{\beta,1\oplus\widehat v_\beta},g')$ 是它没有的串的 hash，分别掩蔽了 $\lambda_\beta(1\|\Delta)$ 和 $\lambda_\alpha\|L_{\alpha,\lambda_\alpha}$。它没有的串与它有的串相差 $\Delta\|1$，而 $T_G$ 里又直接出现 $\lambda_\beta(1\|\Delta)$，所以要求 $H$ 对 $H((L\|x)\oplus(1\|\Delta),g)\oplus(1\|\Delta)$ 形式的值仍然看起来随机（circular correlation robustness），与 FreeXOR 的要求相同。两个半门用不同 tweak，同一个串的 hash 不会被用两次。
+
+**Cost.** 每个 AND gate 发 $2(\kappa+1)$ bit，evaluator 算两次 $H$；XOR gate 仍然免费。
 
 ## Garbled Circuits
 
