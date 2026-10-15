@@ -1,0 +1,702 @@
+# LWE / MLWE → EDCP → CCP: Definitions, Reduction Circuits, and Parameter Budgets
+
+*October 14, 2026*
+
+整理日期：2026-10-14。依据 BJK+25、BKSW18、BFS26 和 Wen–Zheng 2026/155 的全文。
+
+**完整展开的 LWE 搜索链是：当 $q=p^t$ 时，LWE → U-EDCP → DCP → CCP。LWE 前端限制能产生多少态；后两步有明确的投影损耗。MLWE 的原生路线先到整数模数 $Q=q^d+1$ 的结构化 EDCP，再到同模数的普通高斯 EDCP。将这个 $Q$ 降成小素数幂是另外一段规约，不能把它省略。**
+
+本文以秘密恢复为主要目标；判定规约单独标明。“定理级”表示已有定理或完整的直接推导；“观察级”表示参数后果或待完成的证明核查；“猜想级”表示研究目标。难度 ★ 到 ★★★★★ 指证明工作量，具体难点随结论给出。
+
+## 1. Unified Parameters and Input Definitions
+
+安全参数记为 $\lambda$，环次数记为 $d=2^\nu$，避免把两者都写成 $\kappa$。
+未注明底数的 $\log$ 取底数 2，$\ln$ 为自然对数。
+
+| 参数 | 含义 |
+|---|---|
+| $n$ | 普通 LWE、EDCP、CCP 的整数向量维数 |
+| $q=p^t$ | 普通 LWE–CCP 分支的模数；$p$ 素数 |
+| $m$ | LWE 的标量方程数，或 MLWE 的环方程数，分支中明确区分 |
+| $\alpha$ | LWE 相对噪声宽度；绝对宽度为 $\alpha q$ |
+| $M$ | U-EDCP 第一寄存器支撑长度 |
+| $\ell$ | 某一步的量子样本数 |
+| $k$ | MLWE 模块秩；Wen–Zheng 原文的 $n$ 在本文改为 $k$ |
+| $R,R_q$ | $R=\mathbb Z[X]/(X^d+1)$，$R_q=R/qR$ |
+| $Q$ | MLWE 求值后的整数模数 $Q=f(q)=q^d+1$ |
+| $\mathcal C_q$ | CCP 辅助环 $\mathbb Z_q[\zeta_p]$，与 MLWE 的 $R_q$ 区分 |
+| $N_C$ | CCP 求解器完整恢复秘密所需的样本数 |
+
+采用
+$$
+D_{\mathbb Z,r}(z)=
+\frac{\exp(-\pi z^2/r^2)}
+{\sum_{u\in\mathbb Z}\exp(-\pi u^2/r^2)}.
+$$
+$r$ 是 Gaussian width parameter，标准差约为 $r/\sqrt{2\pi}$。
+
+### 1.1 Search LWE
+
+固定 $s\in\mathbb Z_q^n$，输入
+$$
+A\leftarrow U(\mathbb Z_q^{m\times n}),\quad
+e\leftarrow D_{\mathbb Z^m,\alpha q},\quad
+b=As+e\pmod q.
+\tag{1}
+$$
+目标是恢复 $s$。非高斯误差则单独记录 $\|e\|_\infty\le B$，不能把 $B$ 和 $\alpha$ 混用。
+
+### 1.2 U-EDCP and DCP
+
+一个 U-EDCP 样本是
+$$
+|U_{x,s}^{M}\rangle=
+\frac1{\sqrt M}\sum_{j=0}^{M-1}|j\rangle|x+js\bmod q\rangle,
+\qquad x\leftarrow U(\mathbb Z_q^n).
+\tag{2}
+$$
+$\ell$ 个样本使用同一秘密和独立偏移。$M=2$ 时就是 DCP：
+$$
+|D_{x,s}\rangle=
+\frac{|0\rangle|x\rangle+|1\rangle|x+s\rangle}{\sqrt2}.
+\tag{3}
+$$
+
+### 1.3 CCP
+
+令
+$$
+\zeta=\zeta_p,\quad \pi=\zeta-1,\quad
+\mathcal C_q=\mathbb Z_q[\zeta],\quad
+\lambda_j=\sum_{i=0}^{j-1}\zeta^i,\quad\lambda_0=0.
+$$
+CCP 样本是
+$$
+|C_{x,s}\rangle=
+\frac1{\sqrt p}\sum_{j=0}^{p-1}|j\rangle|x+\lambda_js\rangle,
+\qquad x\leftarrow U(\mathcal C_q^n).
+\tag{4}
+$$
+**秘密仍是 $s\in\mathbb Z_q^n$，以常数系数嵌入 $\mathcal C_q^n$。** 偏移有 $n(p-1)$ 个整数系数，秘密有 $n$ 个整数坐标。它不是任意环秘密版本。
+
+分圆环中 $p=u\pi^{p-1}$，其中 $u$ 为单位，所以 $q=p^t$ 对应
+$\mathcal C_q\cong\mathbb Z[\zeta]/(\pi^L)$、$L=t(p-1)$。这才是 CCP 筛使用 $\pi$-进层数而非直接使用 $t$ 层的原因。
+
+定义和 $M=2$ 的关系：**定理级；难度 ★**，直接识别输入态。[BFS，CCP 定义、Definition 10、Proposition 5](https://arxiv.org/html/2609.34996#S5.SS2)
+
+## 2. LWE → U-EDCP: The Actual Circuit and Error Removal
+
+### 2.1 Generating Extrapolated States from Public $(A,b)$
+
+电路不知道 $s$ 或 $e$。先准备
+$$
+\frac1{\sqrt{Mq^n}}
+\sum_{j=0}^{M-1}\sum_{u\in\mathbb Z_q^n}|j\rangle|u\rangle|0\rangle.
+$$
+用公开数据计算
+$$
+|j,u,0\rangle\longmapsto|j,u,Au-jb\bmod q\rangle.
+\tag{5}
+$$
+分析中令 $u=x+js$，状态变为
+$$
+\frac1{\sqrt{Mq^n}}\sum_{j,x}
+|j\rangle|x+js\rangle|Ax-je\rangle.
+\tag{6}
+$$
+这是求和变量替换，不是电路调用未知秘密。
+
+同一 $x$ 对应第三寄存器中的短点列
+$$
+Ax,\ Ax-e,\ldots,Ax-(M-1)e.
+$$
+规约要让完整点列落在同一个桶，并让不同 $x$ 的点列进入不同桶。
+
+定义
+$$
+\Lambda_q(A)=\{v\in\mathbb Z^m:v=Ax\bmod q
+\text{ for some }x\in\mathbb Z_q^n\}.
+$$
+取常数 $c\ge8$、桶宽 $z=q/c$、随机偏移 $w_i\in[0,1)$，逐坐标计算
+$$
+g_w(v)_i=
+\left\lfloor(v_i/z-w_i)\bmod c\right\rfloor.
+\tag{7}
+$$
+将 $g_w(Au-jb)$ 写入第四寄存器，测量它。好的分桶事件留下某个**未知** $x$ 的整条点列：
+$$
+\frac1{\sqrt M}\sum_{j=0}^{M-1}
+|j\rangle|x+js\rangle|Ax-je\rangle.
+\tag{8}
+$$
+第三寄存器不能直接丢弃；必须用公开 $A,b$ 和寄存器中的 $u$ 实施
+$$
+|j,u,v\rangle\longmapsto|j,u,v-Au+jb\rangle.
+\tag{9}
+$$
+它归零后，得到式 (2)。可以再给第二寄存器加独立均匀随机平移，不把该平移给求解器，使平均输入中的偏移均匀。
+
+**桶标签不告诉我们 $x$，也没有现成的成功标志告诉我们是否保留了全部 $M$ 个分支。** 坏结果可能只留下部分分支，不能把这一步当成可检测的 rejection sampling。
+
+### 2.2 Origin of the Parameter Inequality
+
+用 $H$ 表示分桶分析的辅助整数，避免与模块秩 $k$ 混淆。足够的条件为
+$$
+M\|e\|_\infty\le
+\frac{\lambda_1^\infty(\Lambda_q(A))}{2cH}.
+\tag{10}
+$$
+随机桶边界切到短点列的概率受 $1/H$ 控制。生成 $\ell$ 个态时取 $H\gtrsim m\ell$，使全部输出都好的事件仍有常数概率。重复使用的是经典 $(A,b)$，每次重新制备态和选桶偏移。
+
+随机格下界给出 $\lambda_1^\infty\ge q/4$；高斯尾界给出
+$\|e\|_\infty\le\sqrt\lambda\,\alpha q$ 的高概率事件。取 $c=8$，得到
+$$
+\boxed{M\ell<\frac1{64\sqrt\lambda\,m\alpha}.}
+\tag{11}
+$$
+若 $\|e\|_\infty\le B$，对应条件是
+$$
+\boxed{M\ell<\frac q{64Bm}.}
+\tag{12}
+$$
+
+**输出维数为原来的 $n$，模数为原来的 $q$，秘密为原来的 $s$。** 前端限制的是可产生的外推宽度与样本量的乘积。
+
+结论：**定理级；难度 ★★★**。难在随机格距离、联合分桶成功概率和错误尾界。[BJK+25，Theorem 12、Lemma 17、附录 C，pp. 29、38–40](https://eprint.iacr.org/2025/1046)
+
+源文细节：Theorem 12 写 $m\ge n\log q$，但证明引用的 Lemma 1 写 $m\ge2n\log q$。直接沿该附录做保守实例化，应取 $m\ge2n\log q$，或另证较弱样本量的格距离。原文允许 $m=o(2^\lambda)$；通常使用 $m=\operatorname{poly}(\lambda)$，联合尾界更直接。
+
+## 3. U-EDCP → DCP → CCP: Concrete Projections
+
+### 3.1 U-EDCP → DCP
+
+计算并测量第一寄存器的 $\lfloor j/2\rfloor$。完整桶 $\{2b,2b+1\}$ 重编号为 $\{0,1\}$ 后得到
+$$
+\frac{|0\rangle|x'\rangle+|1\rangle|x'+s\rangle}{\sqrt2},
+\qquad x'=x+2bs.
+$$
+奇数 $M$ 的最后一个单点桶丢弃。成功概率
+$$
+\boxed{a_M=\frac{2\lfloor M/2\rfloor}{M}\ge\frac23\quad(M\ge2).}
+\tag{13}
+$$
+这次成功可以从桶编号判断，秘密、维数、模数不变。
+
+结论：**定理级；难度 ★**，直接计算。它给出大支撑 U-EDCP 到 DCP 的单向转换。
+
+### 3.2 DCP → CCP
+
+取 $p-1$ 个独立 DCP 样本，张量积为
+$$
+2^{-(p-1)/2}\sum_{J\in\{0,1\}^{p-1}}
+|J\rangle\bigotimes_{i=0}^{p-2}|x_i+J_i s\rangle.
+$$
+把第二部分重编码为分圆环元素：
+$$
+(v_0,\ldots,v_{p-2})\longmapsto\sum_{i=0}^{p-2}v_i\zeta^i.
+$$
+这是系数表示的双射，可逆实现。令 $x=\sum_i x_i\zeta^i$，得到
+$$
+2^{-(p-1)/2}\sum_J
+|J\rangle\left|x+\left(\sum_iJ_i\zeta^i\right)s\right\rangle.
+\tag{14}
+$$
+保留前面全为 1、后面全为 0 的 $p$ 个串
+$$
+J_j=(\underbrace{1,\ldots,1}_{j},
+\underbrace{0,\ldots,0}_{p-1-j}),\quad0\le j\le p-1.
+$$
+计算并测量谓词 $J\in\{J_0,\ldots,J_{p-1}\}$，成功后把 $J_j$ 可逆编号为 $j$。因为
+$\sum_i(J_j)_i\zeta^i=\lambda_j$，输出就是式 (4)。
+
+成功概率和每个成功 CCP 样本的期望 DCP 消耗为
+$$
+\boxed{\beta_p=\frac p{2^{p-1}},\qquad
+c_p=\frac{p-1}{\beta_p}=\frac{(p-1)2^{p-1}}p.}
+\tag{15}
+$$
+偏移均匀由系数偏移独立均匀及编码双射保证；成功谓词与偏移、秘密无关。
+
+结论：**定理级；难度 ★★**。关键是保留的串恰好给出 $\lambda_j$。[BFS，Proposition 5](https://arxiv.org/html/2609.34996#S5.SS2)
+
+### 3.3 CCP → DCP and the Range of Equivalence
+
+投影第一寄存器到 $\{|0\rangle,|1\rangle\}$，成功率 $2/p$。把偏移展开为系数，因秘密只有常数系数，状态恰好分解为
+$$
+\frac{|0\rangle|x_0\rangle+|1\rangle|x_0+s\rangle}{\sqrt2}
+\otimes|x_1,\ldots,x_{p-2}\rangle.
+$$
+丢弃后面的系数寄存器即可。
+
+固定 $p$ 时，
+$$
+\boxed{\mathrm{CCP}_{n,p^t,p}\equiv_Q
+\mathrm{DCP}_{n,p^t}=\mathrm{U\!-\!EDCP}_{n,p^t,2}.}
+\tag{16}
+$$
+任意 $M\ge2$ 另有 $\mathrm{U\!-\!EDCP}_{n,p^t,M}\le_Q\mathrm{CCP}_{n,p^t,p}$。这些电路没有证明同参数的大 $M$ 双向等价。$p$ 增长时，必须计入式 (15) 的指数样本损耗。
+
+结论：**定理级；难度 ★★**，组合正反向电路。
+
+## 4. Propagating the CCP Solver's Requirements Back to LWE
+
+### 4.1 Expected Budget and Fixed Budget
+
+设求解器完整恢复秘密需要 $N_C$ 个 CCP 样本。期望 U-EDCP 消耗为
+$$
+\boxed{\mathbb E[N_U]=\frac{c_p}{a_M}N_C.}
+\tag{17}
+$$
+若要求转换失败概率不超过 $\delta$，一个保守的固定预算是
+$$
+G=\left\lceil
+\frac{8(N_C+\ln(2/\delta))}{\beta_p}\right\rceil,\qquad
+D_*=(p-1)G,
+$$
+$$
+\boxed{B_U=\left\lceil
+\frac{8(D_*+\ln(2/\delta))}{a_M}\right\rceil.}
+\tag{18}
+$$
+先取得至少 $D_*$ 个 DCP 样本，再分成 $G$ 组做 CCP 投影。两次 Chernoff 界各分配 $\delta/2$；这里的常数 8 是保守选择。
+
+结论：**定理级；难度 ★★**，本文直接推导。固定 $p$ 时，
+$B_U=O_p(N_C+\log(1/\delta))$。
+
+### 4.2 The Actual LWE Parameter Interface
+
+让第 2 节产生 $\ell=B_U$，完整充分条件为
+$$
+\boxed{
+MB_U<\frac1{64\sqrt\lambda\,m\alpha}
+\quad\text{或}\quad
+MB_U<\frac q{64Bm}.
+}
+\tag{19}
+$$
+给定 CCP 算法的 $N_C(n,q,p)$，先算式 (18)，再检查式 (19)，就得到它在这条链上覆盖的 LWE 参数。
+
+若后续只保留两点，选 $M=2$ 最省这条链的前端预算，此时 $a_M=1$。大 $M$ 只有在求解器实际利用支撑时才可能抵消 $M\ell$ 的限制。
+
+组合条件：**定理级；难度 ★★**。关于最省预算的参数后果：**观察级；难度 ★**。
+
+### 4.3 State Error Must Not Be Conflated with Success Events
+
+前端的“全部输出都是好态”是常数概率、通常不可检测的事件。后端的显式投影成功是可检测事件。不能把前者改写成“无条件输出与理想联合态的距离可忽略”。
+
+若另外证明 $B_U$ 个输入的联合态满足
+$$
+\Delta_{\rm tr}(\rho_{B_U},\rho^{\rm ideal}_{B_U})
+\le\varepsilon_{\rm joint},
+$$
+则把失败保留为显式输出 $\bot$ 后，整段转换是量子信道，最终成功概率相对理想实验变化至多 $\varepsilon_{\rm joint}$。独立输入的单态界 $\varepsilon$ 给出
+$\varepsilon_{\rm joint}\le B_U\varepsilon$；相关输入要证明联合界。
+
+结论：**定理级；难度 ★★**，用 trace-distance 的信道收缩性分析。完整信道分析不必把每次条件化损耗粗略重复相乘。
+
+## 5. Native Definitions and Parameters for MLWE
+
+### 5.1 Correspondence between P-MLWE and MLWE
+
+Wen–Zheng 的具体规约使用系数高斯版本：
+$$
+f=X^d+1,\quad A(X)\leftarrow U(R_q^{m\times k}),
+$$
+$$
+s(X)\leftarrow(D_{R,\sigma_s})^k,\quad
+e(X)\leftarrow(D_{R,\sigma_e})^m,\quad
+b(X)=A(X)s(X)+e(X)\pmod{(q,f)}.
+\tag{20}
+$$
+$D_{R,\sigma}$ 指 $d$ 个系数独立按 $D_{\mathbb Z,\sigma}$ 采样。输入有 $m$ 个环方程，秘密有 $kd$ 个系数；展开矩阵有 negacyclic 块结构，不能当成均匀标量 LWE 矩阵。
+
+对二幂分圆环，整数环就是 $R$。使用全部共轭的等距实规范嵌入时，
+$\|\sigma_H(a)\|_2^2=d\|\operatorname{coeff}(a)\|_2^2$；规范嵌入的球形高斯宽度 $r_{\rm can}$ 对应系数宽度 $r_{\rm can}/\sqrt d$。非球形误差还需变换协方差。
+
+均匀秘密且系数高斯误差时，若选出公开可逆子矩阵 $A_0$，可先做 normal form：
+$$
+A'=AA_0^{-1},\qquad
+b'=b-AA_0^{-1}b_0=A'(-e_0)+e.
+\tag{21}
+$$
+恢复新秘密 $s'=-e_0$ 后，原秘密为 $s=A_0^{-1}(b_0+s')$。需要扣除用来选子矩阵的样本并核对可逆概率。
+
+系数／规范嵌入转换：**定理级；难度 ★★**。式 (21)：**定理级；难度 ★**。[Wen–Zheng，Definitions 13–14、附录 B.3、D.1](https://eprint.iacr.org/2026/155)
+
+### 5.2 The Full Input State of IP-M-EDCP
+
+定义
+$$
+Q=f(q)=q^d+1,\qquad
+z=(1,q,\ldots,q^{d-1})^T,\qquad h(c)=\langle c,z\rangle.
+$$
+秘密为 $\widetilde s\in\mathbb Z_Q^k$。输入态为
+$$
+\boxed{
+\frac1{\|\varphi\|_2}\sum_{c\in\mathbb Z^d}
+\varphi(c)|c\rangle|x+h(c)\widetilde s\bmod Q\rangle,
+\quad x\leftarrow U(\mathbb Z_Q^k).
+}
+\tag{22}
+$$
+高斯版本按 Definition 22 取
+$\varphi(c)=\sqrt{D_{\mathbb Z^d,r}(c)}$。本文也用这个**概率宽度**约定定义普通 G-EDCP。BKSW 的幅度约定
+$\rho_{r_a}(j)=e^{-\pi j^2/r_a^2}$ 对应 $r_a=\sqrt2r$。Wen–Zheng 正文经常简写高斯幅度为 $\rho_r$，不能忽略该记号差异。
+
+典型秘密分布是
+$$
+\widetilde s=s(q)\bmod Q,\qquad
+s(X)\leftarrow(D_{R,\sigma_s})^k.
+$$
+因此它不是未经证明就可替换的
+$\sum_j|j\rangle|x+js(X)\rangle$，第二寄存器也不是 $R_q^k$。
+
+定义识别：**定理级；难度 ★**。[Wen–Zheng，Definition 22，pp. 27–28](https://eprint.iacr.org/2026/155)
+
+## 6. P-MLWE → IP-M-EDCP: Evaluation, Carries, and Bucketing
+
+### 6.1 Why Evaluation Is Not a Ring Isomorphism
+
+对 $a(X)\in R_q$，先把系数固定在 $(-q/2,q/2]$，再计算
+$$
+\operatorname{Eval}^{(f)}_q(a)=a(q)\bmod Q.
+\tag{23}
+$$
+从整数多项式环取模 $f$ 后求值，尊重 $f(q)=0\bmod Q$；但从 $R_q$ 出发的式 (23) 不是环同态，因为在 $R_q$ 中 $q=0$，在 $\mathbb Z_Q$ 中 $q\ne0$。
+
+公开计算 $\widetilde A=\operatorname{Eval}(A)$、$\widetilde b=\operatorname{Eval}(b)$。证明中定义
+$$
+\widetilde b=\widetilde A\widetilde s+\widetilde e\bmod Q.
+\tag{24}
+$$
+$\widetilde e$ 包含 $e(q)$ 和加法、乘法、系数取模的进位，可以与 $\widetilde A$ 相关；电路不需要知道它。
+
+对于 $X^d+1$，求值在固定系数代表的 $q^d$ 个元素上是单射，$Q=q^d+1$。故每个均匀环元素求值后的分布与 $U(\mathbb Z_Q)$ 的统计距离恰为 $1/Q$；整个矩阵距离至多 $mk/Q$。
+
+分布结论：**定理级；难度 ★★**，单射加集合大小的直接计算。[Wen–Zheng，Lemma 18、附录 D.3](https://eprint.iacr.org/2026/155)
+
+### 6.2 Many Ring Samples Available: Direct Evaluation
+
+附录 D.5 的 Lemma 52 允许一般模块秩，要求足够的 $m=\Omega(k\log q)$ 环样本。定义
+$$
+\operatorname{EF}(f)=
+\max_{\substack{g\ne0\\\deg g<2d-1}}
+\frac{\|g\bmod f\|_\infty}{\|g\|_\infty}.
+$$
+对于 $X^d+1$ 可用 $\operatorname{EF}(f)\le2$、
+$\|f\|_1=2$、$\|f\|_\infty=1$。论文的进位和错误系数界为
+$$
+C_{\rm carry}=
+\left(\frac32\sigma_s\sqrt\lambda\,k^2
++(7+\|f\|_1)k-2\right)\operatorname{EF}(f)
++\frac{11}2+4\|f\|_\infty,
+$$
+$$
+\boxed{B_0=2+C_{\rm carry}+\sigma_e\sqrt\lambda.}
+\tag{25}
+$$
+$\Phi_q^{(f)}$ 表示居中 $q$-进系数分解。以高概率
+$$
+\|\Phi_q^{(f)}(\widetilde e)\|_\infty\le B_0,\qquad
+\|\widetilde e\|_\infty\le B_0\frac{q^d-1}{q-1}.
+\tag{26}
+$$
+整数错误可以达到 $B_0q^{d-1}$，不能仍写成原 MLWE 的 $\sigma_e$。
+
+结论：**定理级（论文引理）；难度 ★★★**，主要是进位分析。[Wen–Zheng，Lemma 52，pp. 82–84](https://eprint.iacr.org/2026/155)
+
+### 6.3 Only $O(\log\lambda)$ Ring Samples: Amplify First
+
+主文闭环取 $k=O(1)$、$m=O(\log\lambda)$，$q=\operatorname{poly}(\lambda)$ 为在 $R$ 中不分歧的素数，且
+$$
+(q)=\prod_i\mathfrak p_i,\qquad
+\min_iN(\mathfrak p_i)\ge(kd)^{\omega(1/(m-k+1))}.
+\tag{27}
+$$
+选择 $m'=\operatorname{poly}(\lambda)$，
+$\sigma_s,\sigma_e\ge\sqrt d\ge\eta_\varepsilon(\mathbb Z^d)$，
+$\varepsilon=2^{-\omega(\log\lambda)}$，并取
+$$
+\boxed{r_2\ge2d\,q^{\,k/m+2/(dm)}.}
+\tag{28}
+$$
+采样 $m'\times m$ 的环高斯矩阵 $E(X)$，条目用规范嵌入宽度 $r_2$。计算
+$$
+A'=EA\bmod q,\qquad b'=Eb\bmod q.
+\tag{29}
+$$
+Regularity lemma 使 $A'$ 接近均匀；新错误是 $Ee$，可与 $A'$ 相关，不能说这是 $m'$ 个独立的原分布 MLWE 样本。随后对 $(A',b')$ 求值。
+
+主文使用的界是
+$$
+C_{\rm carry}^{\rm amp}
+=3\sigma_s\sqrt\lambda\,k^2+18k+\frac{11}2,
+$$
+$$
+\boxed{B_1=2+C_{\rm carry}^{\rm amp}
++2m\sigma_er_2d^2\sqrt\lambda.}
+\tag{30}
+$$
+样本放大的成本进入 $B_1$，随后缩小外推宽度和量子样本供给。
+
+结论：**定理级（论文引理）；难度 ★★★★**，难在环 regularity 和错误／矩阵相关性。[Wen–Zheng，Lemma 28、Theorem 4，pp. 39–45](https://eprint.iacr.org/2026/155)
+
+### 6.4 Circuit from an Integer Instance to the Structured State
+
+令 $m_*=m$ 或 $m'$，相应 $B_*=B_0$ 或 $B_1$。准备高斯系数叠加和均匀 $u\in\mathbb Z_Q^k$，计算
+$$
+\sum_{c,u}\sqrt{D_{\mathbb Z^d,r}(c)}
+|c\rangle|u\rangle
+|\widetilde A u-h(c)\widetilde b\bmod Q\rangle.
+\tag{31}
+$$
+分析中令 $u=x+h(c)\widetilde s$，第三寄存器成为
+$\widetilde A x-h(c)\widetilde e$。
+
+截断到 $\|c\|_\infty\le r\sqrt\lambda$，损失高斯尾。Lemma 51 利用多项式乘法和进位控制
+$$
+\|h(c)\widetilde e\bmod Q\|_\infty
+\le
+\left(3+r\sqrt\lambda B_*d
+\left(\operatorname{EF}(f)+\frac2q\right)\right)
+\frac{q^d-1}{q-1}.
+\tag{32}
+$$
+还需核对该引理的小系数条件，例如
+$q/(r\sqrt\lambda B_*d\operatorname{EF}(f))$ 足够大；不能把两个大整数直接相乘后无依据地声称模约化让错误变小。
+
+像第 2 节一样做随机分桶、测量；随后实施
+$$
+|c,u,v\rangle\longmapsto
+|c,u,v-\widetilde A u+h(c)\widetilde b\rangle
+$$
+归零第三寄存器，得到式 (22)。也可再加均匀平移。
+
+希望输出 $\ell_{\rm IP}$ 个态时，Lemma 30 的充分条件是
+$$
+\boxed{
+\left(3+r\sqrt\lambda B_*d
+\left(\operatorname{EF}(f)+\frac2q\right)\right)
+\frac{q^d-1}{q-1}
+\le
+\frac{Q^{\,1-k/m_*}}{4C m_*\ell_{\rm IP}},
+\quad C\ge8.
+}
+\tag{33}
+$$
+这就是结构化前端的 $r\ell_{\rm IP}$ 供给约束。好输出事件为常数概率，截断和矩阵分布另有可忽略误差。
+
+结论：**定理级（论文 Lemma 30／Theorem 4）；难度 ★★★**。[Wen–Zheng，pp. 43–45、Lemma 51](https://eprint.iacr.org/2026/155)
+
+参数推算：式 (33) 除以 $Q\asymp q^d$ 后出现 $Q^{k/m_*}$。因此有 $\Omega(k\log q)$ 环样本，并不自动保证有用的 $r$。若想把该因子压为常数，一种充分选择是 $m_*\gtrsim k\log Q\asymp kd\log q$。**观察级；难度 ★**。
+
+## 7. IP-M-EDCP → Gaussian EDCP → U-EDCP
+
+### 7.1 Measuring Out $d-1$ Coefficients
+
+在式 (22) 中测量 $c_1,\ldots,c_{d-1}$。高斯幅度逐坐标因子化。令
+$a=\sum_{i=1}^{d-1}q^ic_i\bmod Q$，剩余状态为
+$$
+\sum_{c_0\in\mathbb Z}\sqrt{D_{\mathbb Z,r}(c_0)}
+|c_0\rangle|x+a\widetilde s+c_0\widetilde s\bmod Q\rangle.
+\tag{34}
+$$
+令 $x'=x+a\widetilde s$，就是普通 G-EDCP。
+
+**此步每个输入输出一个态：维数为 $k$，模数为 $Q=q^d+1$，宽度为一个坐标的 $r$。输出不是 $(kd,q)$ 的 EDCP。**
+
+原文 Theorem 5 写均匀秘密。该电路逐秘密成立；还可用已知均匀 $v\in\mathbb Z_Q^k$，实施
+$|c,w\rangle\mapsto|c,w+h(c)v\rangle$ 把秘密变成均匀的 $\widetilde s+v$，求解后减去 $v$。
+
+结论：**定理级；难度 ★**，随机化扩展也是直接态变换。[Wen–Zheng，Theorem 5，pp. 45–46](https://eprint.iacr.org/2026/155)
+
+### 7.2 Explicit Gaussian-to-Uniform Filter
+
+取 $r\ge2$、$H=\lfloor r/2\rfloor$、$M=2H+1$、
+$Z_r=\sum_{j\in\mathbb Z}e^{-\pi j^2/r^2}$。在第一寄存器实现成功分支幅度
+$$
+F(j)=
+\begin{cases}
+\exp\left(-\dfrac{\pi(H^2-j^2)}{2r^2}\right),&|j|\le H,\\
+0,&|j|>H.
+\end{cases}
+$$
+因为 $0\le F(j)\le1$，可用受控旋转和测量实现。成功后所有 $j\in[-H,H]$ 的幅度相等。重编号 $u=j+H$，偏移变成 $x-H\widetilde s$，得到 U-EDCP。成功概率
+$$
+\boxed{\gamma_{r,M}=
+\frac{M e^{-\pi H^2/r^2}}{Z_r}=\Theta(1).}
+\tag{35}
+$$
+维数、模数、秘密不变；有限精度误差另计。
+
+结论：**定理级；难度 ★★**，式 (35) 是本文直接计算的 rejection sampling 实例。BKSW Lemma 8 原陈述采用更保守的样本 thinning，不能把 $O(\ell/\lambda)$ 当成这个 filter 固有的成功率。[BKSW18，Lemma 8](https://arxiv.org/abs/1710.08223)
+
+目前逐态展开的 MLWE 搜索链是
+$$
+\boxed{
+\mathrm{P\!-\!MLWE}_{R,q,k}^m
+\to\mathrm{G\!-\!IP\!-\!M\!-\!EDCP}_{q,f,k,r}^{\ell_{\rm IP}}
+\to\mathrm{G\!-\!EDCP}_{k,Q,r}^{\ell_{\rm IP}}
+\to\mathrm{U\!-\!EDCP}_{k,Q,M}
+\to\mathrm{DCP}_{k,Q}.
+}
+\tag{36}
+$$
+末端恢复 $\widetilde s$ 后，用居中分解 $\Phi_q^{(f)}$ 恢复 $s(X)\bmod q$，再逆掉 normal form 或秘密随机化。
+
+## 8. From the MLWE Branch to Fixed-Prime CCP: Modulus Reduction Cannot Be Skipped
+
+### 8.1 Modulus Condition
+
+$Q=q^d+1$ 一般不是 $p^t$。即使系数模数 $q$ 是素数，也不能把式 (36) 末端改写成 DCP 模 $q$。
+
+若碰巧 $Q=P^T$，还需检查 $P$ 大小：DCP → CCP 消耗为 $(P-1)2^{P-1}/P$。增长的大素数不能使用固定素数的常数开销结论。
+
+在确实满足该模数条件时，式 (36) 接 CCP 的期望输入需求为
+$\ell_{\rm IP}\approx c_PN_C/(\gamma_{r,M}a_M)$。固定预算则再对 Gaussian filter 应用一次 Chernoff 界，并将这个量代入式 (33)。这给出结构化前端与 CCP 样本需求的实际组合条件。
+
+结论：**观察级；难度 ★**，直接核对模数和预算。
+
+### 8.2 Original Statement of Wen–Zheng's Modulus-Reduction Theorem
+
+附录 E 的 Lemma 58 声明
+$\mathrm{G\!-\!EDCP}_{k,Q,r}^{m_E}
+\to\mathrm{G\!-\!EDCP}_{N,q,r'}^{\ell'}$，条件包括
+$$
+N\ge(k+1)d\lceil\log q\rceil+2\lambda,\qquad
+m_E'=m_E-(16k+4\lceil\ln\ln Q\rceil)\ge N\log q,
+$$
+$$
+\ell'=\operatorname{poly}(\lambda),\qquad
+\beta'\ge\frac{10890k^2\lambda^2N}{\pi^2r^4}
++\frac{4\lambda}{\pi q},
+$$
+$$
+r'\le\frac1{32\sqrt2\,m_E\lambda\beta'\ell' q^{N/m_E}}.
+\tag{37}
+$$
+以上按原文记录，包括其 $\beta'$ 而非 $(\beta')^2$。下面列出它引用的原始平方约束，不擅自修正后将式 (37) 当成本文已重证的精确常数定理。
+
+**层级：定理级（论文声明），证明核查为观察级；难度 ★★★★。** [Wen–Zheng，Lemma 58，pp. 85–86](https://eprint.iacr.org/2026/155)
+
+### 8.3 Actual Operations and Per-Step Constraints
+
+先对高斯 EDCP 的第二寄存器做 $\mathbb Z_Q^k$ 的 QFT，测得均匀 $a$，第一寄存器成为
+$$
+\sum_j\sqrt{D_{\mathbb Z,r}(j)}
+e^{2\pi i j\langle a,\widetilde s\rangle/Q}|j\rangle.
+$$
+对第一寄存器做 Fourier 变换并测量，经 Poisson 公式得到噪声宽度约 $Q/(2r)$ 的经典 LWE。每个量子样本得到一个经典样本。需 $r\gtrsim\sqrt\lambda$ 和 $Q/r\gtrsim\sqrt\lambda$ 控制截断、绕回误差；$1/2$ 使用本文的概率宽度约定。
+
+论文后续路线为
+$$
+\mathrm{LWE}_{k,Q,\alpha_0}
+\to\text{小秘密 LWE}_{k,Q}
+\to\mathrm{LWE}_{k,Q_1,\alpha_1}
+\to\mathrm{binLWE}_{N,Q_1,\le\sqrt{10N}\alpha_1}
+\to\mathrm{binLWE}_{N,P,\le\alpha_2}
+\to\mathrm{LWE}_{N,P,\alpha_2}
+\to\mathrm{G\!-\!EDCP}_{N,P,r'}.
+\tag{38}
+$$
+$Q_1$ 是接近 $Q$ 的素数，源文最后取 $P=q$。取 $Q_1$ 也用于控制 binary-secret 规约的素因子优势损失，它仍是大模数。
+
+记连续高斯宽度为 $\alpha Q$。真正需要记账的约束如下。
+
+1. **normal form：**若
+$\alpha_0\ge\sqrt{\ln(2k(1+1/\varepsilon))/\pi}/Q$，
+消耗约 $16k+4\ln\ln Q$ 个样本，新秘密为宽度
+$\sqrt2\alpha_0Q$ 的离散高斯。记录其 $\ell_2$ 界 $B_s$ 和尾失败概率。
+
+2. **小秘密降到 $Q_1$：**
+$$
+\alpha_1^2\ge\alpha_0^2+
+\frac4\pi\ln(2k(1+1/\varepsilon_1))
+\left(\frac{B_s}{Q_1}\right)^2.
+\tag{39}
+$$
+
+3. **改为 $N$ 维二元秘密：**
+$$
+N\ge(k+1)\log_2Q_1+2\log_2(1/\delta_b),\qquad
+\alpha_1\ge\frac{\sqrt{\ln(2N(1+1/\varepsilon_b))/\pi}}{Q_1}.
+\tag{40}
+$$
+原始定理给出 noise rate 至多 $\sqrt{10N}\alpha_1$ 的二元秘密**判定** LWE。若末端判定优势为 $\eta$，原始优势界是
+$$
+\frac{\eta-\delta_b}{3m}-\frac{41\varepsilon_b}2
+-\sum_{p\mid Q_1}p^{-k-1}.
+\tag{41}
+$$
+
+4. **二元秘密降到 $P$：**因为二元秘密的范数至多 $\sqrt N$，
+$$
+\boxed{\alpha_2^2\ge10N\alpha_1^2+
+\frac{4N}{\pi P^2}\ln(2N(1+1/\varepsilon_2)).}
+\tag{42}
+$$
+再加公开随机秘密使秘密分布均匀；处理未知噪声率可能需要多次 oracle 调用及额外样本。
+
+5. **再生成 EDCP：**先记录离散化后的真实相对宽度 $\alpha_{\rm disc}$。若用等宽 Gaussian padding 将连续噪声离散化，需满足 smoothing 条件，并可保守取 $\alpha_{\rm disc}=\sqrt2\alpha_2$。按 BKSW 的幅度宽度 $r_a'$，cube-separation 的条件为
+$$
+r_a'<\frac1{32m_2\lambda\alpha_{\rm disc}\ell'P^{N/m_2}}.
+\tag{43}
+$$
+按本文约定，$r'=r_a'/\sqrt2$。$m_2$ 是这一步实际取得的经典样本数；不能在未知噪声率处理后无条件继续使用最初的 $m_E'$。
+
+此外要累计 Gaussian 离散／连续转换误差。式 (39)、(42) 是 modulus switching；式 (40)、(41) 是 binary-secret 定理；式 (43) 是 BKSW 前端。
+
+### 8.4 The Concrete Search/Decision Gap
+
+**BLPRS13 全文将 LWE 定义为判定问题，其 Theorem 4.1 是判定 LWE 到判定 binary-secret LWE 的规约。** 所以只列式 (38)，尚未展示如何从末端恢复的秘密逆推最初的 $k$ 维整数秘密。
+
+Wen–Zheng Lemma 58 声明 EDCP 的规约，但附录引用这些判定定理完成证明。若要把它用作参数明确的**搜索 EDCP → 搜索 EDCP**转换，需要补出 search-to-decision／decision-to-search 的适用模数、噪声增大、调用次数和样本量，或给出直接搜索版的 binary-secret 转换。这是本文核查发现的具体缺项，不据此宣称论文主结果错误。
+
+前面的式 (5)–(36) 是逐态、逐秘密的搜索转换；此段需另行核验。原始 BKSW 论文确实定义了判定 EDCP，不能因先前记录遗漏定义，就宣称该定义不存在。
+
+结论：**观察级；难度 ★★★★**。[BLPRS13，Definition 2.11、Theorem 4.1](https://arxiv.org/abs/1306.0281)
+
+### 8.5 When the Final Modulus Is a Fixed $P=p^t$
+
+判定 modulus-switching 条件 (42) 允许目标模数取小素数幂，但这不自动补上搜索衔接。须同时检查
+$$
+P=p^t,\ p\text{ 固定},\quad
+\alpha_2\text{ 满足式 (42)},\quad
+r'\text{ 满足式 (43) 且有用},
+$$
+以及 $\ell'$ 能覆盖 Gaussian filter、两点投影和 CCP 转换的固定样本预算。
+
+若保持源文末端 $P=q$，而原 MLWE 的 $q$ 是增长的素数，则 $p=q$，DCP → CCP 有指数于 $q$ 的样本成本。**“多项式大小的模数”与“固定素数 CCP 筛的适用模数”是两个条件。**
+
+结论：**观察级；难度 ★★**。不能写成对所有标准 MLWE 参数都成立的多项式搜索链。
+
+## 9. Parameter Summary Table
+
+| 步骤 | 输出秘密／模数 | 样本变化 | 主要约束 |
+|---|---|---|---|
+| LWE → U-EDCP | 原 $\mathbb Z_q^n$ 秘密 | $m$ 个经典样本产生 $\ell$ 态 | 式 (11)／(12)，全部好态为常数事件 |
+| U-EDCP → DCP | 原 $\mathbb Z_q^n$ 秘密 | 每态成功 $a_M$ | $M\ge2$ |
+| DCP → CCP | 整数秘密 $\mathbb Z_q^n$，环偏移 | 每组 $p-1$ 态，成功 $\beta_p$ | $q=p^t$，固定 $p$ 才有常数开销 |
+| P-MLWE → IP-MLWE-like | $\mathbb Z_Q^k$，$\widetilde s=s(q)$ | $m$ 或放大后的 $m'$ 方程 | 进位界 $B_0/B_1$ |
+| IP-MLWE-like → G-IP-M-EDCP | $\mathbb Z_Q^k$，第一寄存器 $\mathbb Z^d$ | 输出 $\ell_{\rm IP}$ 态 | 式 (33)、小系数及尾界 |
+| G-IP-M-EDCP → G-EDCP | $\mathbb Z_Q^k$，第一寄存器 $\mathbb Z$ | 每态一个输出 | 高斯幅度因子化 |
+| G-EDCP → U-EDCP | 原 $\mathbb Z_Q^k$ 秘密 | 每态成功 $\gamma=\Theta(1)$ | 式 (35)、精度误差 |
+| 大模数 EDCP → 小模数 EDCP | 论文声明为 $\mathbb Z_P^N$ | 多阶段预算 | 式 (37)–(43)，搜索／判定衔接需核验 |
+
+## 10. Research Interfaces for This Chain
+
+**第一，CCP 的时间和样本界要同时改进。** 给出 $N_C(n,q,p)$ 后，用式 (18)–(19) 就能检查覆盖哪些 LWE 参数。只有时间改进、样本仍超出供给，不能得到这条链上的新 LWE 攻击。**观察级；难度 ★**。
+
+**第二，零和列表改进须代入完整的 $N_C$。** Imran–Ivanyos 保证达到指定列表长度后可高效找非空零和子序列。若筛每层用至多 $S(n,p)$ 个输入产生一个输出，深度为 $L=t(p-1)$，需记账为约 $S(n,p)^{L-1}$ 倍的末层需求，再计入完整数位恢复。缩小 $S$ 会传回 U-EDCP 的样本成本；是否覆盖 LWE 由式 (19) 判断。参数后果：**观察级；难度 ★★**。大 $p$ 的新零和算法：**猜想级研究目标；难度 ★★★★–★★★★★**。
+
+**第三，MLWE 算法可直接利用式 (22)，不必先测掉 $d-1$ 个系数。** 正向目标是在式 (33) 可供给的宽度和样本量内利用 $h(c)=\sum q^ic_i$ 的结构恢复秘密，或降低所需样本。需要真实的时间／样本上界和成功率。**猜想级研究目标；难度 ★★★★–★★★★★**。
+
+**第四，完整 MLWE → 固定素数 CCP 搜索链的具体待做项在第 8 节。** 需要含秘密恢复、噪声变化及样本预算的搜索版衔接，或对结构化态直接降模数。**观察级定位、猜想级改进目标；难度 ★★★★**。不能把它缩成“代数结构不同，所以没必要比较”。
+
+## References
+
+1. [Bai–Jangir–Kirshanova–Ngo–Youmans，ePrint 2025/1046](https://eprint.iacr.org/2025/1046)：Theorem 12、Lemma 17、附录 C；本次下载全文 40 页。
+2. [Brakerski–Kirshanova–Stehlé–Wen，arXiv:1710.08223v2](https://arxiv.org/abs/1710.08223v2)：Definitions 4–5、Lemma 8、Theorems 2、4。
+3. [Boucher–Fouque–Shen，arXiv:2609.34996v1](https://arxiv.org/abs/2609.34996v1)：CCP 的受限秘密定义、Proposition 5、零和筛。
+4. [Wen–Zheng，ePrint 2026/155](https://eprint.iacr.org/2026/155)：本次核对 2026-07-16 更新的 86 页全文；Definitions 13–19、22，Lemmas 28、30、51、52、58，Theorems 4–5。
+5. [Brakerski–Langlois–Peikert–Regev–Stehlé，arXiv:1306.0281](https://arxiv.org/abs/1306.0281)：Definition 2.11、Lemma 2.12、Corollary 3.2、Theorem 4.1。

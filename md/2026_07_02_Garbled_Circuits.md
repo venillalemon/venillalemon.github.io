@@ -2,9 +2,62 @@
 
 *July 2, 2026*
 
+In a garbled circuit, you (evaluator) see only what the garbler wants you to see. 
+
+To show a value $m$ exactly to whoever holds a secret $k$, publish $H(k)\oplus m$.
+
+
 ## A quick catch-up
 
-这里我们用统一的语言描述 GC 的各种构造和优化。设要跑的门是 $g$，其两条 input wire 记为 $\alpha,\beta$，output wire 记为 $\gamma$；更一般地，任意一条 wire 记为 $\omega$。Wire $\omega$ 上对应 bit $x\in\{0,1\}$ 的 label 统一记为 $L_{\omega,x}$，于是这个 gate 的 label 就是 $L_{\alpha,0},L_{\alpha,1},L_{\beta,0},L_{\beta,1}$（input）和 $L_{\gamma,0},L_{\gamma,1}$（output）。Garbling table 用 map 表示，也可以看作一个函数. 导线上的值用 $v$ 表示，随机 pad bit 统一用 $\lambda$ 表示。
+这里我们用统一的语言描述 GC 的各种构造和优化。如果需要基础概念，先读下一章。
+
+设要跑的门是 $g$（大部分优化中是 AND gate），其两条 input wire 记为 $\alpha,\beta$，output wire 记为 $\gamma$；更一般地，任意一条 wire 记为 $\omega$。Wire $\omega$ 上对应 bit $x\in\{0,1\}$ 的 label 统一记为 $L_{\omega,x}$，于是这个 gate 的 label 就是 $L_{\alpha,0},L_{\alpha,1},L_{\beta,0},L_{\beta,1}$（input）和 $L_{\gamma,0},L_{\gamma,1}$（output）。Garbling table 用 map 表示，也可以看作一个函数. 导线上的值用 $v$ 表示，随机 pad bit 统一用 $\lambda$ 表示。
+
+<figure style="margin:20px 0">
+<svg viewBox="0 0 760 250" style="width:100%;max-width:760px;height:auto;display:block;margin:0 auto" role="img" aria-label="GC 构造之间的拓展关系">
+<defs>
+<marker id="gc-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink)"/></marker>
+<marker id="gc-arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent)"/></marker>
+<marker id="gc-arrow-faint" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--faint)"/></marker>
+</defs>
+<g style="stroke:var(--ink);stroke-width:1.4;fill:none">
+<line x1="92" y1="195" x2="176" y2="195" marker-end="url(#gc-arrow)"/>
+<line x1="328" y1="195" x2="402" y2="195" marker-end="url(#gc-arrow)"/>
+</g>
+<g style="stroke:var(--accent);stroke-width:1.8;fill:none">
+<line x1="488" y1="195" x2="572" y2="195" marker-end="url(#gc-arrow-accent)"/>
+<line x1="446" y1="177" x2="524" y2="85" marker-end="url(#gc-arrow-accent)"/>
+</g>
+<g style="stroke:var(--faint);stroke-width:1.4;fill:none;stroke-dasharray:5 4">
+<line x1="561" y1="65" x2="652" y2="65" marker-end="url(#gc-arrow-faint)"/>
+<line x1="622" y1="177" x2="700" y2="85" marker-end="url(#gc-arrow-faint)"/>
+</g>
+<g style="fill:var(--panel);stroke:var(--line);stroke-width:1.2">
+<rect x="8" y="177" width="84" height="36" rx="8"/>
+<rect x="178" y="177" width="150" height="36" rx="8"/>
+<rect x="404" y="177" width="84" height="36" rx="8"/>
+<rect x="574" y="177" width="96" height="36" rx="8"/>
+<rect x="491" y="47" width="70" height="36" rx="8"/>
+<rect x="654" y="47" width="96" height="36" rx="8" style="stroke-dasharray:5 4;stroke:var(--faint)"/>
+</g>
+<g style="fill:var(--ink);font-size:14px" text-anchor="middle">
+<text x="50" y="200">Yao's GC</text>
+<text x="253" y="200">+Point-and-Permute</text>
+<text x="446" y="200">+FreeXOR</text>
+<text x="622" y="200">Half-Gates</text>
+<text x="526" y="70">BMR</text>
+<text x="702" y="70" style="fill:var(--faint)">?</text>
+</g>
+<g style="fill:var(--soft);font-size:12px" text-anchor="middle">
+<text x="134" y="176">indexing with masked bit</text>
+<text x="365" y="176">global secret Δ</text>
+<text x="530" y="234" style="fill:var(--accent)">4 ciphertexts to 2 ciphertexts</text>
+<text x="470" y="126" text-anchor="end" style="fill:var(--accent)">2 to n parties</text>
+<text x="607" y="36" style="fill:var(--faint)">2 ciphertexts</text>
+<text x="700" y="140" text-anchor="start" style="fill:var(--faint)">n parties</text>
+</g>
+</svg>
+</figure>
 
 ### **Yao's GC**
 
@@ -133,68 +186,169 @@ $$
 
 ### **Half-Gates**
 
-与 BMR 一样，把 evaluator 在 wire $\omega$ 上持有的东西写成 $\widehat v_\omega\|L_{\omega,\widehat v_\omega}$：$L_{\omega,x}\in\{0,1\}^\kappa$ 是 label，首位是 masked bit。FreeXOR 下 $L_{\omega,1}=L_{\omega,0}\oplus\Delta$，于是
+把 evaluator 在 wire $\omega$ 上持有的东西写成 $\widehat v_\omega\|L_{\omega,\widehat v_\omega}$。沿用 FreeXOR，
 
 $$
 x\|L_{\omega,x}=(0\|L_{\omega,0})\oplus x(1\|\Delta),
 $$
 
-记号与 FreeXOR 一节相同。$H:\{0,1\}^*\to\{0,1\}^{\kappa+1}$ 为 hash，$g,g'$ 为同一个 AND gate 的两个不同 tweak。目标：AND gate $(\alpha,\beta,\gamma)$ 的 garbled table 只有两行。
+$g,g'$ 为同一个 AND gate 的两个不同 tweak。
 
-**分解.** garbler 知道 $\lambda_\beta$，evaluator 知道 $\widehat v_\beta$，于是
+**Garble.**
 
-$$
-v_\alpha v_\beta=v_\alpha\lambda_\beta\oplus v_\alpha\widehat v_\beta .
-$$
-
-第一项是 $v_\alpha$ 与 garbler 已知常数的 AND（generator half），第二项是 $v_\alpha$ 与 evaluator 已知 bit 的 AND（evaluator half）。每个半门一行，输出是 bit‖label 形式的 $\kappa+1$ bit 串，分别记为 $W_{G,x}=W_{G,0}\oplus x(1\|\Delta)$ 和 $W_{E,x}=W_{E,0}\oplus x(1\|\Delta)$。
-
-**Generator half：计算 $v_\alpha\lambda_\beta$.** 以 $\widehat v_\alpha$ 索引。garbler 令
+garbler 已持有 $\Delta,L_{\alpha,0},L_{\beta,0},\lambda_\alpha,\lambda_\beta$。把 AND 拆成
 
 $$
-W_{G,0}=H(0\|L_{\alpha,0},g)\oplus\lambda_\alpha\lambda_\beta(1\|\Delta),\qquad
-T_G=H(0\|L_{\alpha,0},g)\oplus H(1\|L_{\alpha,1},g)\oplus\lambda_\beta(1\|\Delta),
+v_\alpha v_\beta=v_\alpha\lambda_\beta\oplus v_\alpha\widehat v_\beta :=v_G\oplus v_E,
 $$
 
-发送 $T_G$。evaluator 计算
+Garbler 知道 $\lambda_\beta$, Evaluator 知道 $\widehat v_\beta$, 两个 half 的输出可以看作两条普通 wire $G,E$, mask $\lambda_G,\lambda_E$；label $W_{G,x},W_{E,x}\in\{0,1\}^\kappa$，
 
 $$
-H(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha},g)\oplus\widehat v_\alpha T_G .
+x\|W_{G,x}=(0\|W_{G,0})\oplus x(1\|\Delta),\qquad x\|W_{E,x}=(0\|W_{E,0})\oplus x(1\|\Delta).
 $$
 
-$\widehat v_\alpha=0$ 时它等于 $H(0\|L_{\alpha,0},g)=W_{G,0}\oplus\lambda_\alpha\lambda_\beta(1\|\Delta)$；$\widehat v_\alpha=1$ 时它等于 $H(0\|L_{\alpha,0},g)\oplus\lambda_\beta(1\|\Delta)=W_{G,0}\oplus(1\oplus\lambda_\alpha)\lambda_\beta(1\|\Delta)$。两种情况都是 $W_{G,v_\alpha\lambda_\beta}$。这相当于把 $\widehat v_\alpha=0$ 的那一行取为全零（garbled row reduction），所以只需发一行。
+> Garbler 期望 Evaluator 应拿到 $\widehat v_G\|W_{G,\widehat v_G}=(\lambda_G\|W_{G,\lambda_G})\oplus v_G(1\|\Delta)$ 和 $\widehat v_E\|W_{E,\widehat v_E}=(\lambda_E\|W_{E,\lambda_E})\oplus v_E(1\|\Delta)$，然后直接进行 XOR 运算就能得到 
+> 
+> $$
+> \widehat v_\gamma\|L_{\gamma,\widehat{v}_\gamma}=(\widehat v_G\|W_{G,\widehat v_G})\oplus(\widehat v_E\|W_{E,\widehat v_E}),
+> $$
+> 
+> 也就是说要保证
+> 
+> $$
+> L_{\gamma,0}=W_{G,0}\oplus W_{E,0},\quad\lambda_\gamma=\lambda_G\oplus\lambda_E.
+> $$
 
-**Evaluator half：计算 $v_\alpha\widehat v_\beta$.** 以 $\widehat v_\beta$ 索引。garbler 令
-
-$$
-W_{E,0}=H(0\|L_{\beta,0},g'),\qquad
-T_E=H(0\|L_{\beta,0},g')\oplus H(1\|L_{\beta,1},g')\oplus\bigl(\lambda_\alpha\|L_{\alpha,\lambda_\alpha}\bigr),
-$$
-
-其中 $\lambda_\alpha\|L_{\alpha,\lambda_\alpha}$ 是 $\alpha$ 上真实值为 $0$ 时 evaluator 会持有的串。发送 $T_E$。evaluator 计算
-
-$$
-H(\widehat v_\beta\|L_{\beta,\widehat v_\beta},g')\oplus\widehat v_\beta\bigl(T_E\oplus(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha})\bigr).
-$$
-
-$\widehat v_\beta=0$ 时它等于 $W_{E,0}$；$\widehat v_\beta=1$ 时它等于 $H(0\|L_{\beta,0},g')\oplus(\lambda_\alpha\|L_{\alpha,\lambda_\alpha})\oplus(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha})=W_{E,0}\oplus(\lambda_\alpha\oplus\widehat v_\alpha)(1\|\Delta)=W_{E,0}\oplus v_\alpha(1\|\Delta)$。两种情况都是 $W_{E,v_\alpha\widehat v_\beta}$。evaluator 不知道 $v_\alpha$，但 XOR 自己手里的 $\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha}$ 就把 $v_\alpha(1\|\Delta)$ 加了进去。
-
-**输出.** garbler 取 $\lambda_\gamma$ 为 $W_{G,0}\oplus W_{E,0}$ 的首位，令
+在下面的推导中，会反复用到在 Point-and-Permute 章节出现的公式：
 
 $$
-0\|L_{\gamma,0}=W_{G,0}\oplus W_{E,0}\oplus\lambda_\gamma(1\|\Delta),
+\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha},\ \widehat v_\beta\|L_{\beta,\widehat v_\beta}
+\to
+H\left(L_{\alpha,\widehat v_\alpha},L_{\beta,\widehat v_\beta},i\right)\oplus\bigl(\widehat v_\gamma\|L_{\gamma,\widehat v_\gamma}\bigr)
 $$
 
-右边首位确为 $0$，与约定一致；AND gate 的输出 mask 由 hash 决定，不再自由选择。evaluator 计算
+只不过我们所做的是把它用在两个 half gate 上，并且带入输入端两个 masked bit 的值, 然后通过巧妙地取 label 值少发一个 ciphertext。会用到以下关系：
 
 $$
-W_{G,v_\alpha\lambda_\beta}\oplus W_{E,v_\alpha\widehat v_\beta}
-=W_{G,0}\oplus W_{E,0}\oplus v_\alpha v_\beta(1\|\Delta)
+\widehat v_G=(\widehat v_\alpha\oplus\lambda_\alpha)\lambda_\beta\oplus\lambda_G,\\
+\widehat v_E=(\widehat v_\alpha\oplus\lambda_\alpha)\widehat v_\beta\oplus\lambda_E.
+$$
+
+Generator half. 这里 Garbler 想要让 Evaluator 根据 $\widehat v_\alpha$ 得到 $\widehat v_G$，而且 $\widehat v_G=(\widehat v_\alpha\oplus\lambda_\alpha)\lambda_\beta\oplus\lambda_G$ 的其他变量 Garbler 都知道。因此用 $H$ 来掩盖 $\widehat v_G$：
+
+$$
+\begin{aligned}
+(\widehat v_\alpha=0)&\to H(L_{\alpha,0},g)\oplus(\widehat v_G\|W_{G,\widehat v_G})=H(L_{\alpha,0},g)\oplus(\lambda_G\|W_{G,\lambda_G})\oplus\lambda_\alpha\lambda_\beta(1\|\Delta),\\
+(\widehat v_\alpha=1)&\to H(L_{\alpha,1},g)\oplus(\widehat v_G\|W_{G,\widehat v_G})=H(L_{\alpha,1},g)\oplus(\lambda_G\|W_{G,\lambda_G})\oplus(1\oplus\lambda_\alpha)\lambda_\beta(1\|\Delta).
+\end{aligned}
+$$
+
+取
+
+$$
+\lambda_G\|W_{G,\lambda_G}=H(L_{\alpha,0},g)\oplus\lambda_\alpha\lambda_\beta(1\|\Delta),
+$$
+
+则第一行 $=0$，只需发
+
+$$
+T_G=H(L_{\alpha,0},g)\oplus H(L_{\alpha,1},g)\oplus\lambda_\beta(1\|\Delta).
+$$
+
+Evaluator half. 这里 Garbler 想要让 Evaluator 根据 $\widehat v_\beta$ 得到 $\widehat v_E$，因此用 $H$ 来掩盖 $\widehat v_E$：
+
+$$
+\begin{aligned}
+(\widehat v_\beta=0)&\to H(L_{\beta,0},g')\oplus(\widehat v_E\|W_{E,\widehat v_E})=H(L_{\beta,0},g')\oplus(\lambda_E\|W_{E,\lambda_E}),\\
+(\widehat v_\beta=1)&\to H(L_{\beta,1},g')\oplus(\widehat v_E\|W_{E,\widehat v_E})=H(L_{\beta,1},g')\oplus(\lambda_E\|W_{E,\lambda_E})\oplus{\color{red}(\lambda_\alpha\oplus\widehat v_\alpha)(1\|\Delta)}.
+\end{aligned}
+$$
+
+以上的内容都是我们根据 Point-and-Permute 的公式推导出来的。细心的读者会发现 Garbler 并不知道 $\widehat v_\alpha$ 的值 (红色项)，意味着我们不能完全按照 Point-and-Permute 的方案来做。我们转而注意到，实际上标红的内容就等于：
+
+$$
+(\lambda_\alpha\oplus\widehat v_\alpha)(1\|\Delta)=v_\alpha(1\|\Delta)={\color{#12A06A}(\lambda_\alpha\|L_{\alpha,\lambda_\alpha})}\oplus{\color{#3D8BFD}(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha})},
+$$
+
+前一项 garbler 知道，后一项 evaluator 持有。所以下面才是正确的 table 生成方法：
+
+$$
+\begin{aligned}
+(\widehat v_\beta=0)&\to H(L_{\beta,0},g')\oplus(\widehat v_E\|W_{E,\widehat v_E})=H(L_{\beta,0},g')\oplus(\lambda_E\|W_{E,\lambda_E}),\\
+(\widehat v_\beta=1)&\to H(L_{\beta,1},g')\oplus(\widehat v_E\|W_{E,\widehat v_E})=H(L_{\beta,1},g')\oplus(\lambda_E\|W_{E,\lambda_E})\oplus{\color{#12A06A}(\lambda_\alpha\|L_{\alpha,\lambda_\alpha})}.
+\end{aligned}
+$$
+
+然后让 Evaluator 拿到之后自己拼。细节看后面的 Evaluate 段落。
+
+取
+
+$$
+\lambda_E\|W_{E,\lambda_E}=H(L_{\beta,0},g'),
+$$
+
+则第一行 $=0$，只需发
+
+$$
+T_E=H(L_{\beta,0},g')\oplus H(L_{\beta,1},g')\oplus{\color{#12A06A}(\lambda_\alpha\|L_{\alpha,\lambda_\alpha})}.
+$$
+
+Output wire $v_\gamma=v_G\oplus v_E$，按 FreeXOR 取
+
+$$
+\lambda_\gamma=\lambda_G\oplus\lambda_E,\qquad L_{\gamma,0}=W_{G,0}\oplus W_{E,0}.
+$$
+
+最后 Garbler 给 Evaluator 发送 $(T_G,T_E)$ 两条 ciphertext 作为 garbling table.
+
+**Evaluate.**
+
+evaluator 持有 $\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha}$、$\widehat v_\beta\|L_{\beta,\widehat v_\beta}$ 和 $(T_G,T_E)$，计算
+
+$$
+\begin{aligned}
+U_G&=H(L_{\alpha,\widehat v_\alpha},g)\oplus\widehat v_\alpha T_G,\\
+U_E&=H(L_{\beta,\widehat v_\beta},g')\oplus\widehat v_\beta T_E\oplus {\color{#3D8BFD}\widehat v_\beta(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha})}{\;\gets 如果\widehat v_\beta=1，自己补上}
+\end{aligned}
+$$
+
+并把 $U_G\oplus U_E$ 作为 wire $\gamma$ 上的 label。
+
+**Correctness.**
+
+Generator half：
+
+$$
+U_G=\begin{cases}
+H(L_{\alpha,0},g)=(\lambda_G\|W_{G,\lambda_G})\oplus\lambda_\alpha\lambda_\beta(1\|\Delta), & \widehat v_\alpha=0,\\
+H(L_{\alpha,1},g)\oplus T_G=(\lambda_G\|W_{G,\lambda_G})\oplus(1\oplus\lambda_\alpha)\lambda_\beta(1\|\Delta), & \widehat v_\alpha=1,
+\end{cases}
+$$
+
+两种情况都是 $(\lambda_G\|W_{G,\lambda_G})\oplus v_G(1\|\Delta)=\widehat v_G\|W_{G,\widehat v_G}$。
+
+Evaluator half：
+
+$$
+U_E=\begin{cases}
+\lambda_E\|W_{E,\lambda_E}, & \widehat v_\beta=0,\\
+(\lambda_E\|W_{E,\lambda_E})\oplus(\lambda_\alpha\|L_{\alpha,\lambda_\alpha})\oplus(\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha})=(\lambda_E\|W_{E,\lambda_E})\oplus v_\alpha(1\|\Delta), & \widehat v_\beta=1,
+\end{cases}
+$$
+
+两种情况都是 $(\lambda_E\|W_{E,\lambda_E})\oplus v_E(1\|\Delta)=\widehat v_E\|W_{E,\widehat v_E}$。
+
+合起来，与 FreeXOR 的 XOR gate 相同：
+
+$$
+U_G\oplus U_E
+=(0\|L_{\gamma,0})\oplus(\widehat v_G\oplus\widehat v_E)(1\|\Delta)
 =(0\|L_{\gamma,0})\oplus(\lambda_\gamma\oplus v_\alpha v_\beta)(1\|\Delta)
 =\widehat v_\gamma\|L_{\gamma,\widehat v_\gamma} .
 $$
 
-**Security.** evaluator 只有 $\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha}$ 和 $\widehat v_\beta\|L_{\beta,\widehat v_\beta}$。$T_G$ 中的 $H((1\oplus\widehat v_\alpha)\|L_{\alpha,1\oplus\widehat v_\alpha},g)$ 和 $T_E$ 中的 $H((1\oplus\widehat v_\beta)\|L_{\beta,1\oplus\widehat v_\beta},g')$ 是它没有的串的 hash，分别掩蔽了 $\lambda_\beta(1\|\Delta)$ 和 $\lambda_\alpha\|L_{\alpha,\lambda_\alpha}$。它没有的串与它有的串相差 $\Delta\|1$，而 $T_G$ 里又直接出现 $\lambda_\beta(1\|\Delta)$，所以要求 $H$ 对 $H((L\|x)\oplus(1\|\Delta),g)\oplus(1\|\Delta)$ 形式的值仍然看起来随机（circular correlation robustness），与 FreeXOR 的要求相同。两个半门用不同 tweak，同一个串的 hash 不会被用两次。
+**Security.** evaluator 只有 $\widehat v_\alpha\|L_{\alpha,\widehat v_\alpha}$ 和 $\widehat v_\beta\|L_{\beta,\widehat v_\beta}$。$T_G$ 中的 $H(L_{\alpha,1\oplus\widehat v_\alpha},g)$ 和 $T_E$ 中的 $H(L_{\beta,1\oplus\widehat v_\beta},g')$ 是它没有的 label 的 hash，分别掩蔽了 $\lambda_\beta(1\|\Delta)$ 和 $\lambda_\alpha\|L_{\alpha,\lambda_\alpha}$。它没有的 label 与它有的 label 相差 $\Delta$，而 $T_G$ 里又直接出现 $\lambda_\beta(1\|\Delta)$，所以要求 $H$ 对 $H(L\oplus\Delta,g)\oplus(1\|\Delta)$ 形式的值仍然看起来随机（circular correlation robustness），与 FreeXOR 的要求相同。两个半门用不同 tweak，同一个串的 hash 不会被用两次。
 
 **Cost.** 每个 AND gate 发 $2(\kappa+1)$ bit，evaluator 算两次 $H$；XOR gate 仍然免费。
 
@@ -967,10 +1121,3 @@ XOR gate 免费。真正的主导开销在 preprocessing：$\binom n2$ 对之间
 
 需要强调的是，这个 $n^2$ 并不是 $\binom n2$ 个独立的两方 WRK 拼起来——那样做会失效，因为若对 $(P_i,P_1)$ 各跑一份两方协议，其 mask 只是 $\lambda^{(i)}\oplus\lambda^{(1)}$，$P_1$ 与 $P_i$ 串通即可恢复该电路上的全部真值。必须使用单一的 $n$-out-of-$n$ mask $\lambda_\omega=\bigoplus_i\lambda^{(i)}_\omega$，而这立刻迫使每一行由全体参与方联合产生。这里的两个指标跑的是不同的对象：$n-1$ 个 label 域 $\times$ $n$ 个份额持有者。
 
-<!-- ## Multi-party computation with a secure core
-
-“In practice, a typical way to build a multi-party protocol is to start with a secure 3-party protocol, and to use that protocol as a service provided to a larger set of parties.”
-
-Here we consider (for example) how to use Beaver’s 2.5-party maliciously secure protocol to obtain an $N$ -party protocol.
-
-I have many problems with this part, especially with some certain interactions that I do not consider necessary. So I leave it blank. Check out the textbook [A Graduate Course in Applied Cryptography](https://algebraic-arima.github.io/books/appliedcrypto.pdf). -->
