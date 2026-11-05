@@ -218,7 +218,7 @@ $$
 \mathbf b_k =\mathbf A_k \cdot \mathbf x +\mathbf e_k \pmod p.
 $$
 
-可以看作是一个 CVP 问题，对于给定格点 $t = \begin{bmatrix}0 \\ b_k\end{bmatrix}$, 求它在格
+可以看作是一个 CVP 问题，对于给定目标向量 $t = \begin{bmatrix}0 \\ b_k\end{bmatrix}$, 求它在格
 
 $$
 L = \left\{\begin{bmatrix}\text{SCALE} \cdot \mathbf x \\ \mathbf A \mathbf x + p\mathbf h\end{bmatrix}: \mathbf x \in \mathbb{Z}^n, \mathbf h \in \mathbb{Z}^m\right\}=\mathcal{L}\left(\begin{bmatrix}\text{SCALE} \cdot \mathbf I_n &0\\ \mathbf A &p\mathbf I_m\end{bmatrix}\right)

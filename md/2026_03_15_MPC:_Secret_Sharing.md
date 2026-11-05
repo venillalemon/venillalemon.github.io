@@ -365,7 +365,7 @@ $$
 记 $[x]$ 为这些份额及其认证信息。每个 $P_i$ 只持有
 
 $$
-x_i,\qquad\{M_{i\to j}[x],K_{i\leftarrow j}[x]\}_{j\ne i}.
+x^{(i)},\qquad\{M_{i\to j}[x],K_{i\leftarrow j}[x]\}_{j\ne i}.
 $$
 
 与 BDOZ 一样，以下运算均在本地完成：
@@ -422,9 +422,11 @@ $$
 按同一组系数合并 MAC/key（这里的 $e_kM$、$e_kK$ 是有限域乘法，不是逐位 AND）：
 
 $$
-X_{j,i}=\bigoplus_{k=0}^{\kappa-1}e_kx_{j,i,k},\\
-\bar M_{j\to i}=\bigoplus_ke_kM_{j\to i,k},\\
-\bar K_{i\leftarrow j}=\bigoplus_ke_kK_{i\leftarrow j,k}.
+\begin{aligned}
+X_{j,i}&=\bigoplus_{k=0}^{\kappa-1}e_kx_{j,i,k},\\
+\bar M_{j\to i}&=\bigoplus_ke_kM_{j\to i,k},\\
+\bar K_{i\leftarrow j}&=\bigoplus_ke_kK_{i\leftarrow j,k}.
+\end{aligned}
 $$
 
 记 $Y_i=\bigoplus_{j\ne i}X_{j,i}$，检查
@@ -496,7 +498,7 @@ $$
 \bigoplus_i\phi^{(i)}
 &=\bigoplus_i b^{(i)}\Delta_i
  \oplus\bigoplus_{i\ne j}\bigl(K_{i\leftarrow j}[b]\oplus M_{j\to i}[b]\bigr)\\
-&=\bigoplus_i b^{(i)}\Delta_i\oplus\bigoplus_{i\ne j}v^{(j)}\Delta_i\\
+&=\bigoplus_i b^{(i)}\Delta_i\oplus\bigoplus_{i\ne j}b^{(j)}\Delta_i\\
 &=\left(\bigoplus_jb^{(j)}\right)\left(\bigoplus_i\Delta_i\right)=b\Delta_\Sigma.
 \end{aligned}
 $$
@@ -505,15 +507,16 @@ $$
 
 $$
 b^{(i)}\Delta_i\oplus
-\bigoplus_{j\ne i}\bigl(K_{i\leftarrow j}[b]\oplus M_{i\to j}[b]\bigr),$$
+\bigoplus_{j\ne i}\bigl(K_{i\leftarrow j}[b]\oplus M_{i\to j}[b]\bigr),
+$$
 
 因为这个值由 MAC/Key 确定性地决定。
 
-**(b) 用已有 COT 计算交叉项 $a^{(j)}\phi_i$。** 设 $H:\{0,1\}^*\to\mathbb F_{2^\kappa}$ 为 hash，$k$ 为本候选在批中的公开编号。对 $i\ne j$，$P_i$ 给 $P_j$ 发送
+**(b) 用已有 COT 计算交叉项 $a^{(j)}\phi^{(i)}$。** 设 $H:\{0,1\}^*\to\mathbb F_{2^\kappa}$ 为 hash，$k$ 为本候选在批中的公开编号。对 $i\ne j$，$P_i$ 给 $P_j$ 发送
 
 $$
 G_{i\to j}=H(i,j,k,K_{i\leftarrow j}[a])\oplus
-H(i,j,k,K_{i\leftarrow j}[a]\oplus\Delta_i)\oplus\phi_i.
+H(i,j,k,K_{i\leftarrow j}[a]\oplus\Delta_i)\oplus\phi^{(i)}.
 $$
 
 $P_j$ 计算
@@ -529,27 +532,29 @@ E_{i\to j}=
 \begin{cases}
 H(i,j,k,K_{i\leftarrow j}[a]),&a^{(j)}=0,\\
 H(i,j,k,K_{i\leftarrow j}[a]\oplus\Delta_i)\oplus G_{i\to j}
-=H(i,j,k,K_{i\leftarrow j}[a])\oplus\phi_i,&a^{(j)}=1.
+=H(i,j,k,K_{i\leftarrow j}[a])\oplus\phi^{(i)},&a^{(j)}=1.
 \end{cases}
 $$
 
-即 $E_{i\to j}=H(i,j,k,K_{i\leftarrow j}[a])\oplus a^{(j)}\phi_i$。sender 持有 $H(i,j,k,K_{i\leftarrow j}[a])$，receiver 持有 $E_{i\to j}$，两者 XOR 就是交叉项。
+即 $E_{i\to j}=H(i,j,k,K_{i\leftarrow j}[a])\oplus a^{(j)}\phi^{(i)}$。sender 持有 $H(i,j,k,K_{i\leftarrow j}[a])$，receiver 持有 $E_{i\to j}$，两者 XOR 就是交叉项。
 
 **(c) 合并交叉项，再用 $r$ 掩蔽。** 每个 party 计算
 
 $$
-T_i=a^{(i)}\phi_i\oplus
+T_i=a^{(i)}\phi^{(i)}\oplus
 \bigoplus_{j\ne i}\bigl(H(i,j,k,K_{i\leftarrow j}[a])\oplus E_{j\to i}\bigr)
 \oplus F_i([r]).
 $$
+
+其中 $F_i([r])=r^{(i)}\Delta_i\oplus\bigoplus_{j\ne i}\bigl(K_{i\leftarrow j}[r]\oplus M_{i\to j}[r]\bigr)$，即按 (a) 由 $[r]$ 本地算出的 $r\Delta_\Sigma$ 的 share。
 
 每个 $H(i,j,k,K_{i\leftarrow j}[a])$ 在 $T_i$ 和 $T_j$ 里各出现一次，相互抵消：
 
 $$
 \begin{aligned}
 \bigoplus_iT_i
-&=\bigoplus_i a^{(i)}\phi_i\oplus\bigoplus_{i\ne j}a^{(j)}\phi_i\oplus r\Delta_\Sigma\\
-&=\left(\bigoplus_ja^{(j)}\right)\left(\bigoplus_i\phi_i\right)\oplus r\Delta_\Sigma\\
+&=\bigoplus_i a^{(i)}\phi^{(i)}\oplus\bigoplus_{i\ne j}a^{(j)}\phi^{(i)}\oplus r\Delta_\Sigma\\
+&=\left(\bigoplus_ja^{(j)}\right)\left(\bigoplus_i\phi^{(i)}\right)\oplus r\Delta_\Sigma\\
 &=(ab\oplus r)\Delta_\Sigma.
 \end{aligned}
 $$

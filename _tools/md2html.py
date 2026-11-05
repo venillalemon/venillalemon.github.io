@@ -13,8 +13,13 @@ The document shell (head, masthead, footer, theme toggle, analytics) comes
 from restyle_posts.build(), so a change to the chrome there flows into
 posts built from Markdown too.
 
+English translations live in md/en/<same-stem>.md.  When one exists it is
+built into the same page, and the header's EN / 中文 button switches between
+the two (the choice is remembered site-wide).
+
 Usage:  python3 _tools/md2html.py md/foo.md [more.md ...]
         writes files/<same-stem>.html for each input.
+        Passing md/en/foo.md rebuilds files/foo.html as well.
 Options: --out PATH (single input only), --title T, --date "Month D, YYYY"
 """
 
@@ -280,9 +285,18 @@ def take_header(text):
     return title, date, "\n".join(lines)
 
 
+def render_body(body_md):
+    stash = Stash()
+    body = stash.restore(parse_blocks(stash.protect(body_md)))
+    # a fence that formed a paragraph of its own: <pre> may not sit inside <p>
+    return re.sub(r"<p>(<pre>.*?</pre>)</p>", r"\1", body, flags=re.S)
+
+
 def convert(path, out_path=None, title=None, date=None):
-    src = open(path, encoding="utf-8").read()
     basename = os.path.splitext(os.path.basename(path))[0]
+    if os.path.basename(os.path.dirname(os.path.abspath(path))) == "en":
+        path = os.path.join(ROOT, "md", basename + ".md")   # build from the original
+    src = open(path, encoding="utf-8").read()
     doc_title, doc_date, body_md = take_header(src)
     if PDF_STUB_RE.match(body_md):
         print(f"skipped {path}: this is a pdf-embed stub (from html2md.py) — "
@@ -292,16 +306,21 @@ def convert(path, out_path=None, title=None, date=None):
     iso_date, human_date = date_from_basename(basename)
     human_date = date or doc_date or human_date
 
-    stash = Stash()
-    body = stash.restore(parse_blocks(stash.protect(body_md)))
-    # a fence that formed a paragraph of its own: <pre> may not sit inside <p>
-    body = re.sub(r"<p>(<pre>.*?</pre>)</p>", r"\1", body, flags=re.S)
-    page = build(basename, title, iso_date, human_date, "markdown", "\n" + body + "\n")
+    body = render_body(body_md)
+
+    body_en = title_en = None
+    en_path = os.path.join(os.path.dirname(os.path.abspath(path)), "en", basename + ".md")
+    if os.path.exists(en_path):
+        title_en, _, en_md = take_header(open(en_path, encoding="utf-8").read())
+        body_en = "\n" + render_body(en_md) + "\n"
+    page = build(basename, title, iso_date, human_date, "markdown", "\n" + body + "\n",
+                 body_en=body_en, title_en=title_en or title)
 
     out_path = out_path or os.path.join(ROOT, "files", basename + ".html")
     with open(out_path, "w", encoding="utf-8") as fh:
         fh.write(page)
-    print(f"built {os.path.relpath(out_path, ROOT)}  ({len(body)} chars)", flush=True)
+    en = f" + en ({len(body_en)} chars)" if body_en else ""
+    print(f"built {os.path.relpath(out_path, ROOT)}  ({len(body)} chars{en})", flush=True)
 
 
 def main():

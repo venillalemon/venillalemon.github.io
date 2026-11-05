@@ -1,4 +1,4 @@
-# Solving the Shortest Vector Problem in 2n2^n2n Time via Discrete Gaussian Sampling
+# Solving the Shortest Vector Problem in 2^n Time via Discrete Gaussian Sampling
 
 *May 11, 2026*
 
@@ -14,7 +14,7 @@ A reading notes of [ADRS14](https://arxiv.org/pdf/1412.7994)
 
 我们希望给定一定数量的 $D_{L,s}$ sample，能给出一定数量的 $D_{L,s/2}$ sample （总之这个 variance 得少一个常数，这有利于我们采样短向量）。在连续高斯分布下很好做，直接采样后除以 $2$ ；但是在 lattice 中，首先这需要碰运气找到 $2L$ 中的向量，这发生的概率是 $\frac{\rho_s(2L)}{\rho_s(L)}$ ，当 $s$ 很大的时候这个值几乎是 $2^{-n}$ 。
 
-因此换种方法，我们拿到很多 $D_{L,s}$ 样本之后，按照 $L/2L$ 的陪集来分 bucket，让 $\bmod L$ 相同的向量互相消掉。下面用 $c\in{0,1}^n$ 表示陪集 $Bc+2L$ ，研究最终得到的样本分布。一个样本处于陪集 $c$ 的概率是 $\rho_s(c):=\sum_{x\in L}\rho_s(Bc+x)$ ，因此如果有大量样本，将bucket内部两两配对形成形如 $(X,Y)$ 的 sample，那么陪集 $c$ 中的样本个数正比于 $\rho_s(c)$ 。而后，我们计算所有的 $\frac{X+Y}{2}$ ，期望得到的样本服从 $D_{L,s/\sqrt{2}}$ 的分布。
+因此换种方法，我们拿到很多 $D_{L,s}$ 样本之后，按照 $L/2L$ 的陪集来分 bucket，让 $\bmod 2L$ 相同的向量互相消掉。下面用 $c\in\{0,1\}^n$ 表示陪集 $Bc+2L$ ，研究最终得到的样本分布。一个样本处于陪集 $c$ 的概率是 $\rho_s(c):=\sum_{x\in 2L}\rho_s(Bc+x)$ ，因此如果有大量样本，将bucket内部两两配对形成形如 $(X,Y)$ 的 sample，那么陪集 $c$ 中的样本个数正比于 $\rho_s(c)$ 。而后，我们计算所有的 $\frac{X+Y}{2}$ ，期望得到的样本服从 $D_{L,s/\sqrt{2}}$ 的分布。
 
 再看：假设我们独立随机选取 $x,y\sim D_{L,s}$ ，然后拒绝采样，即舍弃 $x,y$ 不同陪集的情况。这样， $(x+y)/2$ 的分布就是
 
@@ -28,7 +28,7 @@ $$
 \overline L=\left\{(x,y):x\equiv y\bmod 2L\right\}\subset L^2
 $$
 
-由于 $X,Y$ 独立同分布，得到 $(X,Y)$ 的联合分布是 $D_{L^2,s}$ ，那么 $(X,Y)| X\equiv Y\bmod 2L$ 这个条件分布的 variance 仍然是 $s$, 即服从 $D_{\overline L,s}$ 。然后，对 $\overline L\subset L^2$ 进行旋转变换
+由于 $X,Y$ 独立同分布，得到 $(X,Y)$ 的联合分布是 $D_{L^2,s}$ ，那么 $(X,Y)| X\equiv Y\bmod 2L$ 这个条件分布的参数仍然是 $s$, 即服从 $D_{\overline L,s}$ 。然后，对 $\overline L\subset L^2$ 进行旋转变换
 
 $$
 \sigma:(x,y)\mapsto \left(\frac{x+y}{\sqrt{2}},\frac{x-y}{\sqrt{2}}\right)
@@ -114,7 +114,7 @@ $$
 \sum_{\mathbf{c}\in\mathcal{L}/(2\mathcal{L})} \rho_s(\mathbf{c})^2 = \rho_{s/\sqrt{2}}(\mathcal{L})^2.
 $$
 
-下面我们将 Theorem 3.3 的采样集合 ${1,\dots, N}$ 换成 $L/2L={c_1,\dots,c_{2^n}}$. 这样来， $p_i=\frac{\rho_s(c_i)}{\rho_s(L)}$ ，注意这里的 $c$ 代表一个陪集 $c+2L$ ；我们有 $p_{\max}=\frac{\rho_s(2L)}{\rho_s(L)}$ （还挺显然的）。
+下面我们将 Theorem 3.3 的采样集合 $\{1,\dots, N\}$ 换成 $L/2L=\{c_1,\dots,c_{2^n}\}$. 这样来， $p_i=\frac{\rho_s(c_i)}{\rho_s(L)}$ ，注意这里的 $c$ 代表一个陪集 $c+2L$ ；我们有 $p_{\max}=\frac{\rho_s(2L)}{\rho_s(L)}$ （还挺显然的）。
 
 所以只需要检验 Theorem 3.3 条件满足，然后可以计算需要的前提是 $M\geq \frac{10\kappa^2\rho_s(L)}{\rho_s(2L)}$ ，得到的样本总数是 $m\geq M\frac{\rho_s(L)\sum_i\rho_s^2(c_i)}{32\kappa\rho_s(2L)\rho_s^2(L)}=M\frac{\sum_i\rho_s^2(c_i)}{32\kappa\rho_s(2L)\rho_s(L)}$ ，根据 Lemma 3.4 我们有 $m\geq M\frac{\rho_{s/\sqrt{2}}^2(L)}{32\kappa\rho_s(2L)\rho_s(L)}$ 。
 
@@ -164,7 +164,7 @@ The result then follows from Lemma 3.4. $\square$
 
 ## Reduction from SVP to DGS
 
-## A Exact Gaussian Sampler from [[BLP+13]](https://arxiv.org/pdf/1306.0281)
+## An Exact Gaussian Sampler from [[BLP+13]](https://arxiv.org/pdf/1306.0281)
 
 Here is the original version of the Gaussian sampling lemma.
 
@@ -172,18 +172,18 @@ Lemma 2.3
 
 There is a probabilistic polynomial-time algorithm that, given a basis $\mathbf{B}$ of an $n$ -dimensional lattice $\Lambda = \mathcal{L}(\mathbf{B})$, $\mathbf{c} \in \mathbb{R}^n$, and a parameter $r \ge \|\widetilde{\mathbf{B}}\| \cdot \sqrt{\ln(2n+4)/\pi}$, outputs a sample distributed according to $D_{\Lambda+\mathbf{c},\,r}$.
 
-首先考虑 $n=1$ 的情况，假设我们要从 $D_{\mathbb Z+c,r}$ 中采样，其中 $c\in[0,1)$. 我们会想到从连续高斯分布中采样然后取整，然后通过拒绝采样修正概率的误差。令 $Z=\rho_r(c)+\rho_r(c-1)+\int_{-\infty}^{c-1}\rho_r(x),\mathrm{d} x+\int_c^{+\infty}\rho_r(x),\mathrm{d} x$.
+首先考虑 $n=1$ 的情况，假设我们要从 $D_{\mathbb Z+c,r}$ 中采样，其中 $c\in[0,1)$. 我们会想到从连续高斯分布中采样然后取整，然后通过拒绝采样修正概率的误差。令 $Z=\rho_r(c)+\rho_r(c-1)+\int_{-\infty}^{c-1}\rho_r(x)\,\mathrm{d} x+\int_c^{+\infty}\rho_r(x)\,\mathrm{d} x$.
 
 - 以 $\frac{\rho_r(c)}{Z}$ 取 $c$, 以 $\frac{\rho_r(c-1)}{Z}$ 取 $c-1$;
 
-- 以 $\int_c^{+\infty}\rho_r(x),\mathrm{d} x/Z$ 概率，去 $(c,+\infty)$ 按照连续 Gaussian 采样得到 $x$, 然后令 $y=c+\lceil x-c\rceil$ (向上取整)，然后以 $\frac{\rho_r(y)}{\rho_r(x)}$ 的概率接受，如果拒绝，那么重新回到开始。
+- 以 $\int_c^{+\infty}\rho_r(x)\,\mathrm{d} x/Z$ 概率，去 $(c,+\infty)$ 按照连续 Gaussian 采样得到 $x$, 然后令 $y=c+\lceil x-c\rceil$ (向上取整)，然后以 $\frac{\rho_r(y)}{\rho_r(x)}$ 的概率接受，如果拒绝，那么重新回到开始。
 
-- 以 $\int_{-\infty}^{c-1}\rho_r(x),\mathrm{d} x/Z$ 概率，去 $(-\infty,c-1)$ 按照连续 Gaussian 采样得到 $x$, 然后令 $y=c+\lfloor x-c\rfloor$ (向下取整)，然后以 $\frac{\rho_r(y)}{\rho_r(x)}$ 的概率接受，如果拒绝，那么重新回到开始。
+- 以 $\int_{-\infty}^{c-1}\rho_r(x)\,\mathrm{d} x/Z$ 概率，去 $(-\infty,c-1)$ 按照连续 Gaussian 采样得到 $x$, 然后令 $y=c+\lfloor x-c\rfloor$ (向下取整)，然后以 $\frac{\rho_r(y)}{\rho_r(x)}$ 的概率接受，如果拒绝，那么重新回到开始。
 
-当 $k> 0$ 得到 $y=c+k$ 的概率是 $\int_{c+k-1}^{c+k}\rho_r(x)\frac{\rho_r(y)}{\rho_r(x)},\mathrm{d} x/Z=\frac{\rho_r(y)}{Z}$.
+当 $k> 0$ 得到 $y=c+k$ 的概率是 $\int_{c+k-1}^{c+k}\rho_r(x)\frac{\rho_r(y)}{\rho_r(x)}\,\mathrm{d} x/Z=\frac{\rho_r(y)}{Z}$.
 
-当 $k<-1$ 得到 $y=c+k$ 的概率是 $\int_{c+k}^{c+k+1}\rho_r(x)\frac{\rho_r(y)}{\rho_r(x)},\mathrm{d} x/Z=\frac{\rho_r(y)}{Z}$.
+当 $k<-1$ 得到 $y=c+k$ 的概率是 $\int_{c+k}^{c+k+1}\rho_r(x)\frac{\rho_r(y)}{\rho_r(x)}\,\mathrm{d} x/Z=\frac{\rho_r(y)}{Z}$.
 
-同时采样成功的概率就是 $\frac{\rho_r(c+\mathbb Z)}{\rho_r(c)+\rho_r(c-1)+\int_{-\infty}^{c-1}\rho_r(x),\mathrm{d} x+\int_c^{+\infty}\rho_r(x),\mathrm{d} x}\geq\frac{\rho_r(c+\mathbb Z)}{\rho_r(c+\mathbb Z)+\rho_r(c)+\rho_r(c-1)}\geq\frac{1}{2}$.
+同时采样成功的概率就是 $\frac{\rho_r(c+\mathbb Z)}{\rho_r(c)+\rho_r(c-1)+\int_{-\infty}^{c-1}\rho_r(x)\,\mathrm{d} x+\int_c^{+\infty}\rho_r(x)\,\mathrm{d} x}\geq\frac{\rho_r(c+\mathbb Z)}{\rho_r(c+\mathbb Z)+\rho_r(c)+\rho_r(c-1)}\geq\frac{1}{2}$.
 
 注意这里的证明并不依赖 $\rho_r$ 的性质，因此随便换一个连续分布函数都是可以的。

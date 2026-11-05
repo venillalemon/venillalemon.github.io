@@ -8,6 +8,8 @@ python3 _tools/md2html.py md/<name>.md
 
 Rebuild after every edit to a `.md`.
 
+English translations live in `md/en/<name>.md` (same structure and math as the original). The build puts both into one page, and the header's `EN / 中文` button switches between them. If the original changes, update the translation to match.
+
 ## Scope
 
 - Questions, discussion, “为什么”, “啥意思”, derivations, and fact-checking are read-only. Answer in chat; do not edit `md/`.

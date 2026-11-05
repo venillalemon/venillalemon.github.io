@@ -13,5 +13,12 @@
         try { localStorage.setItem('theme', next); } catch (e) {}
       });
     });
+    document.querySelectorAll('[data-lang-toggle]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var next = root.getAttribute('data-lang') === 'en' ? 'zh' : 'en';
+        root.setAttribute('data-lang', next);
+        try { localStorage.setItem('lang', next); } catch (e) {}
+      });
+    });
   })();
 </script>

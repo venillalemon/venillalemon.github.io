@@ -691,7 +691,7 @@ $$
 
 其中 $\widehat v_\omega$ 是 masked bit，不是 $v_\omega$；这个 pair $(\widehat v_\omega,L_{\omega,\widehat v_\omega})$ 就是 $E$ 在 wire $\omega$ 上持有的全部信息，和最前面 Point-and-Permute 里"label 是一个 pair"的约定一致。
 
-双方还分别持有全局 MAC key $\Delta^{(G)}$ 和 $\Delta^{(E)}$。这里的 $\Delta^{(G)}$ 与上面 FreeXOR 意义下的 label offset 是**同一个对象**——WRK 的设计就是让 $G$ 的 label offset 同时充当"$E$ 认证 $G$ 持有的值"时所用的 MAC key，从而不必维护两套全局差值。$\Delta^{(E)}$ 则纯粹是一个 MAC key：$E$ 不 garble，没有对应的 label 结构可复用。$G$ 持有的 mask share $\lambda_\omega^{(G)}$ 由 $E$ 认证：
+双方还分别持有全局 MAC key $\Delta^{(G)}$ 和 $\Delta^{(E)}$。这里的 $\Delta^{(G)}$ 与上面 FreeXOR 意义下的 label offset 是**同一个对象**——WRK 的设计就是让 $G$ 的 label offset 同时充当"$G$ 认证 $E$ 持有的值"时所用的 MAC key，从而不必维护两套全局差值。$\Delta^{(E)}$ 则纯粹是一个 MAC key：$E$ 不 garble，没有对应的 label 结构可复用。$G$ 持有的 mask share $\lambda_\omega^{(G)}$ 由 $E$ 认证：
 
 $$
 M_\omega^{(G)}
@@ -715,7 +715,7 @@ M_x^{(E)}
 =K_x^{(G)}\oplus x^{(E)}\Delta^{(G)}.
 $$
 
-前面我们已经 share 了每个 wire 的 label，后面还会 share 和 gate 有关的 $\lambda_\alpha\lambda_\beta$, 于是下标用 $g$; 还会 share 和 gate 两个输入值有关的 $r_{g,p,q}$, 于是下标用 $g,p,q$.
+前面我们已经 share 了每个 wire 的 mask $\lambda_\omega$，后面还会 share 和 gate 有关的 $\lambda_\alpha\lambda_\beta$, 于是下标用 $g$; 还会 share 和 gate 两个输入值有关的 $r_{g,p,q}$, 于是下标用 $g,p,q$.
 
 若 $G$ 将 $\lambda_\omega^{(G)}$ 改变一个 bit，它还必须计算出
 

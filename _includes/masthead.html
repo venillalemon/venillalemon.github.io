@@ -13,6 +13,7 @@
         {% endif %}
         <a href="{{ domain }}{{ link.url }}"{% if page.url == link.url %} class="is-active"{% endif %}>{{ link.title }}</a>
       {% endfor %}
+      <button class="theme-toggle lang-toggle" type="button" data-lang-toggle aria-label="Switch language / 切换语言"><span data-lang-zh>EN</span><span data-lang-en>中文</span></button>
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light / dark theme">◐ theme</button>
     </nav>
   </div>

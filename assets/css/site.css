@@ -257,3 +257,7 @@ math{font-family:var(--math)}
 
 /* KaTeX / MathJax overflow guard */
 .katex-display,mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+
+/* ------------------------------------------------- language toggle (EN / 中文) */
+:root[data-lang="en"] [data-lang-zh]{display:none !important}
+:root:not([data-lang="en"]) [data-lang-en]{display:none !important}

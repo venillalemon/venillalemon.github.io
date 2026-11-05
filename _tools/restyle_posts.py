@@ -48,9 +48,11 @@ LEADING_JUNK_RE = re.compile(
 )
 H1_RE = re.compile(r"<h1\b[^>]*>(.*?)</h1>", re.S | re.I)
 # on a re-run, the heading we lifted last time lives here
-POST_HEAD_H1_RE = re.compile(r'<div class="post-head">.*?<h1>(.*?)</h1>', re.S)
+POST_HEAD_H1_RE = re.compile(r'<div class="post-head">.*?<h1(?: data-lang-zh)?>(.*?)</h1>', re.S)
+EN_H1_RE = re.compile(r'<h1 data-lang-en>(.*?)</h1>', re.S)
+EN_ARTICLE_RE = re.compile(r'\s*<article class="prose[^"]*" data-src="[a-z]+" data-lang-en lang="en">(.*?)</article>', re.S)
 # our own shell, for idempotent re-runs
-NEW_ARTICLE_RE = re.compile(r"<article class=\"prose[^\"]*\" data-src=\"([a-z]+)\">(.*)</article>", re.S)
+NEW_ARTICLE_RE = re.compile(r"<article class=\"prose[^\"]*\" data-src=\"([a-z]+)\"(?: data-lang-zh)?>(.*)</article>", re.S)
 NEW_MARKER = 'data-shell="venillalemon"'
 
 MONTHS = ["January", "February", "March", "April", "May", "June", "July",
@@ -77,7 +79,10 @@ def date_from_basename(basename):
     return f"{y}-{mo}-{d}", f"{MONTHS[int(mo) - 1]} {int(d)}, {y}"
 
 
-def build(basename, title, iso_date, human_date, flavour, body, title_html=None):
+def build(basename, title, iso_date, human_date, flavour, body, title_html=None,
+          body_en=None, title_en=None):
+    """body_en / title_en: an English translation shown instead of the original
+    when the reader picks EN with the language toggle (md/en/<name>.md)."""
     esc_title = html.escape(title, quote=False)
     # the <h1> keeps the heading's own markup (KaTeX spans and all); the
     # <title> tag needs flat text
@@ -97,12 +102,22 @@ def build(basename, title, iso_date, human_date, flavour, body, title_html=None)
   ignoredClasses: ['katex'],
   throwOnError: false
 }})"></script>"""
+    if body_en:
+        esc_en = html.escape(title_en or title, quote=False)
+        title_en_attr = f' data-title-en="{html.escape(title_en or title)}"'
+        h1 = f"<h1 data-lang-zh>{head_title}</h1>\n      <h1 data-lang-en>{esc_en}</h1>"
+        articles = (f'<article class="prose {flavour}" data-src="{flavour}" data-lang-zh>{body}</article>\n\n'
+                    f'    <article class="prose {flavour}" data-src="{flavour}" data-lang-en lang="en">{body_en}</article>')
+    else:
+        title_en_attr = ""
+        h1 = f"<h1>{head_title}</h1>"
+        articles = f'<article class="prose {flavour}" data-src="{flavour}">{body}</article>'
     highlight = ""
-    if 'class="language-' in body:
+    if 'class="language-' in body + (body_en or ""):
         highlight = f"""
 <script defer src="{HLJS_JS}" onload="hljs.highlightAll()"></script>"""
     return f"""<!doctype html>
-<html lang="en" {NEW_MARKER}>
+<html lang="en" {NEW_MARKER}{title_en_attr}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -115,6 +130,9 @@ def build(basename, title, iso_date, human_date, flavour, body, title_html=None)
       var t = localStorage.getItem('theme');
       if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
     }} catch (e) {{}}
+    var l = 'zh';
+    try {{ if (localStorage.getItem('lang') === 'en') l = 'en'; }} catch (e) {{}}
+    document.documentElement.setAttribute('data-lang', l);
   }})();
 </script>
 <link rel="stylesheet" href="{KATEX_CSS}">
@@ -128,6 +146,7 @@ def build(basename, title, iso_date, human_date, flavour, body, title_html=None)
     <nav class="site-nav">
       <a href="/">About</a>
       <a href="/blog/">Blog Posts</a>
+      <button class="theme-toggle lang-toggle" type="button" data-lang-toggle aria-label="Switch language / 切换语言"><span data-lang-zh>EN</span><span data-lang-en>中文</span></button>
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light / dark theme">&#9689; theme</button>
     </nav>
   </div>
@@ -137,11 +156,11 @@ def build(basename, title, iso_date, human_date, flavour, body, title_html=None)
   <div class="col">
     <div class="post-head">
       <p class="eyebrow">{html.escape(eyebrow, quote=False)}</p>
-      <h1>{head_title}</h1>
+      {h1}
       <hr class="rule">
     </div>
 
-    <article class="prose {flavour}" data-src="{flavour}">{body}</article>
+    {articles}
   </div>
 </main>
 
@@ -170,6 +189,20 @@ def build(basename, title, iso_date, human_date, flavour, body, title_html=None)
         try {{ localStorage.setItem('theme', next); }} catch (e) {{}}
       }});
     }});
+    var zhTitle = document.title;
+    function applyLang(l) {{
+      root.setAttribute('data-lang', l);
+      var en = root.getAttribute('data-title-en');
+      document.title = (l === 'en' && en) ? en + ' \u00b7 venillalemon' : zhTitle;
+    }}
+    applyLang(root.getAttribute('data-lang') === 'en' ? 'en' : 'zh');
+    document.querySelectorAll('[data-lang-toggle]').forEach(function (btn) {{
+      btn.addEventListener('click', function () {{
+        var next = root.getAttribute('data-lang') === 'en' ? 'zh' : 'en';
+        applyLang(next);
+        try {{ localStorage.setItem('lang', next); }} catch (e) {{}}
+      }});
+    }});
   }})();
 </script>
 
@@ -193,6 +226,12 @@ def convert(path):
 
     already_new = NEW_MARKER in src
     if already_new:
+        body_en = title_en = None
+        en_art = EN_ARTICLE_RE.search(body)
+        if en_art:
+            body_en = en_art.group(1)
+            body = body[: en_art.start()] + body[en_art.end():]
+            title_en = text_of(EN_H1_RE.search(src).group(1))
         art = NEW_ARTICLE_RE.search(body)
         if not art:
             raise SystemExit(f"{path}: restyled file without an article body")
@@ -201,7 +240,7 @@ def convert(path):
         kept = POST_HEAD_H1_RE.search(src)
         title_html = kept.group(1).strip() if kept else None
         return build(basename, title, iso_date, human_date, flavour, body,
-                     title_html=title_html)
+                     title_html=title_html, body_en=body_en, title_en=title_en)
 
     title = ""
     tm = TITLE_RE.search(src)

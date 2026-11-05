@@ -12,6 +12,9 @@
       var t = localStorage.getItem('theme');
       if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
     } catch (e) {}
+    var l = 'zh';
+    try { if (localStorage.getItem('lang') === 'en') l = 'en'; } catch (e) {}
+    document.documentElement.setAttribute('data-lang', l);
   })();
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
@@ -36,6 +39,7 @@
     <nav class="site-nav">
       <a href="/">About</a>
       <a href="/blog/">Blog Posts</a>
+      <button class="theme-toggle lang-toggle" type="button" data-lang-toggle aria-label="Switch language / 切换语言"><span data-lang-zh>EN</span><span data-lang-en>中文</span></button>
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle light / dark theme">&#9689; theme</button>
     </nav>
   </div>
@@ -83,6 +87,20 @@
         var next = current() === 'dark' ? 'light' : 'dark';
         root.setAttribute('data-theme', next);
         try { localStorage.setItem('theme', next); } catch (e) {}
+      });
+    });
+    var zhTitle = document.title;
+    function applyLang(l) {
+      root.setAttribute('data-lang', l);
+      var en = root.getAttribute('data-title-en');
+      document.title = (l === 'en' && en) ? en + ' · venillalemon' : zhTitle;
+    }
+    applyLang(root.getAttribute('data-lang') === 'en' ? 'en' : 'zh');
+    document.querySelectorAll('[data-lang-toggle]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var next = root.getAttribute('data-lang') === 'en' ? 'zh' : 'en';
+        applyLang(next);
+        try { localStorage.setItem('lang', next); } catch (e) {}
       });
     });
   })();
